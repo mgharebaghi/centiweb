@@ -1,33 +1,133 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
+/* Custom CSS for responsive width */
+@media (min-width: 300px) {
+  /* sm breakpoint */
+  .type-animation-wrapper {
+    font-size: 46px;
+    font-weight: bold;
+    color: rgb(67, 79, 92);
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+  .dl-type-animation-wrapper {
+    font-size: 31px;
+    font-weight: bold;
+    color: rgb(67, 79, 92);
+  }
+
+  .banner-description {
+    width: 95%;
+  }
+  .banner-title {
+    font-size: 22px;
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+@media (min-width: 540px) {
+  /* md breakpoint */
+  .type-animation-wrapper {
+    font-size: 50px;
+    font-weight: bold;
+    color: rgb(67, 79, 92);
+  }
+
+  .dl-type-animation-wrapper {
+    font-size: 31px;
+    font-weight: bold;
+    color: rgb(67, 79, 92);
+  }
+
+  .banner-description {
+    width: 95%;
+  }
+  .banner-title {
+    font-size: 30px;
+  }
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+@media (min-width: 768px) {
+  /* md breakpoint */
+  .type-animation-wrapper {
+    font-size: 55px;
+    font-weight: bold;
+    color: rgb(67, 79, 92);
   }
+
+  .dl-type-animation-wrapper {
+    font-size: 39px;
+    font-weight: bold;
+    color: rgb(67, 79, 92);
+  }
+
+  .banner-description {
+    width: 80%;
+  }
+  .banner-title {
+    font-size: 40px;
+  }
+}
+
+@media (min-width: 1024px) {
+  /* lg breakpoint */
+  .type-animation-wrapper {
+    font-size: 70px;
+    font-weight: bold;
+    color: rgb(67, 79, 92);
+  }
+
+  .dl-type-animation-wrapper {
+    font-size: 40px;
+    font-weight: bold;
+    color: rgb(67, 79, 92);
+  }
+
+  .banner-description {
+    width: 60%;
+  }
+  .banner-title {
+    font-size: 40px;
+  }
+}
+
+@media (min-width: 1366px) {
+  /* lg breakpoint */
+  .type-animation-wrapper {
+    font-size: 100px;
+    font-weight: bold;
+    color: rgb(67, 79, 92);
+  }
+
+  .dl-type-animation-wrapper {
+    font-size: 45px;
+    font-weight: bold;
+    color: rgb(67, 79, 92);
+  }
+
+  .banner-description {
+    width: 60%;
+  }
+  .banner-title {
+    font-size: 40px;
+  }
+}
+
+.banner {
+  user-select: none;
+  background-image: linear-gradient(#ececec 1px, transparent 1px),
+    linear-gradient(90deg, #ececec 1px, transparent 1px);
+  background-size: 1.5rem 1.5rem;
+  min-height: 697px;
+  width: 100%;
+  display: grid;
+  align-content: center;
+}
+
+.footer-items {
+  text-align: center;
+  display: grid;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
 }
