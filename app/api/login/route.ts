@@ -36,6 +36,9 @@ export async function POST(req: Request, res: NextApiResponse) {
       });
     }
   } catch (e) {
-    console.log(e);
+    return NextResponse.json({
+      status: "notfound",
+      description: "user not found",
+    });
   }
 }

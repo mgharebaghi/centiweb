@@ -2,7 +2,7 @@ import { MongoClient, WithId } from "mongodb";
 import { NextResponse } from "next/server";
 import { Post } from "../types/types";
 
-const uri = "mongodb://localhost:27017";
+const uri = "mongodb://0.0.0.0:27017";
 const client = new MongoClient(uri);
 
 export async function GET() {

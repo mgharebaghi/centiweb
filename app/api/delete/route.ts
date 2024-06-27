@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import {MongoClient, ObjectId} from 'mongodb';
 
-const uri = "mongodb://localhost:27017";
+const uri = "mongodb://0.0.0.0:27017";
 const client = new MongoClient(uri);
 
 export async function POST(req: NextRequest) {
