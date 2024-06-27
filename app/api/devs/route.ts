@@ -6,16 +6,22 @@ const uri = "mongodb://localhost:27017";
 const client = new MongoClient(uri);
 
 export async function GET() {
-  let data: Post[] = [];
-  const db = client.db("centiweb");
-  const collection = db.collection<WithId<Post>>("posts");
-  const curosr = collection.find({ type: "dev" });
+  try {
+    let data: Post[] = [];
+    const db = client.db("centiweb");
+    const collection = db.collection<WithId<Post>>("posts");
+    const curosr = collection.find({ type: "dev" });
 
-  await curosr.forEach((doc) => {
-    data.push(doc);
-  });
+    await curosr.forEach((doc) => {
+      data.push(doc);
+    });
 
-  return NextResponse.json({
-    data: data,
-  });
+    return NextResponse.json({
+      data: data,
+    });
+  } catch (e) {
+    return NextResponse.json({
+      data: [],
+    });
+  }
 }

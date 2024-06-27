@@ -5,20 +5,27 @@ import { Block } from "../types/types";
 const uri = "mongodb://localhost:27017";
 const client = new MongoClient(uri);
 
-
 export async function GET() {
-  await client.connect();
-  let db = client.db("Blockchain");
-  let collection = db.collection<WithId<Block>>("Blocks");
-  let cursor = await collection.find({});
-  let generated:number = 0;
-  let all:number = 21000000.0;
+  try {
+    await client.connect();
+    let db = client.db("Blockchain");
+    let collection = db.collection<WithId<Block>>("Blocks");
+    let cursor = await collection.find({});
+    let generated: number = 0;
+    let all: number = 21000000.0;
 
-  await cursor.forEach((doc) => {
-    generated = generated + parseFloat(doc.body.coinbase.coinbase_data.reward.toString());
-  })
+    await cursor.forEach((doc) => {
+      generated =
+        generated +
+        parseFloat(doc.body.coinbase.coinbase_data.reward.toString());
+    });
 
-  return NextResponse.json({
-    message: all - generated
-  });
+    return NextResponse.json({
+      message: all - generated,
+    });
+  } catch (e) {
+    return NextResponse.json({
+      message: 0,
+    });
+  }
 }
