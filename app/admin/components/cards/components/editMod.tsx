@@ -2,10 +2,11 @@
 import { Button, Typography } from "@mui/material";
 import { Col, Input, Row, Select } from "antd";
 import TextArea from "antd/es/input/TextArea";
-import React, { MouseEvent, useState } from "react";
-import ReactQuill from "react-quill";
+import dynamic from "next/dynamic";
+import React, { useState } from "react";
 import "react-quill/dist/quill.snow.css";
 import { PulseLoader } from "react-spinners";
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
 function Editor(props: any) {
   const [title, setTitle] = useState(props.title);
@@ -13,7 +14,7 @@ function Editor(props: any) {
   const [select, setSelect] = useState(props.type);
   const [desc, setDesc] = useState(props.description);
   const [msg, setMsg] = useState("");
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
   const [msgColor, setMsgColor] = useState("");
   const [file, setFile] = useState<File>();
   const [postImg, setPostImg] = useState("");
@@ -90,7 +91,7 @@ function Editor(props: any) {
       description: desc,
       image: postImg,
     };
-    await fetch("./api/update", {
+    await fetch("/api/update", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -101,7 +102,7 @@ function Editor(props: any) {
       } else {
         res.json().then((message) => {
           if (message.message === "success") {
-            props.getData();
+            props.getData(props.getUrl, props.setData);
             setMsg("Your data updated :)");
             setLoading(false);
             setMsgColor("green");

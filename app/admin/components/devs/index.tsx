@@ -1,7 +1,6 @@
 "use client";
 import { Col, Empty, Row, Typography } from "antd";
 import Card from "../cards";
-import { useEffect } from "react";
 import { PulseLoader } from "react-spinners";
 import { ObjectId } from "mongodb";
 
@@ -15,10 +14,6 @@ interface Post {
 }
 
 function Devs(props: any) {
-  useEffect(() => {
-    props.getDevs();
-  }, []);
-
   return (
     <Row className="min-h-[500px]">
       {!props.loading && props.err === "" ? (
@@ -43,7 +38,9 @@ function Devs(props: any) {
                   content={item.content}
                   type={item.type}
                   index={index}
-                  getData={props.getDevs}
+                  getData={props.fetchData}
+                  setData={props.setData}
+                  getUrl={"/api/devs"}
                 />
               </Col>
             );

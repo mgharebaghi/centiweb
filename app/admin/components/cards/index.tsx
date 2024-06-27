@@ -1,16 +1,17 @@
-import { Button, Typography } from "@mui/material";
+'use client'
+import { Typography } from "@mui/material";
 import { Col, Divider, Modal, Row, Spin } from "antd";
 import Image from "next/image";
 import { useState } from "react";
 import { MdOutlineEditNote } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
-import Editor from "./editMod";
+import Editor from "./components/editMod";
 import { PiSealWarningBold } from "react-icons/pi";
-import DeleteModal from "./deleteMod";
+import DeleteModal from "./components/deleteMod";
 
 export default function Card(props: any) {
-  const [openEdit, setOpenEdit] = useState<boolean>(false);
-  const [openDelete, setOpenDelete] = useState<boolean>(false);
+  const [openEdit, setOpenEdit] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
 
   return (
     <div
@@ -25,9 +26,9 @@ export default function Card(props: any) {
           lg={9}
           xl={9}
           xxl={9}
-          className="flex justify-center items-center h-[200px]"
+          className="flex justify-center items-center min-h-[200px]"
         >
-          <Image alt="img" src={props.pic} width={200} height={200} />
+          <Image alt="img" className="rounded-2xl" src={props.pic} width={200} height={200} />
         </Col>
         <Col
           xs={24}
@@ -84,7 +85,9 @@ export default function Card(props: any) {
           content={props.content}
           type={props.type}
           description={props.description}
-          getData= {props.getData}
+          getData={props.getData}
+          setData={props.setData}
+          getUrl={props.getUrl}
         />
       </Modal>
 
@@ -105,7 +108,14 @@ export default function Card(props: any) {
         onCancel={() => setOpenDelete(false)}
         footer={null}
       >
-        <DeleteModal title={props.title} setOpenDelete={setOpenDelete} getData={props.getData} id={props.id} />
+        <DeleteModal
+          title={props.title}
+          setOpenDelete={setOpenDelete}
+          getData={props.getData}
+          setData={props.setData}
+          getUrl={props.getUrl}
+          id={props.id}
+        />
       </Modal>
     </div>
   );

@@ -1,10 +1,9 @@
+'use client'
 import { Col, Empty, Row } from "antd";
 import { ObjectId } from "mongodb";
 import Card from "../cards";
 import { Typography } from "@mui/material";
 import { PulseLoader } from "react-spinners";
-import { useEffect } from "react";
-
 interface Post {
   _id: ObjectId;
   title: string;
@@ -15,10 +14,6 @@ interface Post {
 }
 
 function Others(props: any) {
-  useEffect(() => {
-    props.getOthers();
-  }, []);
-
   return (
     <Row className="min-h-[500px]">
       {!props.loading && props.err === "" ? (
@@ -43,7 +38,9 @@ function Others(props: any) {
                   content={item.content}
                   type={item.type}
                   index={index}
-                  getData={props.getOthers}
+                  getData={props.fetchData}
+                  setData={props.setData}
+                  getUrl={"/api/others"}
                 />
               </Col>
             );

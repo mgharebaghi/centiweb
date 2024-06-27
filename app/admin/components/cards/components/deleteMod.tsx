@@ -1,3 +1,4 @@
+'use client'
 import { Button, Typography } from "@mui/material";
 import { Col, Divider, Row } from "antd";
 import { useState } from "react";
@@ -23,7 +24,7 @@ function DeleteModal(props: any) {
         res.json().then((data) => {
           if (data.status === "done") {
             setLoading(false);
-            props.getData();
+            props.getData(props.getUrl, props.setData);
             props.setOpenDelete(false);
           } else {
             setLoading(false);

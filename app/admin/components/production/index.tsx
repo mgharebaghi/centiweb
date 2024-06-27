@@ -1,22 +1,25 @@
 "use client";
-import { Typography } from "@mui/material";
-import { Button, Col, Divider, Input, Row, Select } from "antd";
+import { Button, Typography } from "@mui/material";
+import { Col, Divider, Input, Row, Select } from "antd";
 import TextArea from "antd/es/input/TextArea";
+import dynamic from "next/dynamic";
 import React, { useState } from "react";
-import ReactQuill from "react-quill";
+// import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { PulseLoader } from "react-spinners";
 
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+
 function Production(props: any) {
-  const [title, setTitle] = useState<string>("");
-  const [content, setContent] = useState<string>("");
-  const [select, setSelect] = useState<string>("");
-  const [desc, setDesc] = useState<string>("");
-  const [msg, setMsg] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
-  const [msgColor, setMsgColor] = useState<string>("");
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [select, setSelect] = useState("");
+  const [desc, setDesc] = useState("");
+  const [msg, setMsg] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [msgColor, setMsgColor] = useState("");
   const [file, setFile] = useState<File>();
-  const [postImg, setPostImg] = useState<string>("");
+  const [postImg, setPostImg] = useState("");
 
   const toolbarOptions = [
     ["bold", "italic", "underline", "strike"], // toggled buttons
@@ -61,17 +64,14 @@ function Production(props: any) {
       const formData = new FormData();
       formData.set("file", file ?? new Blob());
 
-      const imgUpload = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
+      const imgUpload = await props.imageUpload(formData);
 
       if (!imgUpload.ok) {
         setLoading(false);
         setMsgColor("red");
         setMsg("Image Upload problem!");
       } else {
-        imgUpload.json().then((message) => {
+        imgUpload.json().then((message: any) => {
           if (message.status === "success") {
             postData();
           } else {
@@ -108,9 +108,11 @@ function Production(props: any) {
         res.json().then((message) => {
           if (message.message === "success") {
             if (select === "dev") {
-              props.devs();
+              props.fetchData("/api/devs", props.setDevs);
+            } else if (select === "article") {
+              props.fetchData("/api/articles", props.setArticles);
             } else {
-              props.getArticles();
+              props.fetchData("/api/others", props.setOtehrs);
             }
             setMsg("Your data inserted :)");
             setLoading(false);
@@ -155,7 +157,7 @@ function Production(props: any) {
           <ReactQuill
             theme="snow"
             modules={modules}
-            style={{height: "350px"}}
+            style={{ height: "350px" }}
             onChange={(txt) => {
               setContent(txt);
             }}
@@ -181,7 +183,8 @@ function Production(props: any) {
       <Row className="w-[100%]">
         <Col xs={24} sm={24} md={8} lg={8} xl={8} xxl={8}>
           <Button
-            className="hover:bg-gray-600 border-slate-600 text-slate-600 w-[250px]"
+            variant="outlined"
+            className="border-slate-600 text-slate-600 w-[250px] hover:bg-gray-600 hover:text-white"
             onClick={insert}
           >
             Create post

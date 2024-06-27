@@ -1,24 +1,10 @@
 "use client";
 import { Col, Empty, Row, Typography } from "antd";
 import Card from "../cards";
-import { useEffect } from "react";
 import { PulseLoader } from "react-spinners";
-import { ObjectId } from "mongodb";
+import { Post } from "@/app/api/types/types";
 
-interface Post {
-  _id: ObjectId;
-  title: string;
-  description: string;
-  content: string;
-  type: string;
-  image: string;
-}
-
-export default function Articles(props: any) {
-  useEffect(() => {
-    props.getArticles();
-  }, []);
-
+function Articles(props: any) {
   return (
     <Row className="min-h-[500px]">
       {!props.loading && props.err === "" ? (
@@ -43,7 +29,9 @@ export default function Articles(props: any) {
                   content={item.content}
                   type={item.type}
                   index={index}
-                  getData={props.getArticles}
+                  getData={props.fetchData}
+                  setData={props.setData}
+                  getUrl={"/api/articles"}
                 />
               </Col>
             );
@@ -66,3 +54,5 @@ export default function Articles(props: any) {
     </Row>
   );
 }
+
+export default Articles;

@@ -1,6 +1,7 @@
-import { Decimal128 } from "mongodb";
+import { Decimal128, ObjectId } from "mongodb";
 
 export interface Post {
+  _id: ObjectId;
   title: string;
   content: string;
   type: string;
