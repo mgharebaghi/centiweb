@@ -64,7 +64,10 @@ function Production(props: any) {
       const formData = new FormData();
       formData.set("file", file ?? new Blob());
 
-      const imgUpload = await props.imageUpload(formData);
+      const imgUpload = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
 
       if (!imgUpload.ok) {
         setLoading(false);

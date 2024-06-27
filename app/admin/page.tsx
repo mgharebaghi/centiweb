@@ -33,13 +33,6 @@ export default function AdminProfile() {
     }
   };
 
-  const imageUpload = async (formData: FormData) => {
-    return await fetch("/api/upload", {
-      method: "POST",
-      body: formData,
-    });
-  };
-
   useEffect(() => {
     fetchData("/api/articles", setArticles);
     fetchData("/api/devs", setDevs);
@@ -117,7 +110,6 @@ export default function AdminProfile() {
                 setArticles={setArticles}
                 setDevs={setDevs}
                 setOthers={setOthers}
-                imageUpload={imageUpload}
               />
             ) : null}
           </Content>
