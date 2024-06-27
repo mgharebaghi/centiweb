@@ -4,7 +4,7 @@ import { NextApiResponse } from "next";
 import { NextResponse } from "next/server";
 import { Admin } from "../types/types";
 
-const uri = "mongodb://localhost:27017";
+const uri = "mongodb://0.0.0.0:27017/";
 const client = new MongoClient(uri);
 
 export async function POST(req: Request, res: NextApiResponse) {
