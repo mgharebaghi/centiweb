@@ -61,7 +61,7 @@ function CustomDrawer(props: any) {
           className="w-full active:bg-slate-700 active:text-white transition duration-150"
           onClick={() => {
             window.scroll(0, 0);
-            props.router.push("/articles/666c1c7dad6166e10de349d4");
+            props.router.push("/articles/66853f1a2b7f6349a1f3bbb7");
             props.setValue(0);
             props.setToggle(!props.toggle);
           }}
@@ -73,7 +73,7 @@ function CustomDrawer(props: any) {
           className="w-full active:bg-slate-700 active:text-white transition duration-150"
           onClick={() => {
             window.scroll(0, 0);
-            props.router.push("/articles/666c1f2ead6166e10de349d5");
+            props.router.push("/articles/668540112b7f6349a1f3bbb8");
             props.setValue(0);
             props.setToggle(!props.toggle);
           }}
@@ -85,7 +85,7 @@ function CustomDrawer(props: any) {
           className="w-full active:bg-slate-700 active:text-white transition duration-150"
           onClick={() => {
             window.scroll(0, 0);
-            props.router.push("/articles/666d578ca47c55a489719a16");
+            props.router.push("/articles/66854dddbe58431231ea08b8");
             props.setValue(0);
             props.setToggle(!props.toggle);
           }}

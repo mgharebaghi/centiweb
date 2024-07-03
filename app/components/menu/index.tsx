@@ -33,7 +33,7 @@ function Menu() {
       setValue(1);
     } else if (pathname === "/articles/668540112b7f6349a1f3bbb8") {
       setValue(2);
-    } else if (pathname === "/articles/668504e872578ae3afe88b2d") {
+    } else if (pathname === "/articles/66854dddbe58431231ea08b8") {
       setValue(3);
     } else if (pathname === "/download") {
       setValue(4);
@@ -129,7 +129,7 @@ function Menu() {
                 className={tabsClass}
                 onClick={() => {
                   window.scroll(0, 0);
-                  router.push("/articles/668504e872578ae3afe88b2d");
+                  router.push("/articles/66854dddbe58431231ea08b8");
                   setValue(3);
                 }}
                 // icon={<IoMdPaper />}

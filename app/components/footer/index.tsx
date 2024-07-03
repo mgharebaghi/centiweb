@@ -52,7 +52,7 @@ function Footer() {
             className="footer-items"
           >
             <Link
-              href="/articles/668504e872578ae3afe88b2d"
+              href="/articles/66854dddbe58431231ea08b8"
               className={itemsClass}
             >
               <Typography>whitepaper</Typography>

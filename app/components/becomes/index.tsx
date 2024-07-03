@@ -37,7 +37,7 @@ function Becomes() {
           <Col span={24} className="grid justify-center pt-3">
             <Button
               variant="outlined"
-              onClick={() => route.push('/articles/666c1f2ead6166e10de349d5')}
+              onClick={() => route.push('/articles/668540112b7f6349a1f3bbb8')}
               className="border-slate-600 text-slate-600 hover:border-slate-600 hover:bg-slate-600 hover:text-white"
             >
               How to become
@@ -76,7 +76,7 @@ function Becomes() {
           </Col>
           <Col span={24} className="grid justify-center pt-3">
             <Button
-              onClick={() => route.push("/articles/6683e2680a96760eda33058b")}
+              onClick={() => route.push("/articles/66853f1a2b7f6349a1f3bbb7")}
               variant="outlined"
               className="border-slate-600 text-white bg-slate-600 hover:border-slate-600 hover:bg-white hover:text-slate-600"
             >
