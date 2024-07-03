@@ -5,7 +5,7 @@ export async function POST(req: NextRequest) {
   try {
     const data = await req.formData();
     const file: File | null = data.get("file") as unknown as File;
-    const path = `./public/images/${file.name}`;
+    const path = `/images/${file.name}`;
     if (!file) {
       return NextResponse.json({
         status: "error",
