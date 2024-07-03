@@ -20,8 +20,9 @@ export async function GET(req: NextRequest) {
       data: data,
     });
   } catch (e) {
-    return NextResponse.json({
-      data: [],
-    });
+    // return NextResponse.json({
+    //   data: [],
+    // });
+    console.log(e);
   }
 }
