@@ -30,13 +30,13 @@ function Footer() {
               <Typography>scan</Typography>
             </Link>
             <Link
-              href="/articles/6683e2680a96760eda33058b"
+              href="/articles/66853f1a2b7f6349a1f3bbb7"
               className={itemsClass}
             >
               <Typography>validator</Typography>
             </Link>
             <Link
-              href="/articles/668501cb72578ae3afe88b2c"
+              href="/articles/668540112b7f6349a1f3bbb8"
               className={itemsClass}
             >
               <Typography>relay</Typography>

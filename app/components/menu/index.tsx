@@ -29,9 +29,9 @@ function Menu() {
 
     if (pathname === "/scan") {
       setValue(0);
-    } else if (pathname === "/articles/6683e2680a96760eda33058b") {
+    } else if (pathname === "/articles/66853f1a2b7f6349a1f3bbb7") {
       setValue(1);
-    } else if (pathname === "/articles/668501cb72578ae3afe88b2c") {
+    } else if (pathname === "/articles/668540112b7f6349a1f3bbb8") {
       setValue(2);
     } else if (pathname === "/articles/668504e872578ae3afe88b2d") {
       setValue(3);
@@ -107,7 +107,7 @@ function Menu() {
                 className={tabsClass}
                 onClick={() => {
                   window.scroll(0, 0);
-                  router.push("/articles/6683e2680a96760eda33058b");
+                  router.push("/articles/66853f1a2b7f6349a1f3bbb7");
                   setValue(1);
                 }}
                 // icon={<GrValidate />}
@@ -118,7 +118,7 @@ function Menu() {
                 className={tabsClass}
                 onClick={() => {
                   window.scroll(0, 0);
-                  router.push("/articles/668501cb72578ae3afe88b2c");
+                  router.push("/articles/668540112b7f6349a1f3bbb8");
                   setValue(2);
                 }}
                 // icon={<SiRelay />}
