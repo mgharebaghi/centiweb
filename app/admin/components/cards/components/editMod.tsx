@@ -1,12 +1,10 @@
-"use client";
 import { Button, Typography } from "@mui/material";
 import { Col, Input, Row, Select } from "antd";
 import TextArea from "antd/es/input/TextArea";
-import dynamic from "next/dynamic";
 import React, { useState } from "react";
 import "react-quill/dist/quill.snow.css";
 import { PulseLoader } from "react-spinners";
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+import { Editor as Editor1 } from "@tinymce/tinymce-react";
 
 function Editor(props: any) {
   const [title, setTitle] = useState(props.title);
@@ -18,30 +16,6 @@ function Editor(props: any) {
   const [msgColor, setMsgColor] = useState("");
   const [file, setFile] = useState<File>();
   const [postImg, setPostImg] = useState("");
-
-  const toolbarOptions = [
-    ["bold", "italic", "underline", "strike"], // toggled buttons
-    ["blockquote", "code-block"],
-    ["link", "image", "video", "formula"],
-
-    [{ header: 1 }, { header: 2 }], // custom button values
-    [{ list: "ordered" }, { list: "bullet" }, { list: "check" }],
-    [{ script: "sub" }, { script: "super" }], // superscript/subscript
-    [{ indent: "-1" }, { indent: "+1" }], // outdent/indent
-    [{ direction: "rtl" }], // text direction
-
-    [{ size: ["small", false, "large", "huge"] }], // custom dropdown
-    [{ header: [1, 2, 3, 4, 5, 6, false] }],
-
-    [{ color: [] }, { background: [] }], // dropdown with defaults from theme
-    [{ font: [] }],
-    [{ align: [] }],
-
-    ["clean"], // remove formatting button
-  ];
-  const modules = {
-    toolbar: toolbarOptions,
-  };
 
   const selectOpt = [
     { value: "article", label: "Article" },
@@ -146,13 +120,28 @@ function Editor(props: any) {
       </Row>
       <Row className="mb-3">
         <Col span={24}>
-          <ReactQuill
-            value={content}
-            theme="snow"
-            modules={modules}
-            onChange={(txt: string) => {
-              setContent(txt);
+          <Editor1
+            apiKey="2xuwpiwtg6dpym37fkznj8mvxvgl0yknv717zz9p0jpyffrx"
+            initialValue={content}
+            init={{
+              height: 500,
+              menubar: true,
+              plugins:
+                "advlist autolink lists link image charmap preview anchor searchreplace visualblocks code codesample fullscreen insertdatetime media table code help wordcount linebreak",
+              toolbar:
+                "undo redo | blocks | " +
+                "bold italic forecolor | alignleft aligncenter " +
+                "alignright alignjustify | bullist numlist outdent indent | " +
+                "removeformat | help" +
+                "code | codesample",
+              content_style:
+                "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+              image_class_list: [
+                // Bootstrap class
+                { title: "Responsive", value: "img-fluid" }, // Materialize class
+              ],
             }}
+            onEditorChange={(txt) => setContent(txt)}
           />
         </Col>
       </Row>

@@ -1,5 +1,6 @@
-import { Typography, Button } from "@mui/material";
+import { Typography, Button, Container } from "@mui/material";
 import { Col, Row } from "antd";
+import Link from "next/link";
 import { TypeAnimation } from "react-type-animation";
 
 export default function Banner() {
@@ -42,7 +43,7 @@ export default function Banner() {
           <div className="banner-description">
             <Typography
               variant="h5"
-              className="bg-clip-text text-transparent bg-gradient-to-r from-slate-700 to-green-600"
+              className="bg-clip-text text-transparent bg-gradient-to-r from-slate-950 to-slate-500"
             >
               And you do not need specialized hardware or high-performance
               computing devices like miners, nor do you need to stake any value
@@ -51,16 +52,34 @@ export default function Banner() {
           </div>
         </Col>
       </Row>
-      <Row className="flex items-center">
-        <Col span={24} className="flex justify-center pt-6">
-          <Button
-            variant="outlined"
-            className="w-72 h-14 border-slate-600 text-white bg-slate-600 hover:bg-white hover:border-slate-600 hover:text-slate-600"
+      <Container maxWidth="sm" className="mt-10">
+        <Row>
+          <Col
+            xs={24}
+            sm={24}
+            md={24}
+            lg={12}
+            xl={12}
+            xxl={12}
+            className="flex justify-center p-3"
           >
-            <Typography>read more</Typography>
-          </Button>
-        </Col>
-      </Row>
+            <Link
+              href="/download"
+              className="w-[100%] h-14 border-[1px] grid justify-center items-center rounded-md transition duration-200 border-slate-600 text-white bg-slate-600 hover:bg-white hover:border-slate-600 hover:text-slate-600"
+            >
+              <Typography>Download</Typography>
+            </Link>
+          </Col>
+          <Col xs={24} sm={24} md={24} lg={12} xl={12} xxl={12} className="flex justify-center p-3">
+            <Link
+              href="/articles/668504e872578ae3afe88b2d"
+              className="w-[100%] h-14 border-[1px] grid justify-center items-center rounded-md transition duration-200 border-slate-600 text-slate-600 bg-white hover:bg-slate-600 hover:border-slate-600 hover:text-white"
+            >
+              <Typography>Read More</Typography>
+            </Link>
+          </Col>
+        </Row>
+      </Container>
     </div>
   );
 }

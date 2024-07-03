@@ -1,15 +1,21 @@
 "use client";
+import "../prism";
 import { Typography } from "@mui/material";
-import { Button, Col, Divider, Layout, Menu, Row } from "antd";
+import { Button, Layout, Menu, Row } from "antd";
 import { Content, Footer, Header } from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
 import { ObjectId } from "mongodb";
 import { useEffect, useState } from "react";
-import { GrNext, GrPrevious } from "react-icons/gr";
+import "react-quill/dist/quill.snow.css";
 import { RiMenuFold2Fill, RiMenuUnfold2Fill } from "react-icons/ri";
-import { TiUploadOutline, TiUserOutline } from "react-icons/ti";
 import { PulseLoader } from "react-spinners";
 import DevFooter from "./components/footer";
+import { TbApi } from "react-icons/tb";
+import { GiHouseKeys } from "react-icons/gi";
+import { CiMoneyBill } from "react-icons/ci";
+import { GrTransaction } from "react-icons/gr";
+import { FaFileExport } from "react-icons/fa6";
+import { SiBnbchain } from "react-icons/si";
 
 interface Item {
   key: string;
@@ -32,7 +38,7 @@ function Dev() {
   const [key, setKey] = useState<string>("0");
 
   useEffect(() => {
-    document.title = "Centichain - DEV"
+    document.title = "Centichain - DEV";
     getItems();
   }, []);
 
@@ -53,9 +59,17 @@ function Dev() {
   useEffect(() => {
     posts.map((item, index) => {
       let icon = item.title.includes("API") ? (
-        <TiUserOutline />
+        <TbApi />
       ) : item.title.includes("Keypair") ? (
-        <TiUploadOutline />
+        <GiHouseKeys />
+      ) : item.title.includes("UTXO") ? (
+        <CiMoneyBill />
+      ) : item.title.includes("Transaction") ? (
+        <GrTransaction />
+      ) : item.title.includes("Reciepts") ? (
+        <FaFileExport />
+      ) : item.title.includes("Blockchain") ? (
+        <SiBnbchain />
       ) : null;
       let newItem: Item = {
         key: index.toString(),
@@ -101,13 +115,18 @@ function Dev() {
               borderRadius: "10px",
               backgroundColor: "white",
               wordBreak: "break-all",
-              width: "80%",
+              width: "95%",
             }}
           >
             {!loading && Number(key) < posts.length ? (
-              <div
-                dangerouslySetInnerHTML={{ __html: posts[Number(key)].content }}
-              />
+              <Typography>
+                <div
+                  className="ql-editor"
+                  dangerouslySetInnerHTML={{
+                    __html: posts[Number(key)].content,
+                  }}
+                />
+              </Typography>
             ) : (
               <div className="min-h-[600px] flex justify-center items-center">
                 <PulseLoader color="gray" size={5} />

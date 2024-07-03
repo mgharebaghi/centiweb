@@ -14,8 +14,8 @@ export default function Home() {
     <ThemeProvider theme={theme}>
       <Banner />
       <Articles />
-      <Becomes />
       <Generated />
+      <Becomes />
       <Make />
     </ThemeProvider>
   );

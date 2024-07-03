@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Tab,
-  Tabs,
-  Toolbar,
-  Typography,
-  useMediaQuery,
-} from "@mui/material";
+import { Tab, Tabs, Toolbar, Typography, useMediaQuery } from "@mui/material";
 import { Col, Row } from "antd";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -17,10 +11,11 @@ import { IoReorderThree } from "react-icons/io5";
 import { MdOutlineDocumentScanner } from "react-icons/md";
 import { PulseLoader } from "react-spinners";
 import CustomDrawer from "./components/drawer";
+import Link from "next/link";
 
 function Menu() {
   const tabsClass =
-    "transition duration-190 text-slate-500 hover:bg-slate-100 rounded-[25px]";
+    "transition duration-190 text-slate-500 m-[1px] hover:bg-slate-600 hover:text-white rounded-[5px]";
 
   const [value, setValue] = useState(Number);
   const pathname = usePathname();
@@ -32,32 +27,20 @@ function Menu() {
   useEffect(() => {
     remainingCoins(); //get coins from server
 
-    if (pathname === "/") {
-      setValue(-1);
-    }
-    if (pathname === "/login") {
-      setValue(-1);
-    }
-    if (pathname === "/admin") {
-      setValue(-1);
-    }
     if (pathname === "/scan") {
       setValue(0);
-    }
-    if (pathname === "/articles/666c1c7dad6166e10de349d4") {
+    } else if (pathname === "/articles/6683e2680a96760eda33058b") {
       setValue(1);
-    }
-    if (pathname === "/articles/666c1f2ead6166e10de349d5") {
+    } else if (pathname === "/articles/668501cb72578ae3afe88b2c") {
       setValue(2);
-    }
-    if (pathname === "/articles/666d578ca47c55a489719a16") {
+    } else if (pathname === "/articles/668504e872578ae3afe88b2d") {
       setValue(3);
-    }
-    if (pathname === "/download") {
+    } else if (pathname === "/download") {
       setValue(4);
-    }
-    if (pathname === "/dev") {
+    } else if (pathname === "/dev") {
       setValue(5);
+    } else {
+      setValue(-1);
     }
   }, [pathname]);
 
@@ -69,7 +52,7 @@ function Menu() {
   };
 
   return (
-    <Toolbar className="w-full backdrop-blur bg-white/70 h-[75px] fixed z-10 flex items-center shadow-md">
+    <Toolbar className="w-full backdrop-blur bg-white/50 h-[75px] fixed z-10 flex items-center shadow-md">
       {screenMatch ? (
         <>
           <Col xs={4} sm={4} md={4} lg={7} xl={7} xxl={7}>
@@ -89,18 +72,20 @@ function Menu() {
               sx={{
                 marginLeft: "auto",
                 "& button.Mui-selected": {
-                  color: "#1F313F",
-                  backgroundColor: "#DCE9F3",
+                  color: "white",
+                  backgroundColor: " #475569",
                   zIndex: "1",
-                  borderRadius: "25px",
+                  borderRadius: "5px",
+                  margin:"1px"
                 },
               }}
               TabIndicatorProps={{
                 style: {
-                  backgroundColor: "#DCE9F3",
-                  color: "#34424E",
+                  backgroundColor: " #475569",
+                  color: "white",
                   height: "100%",
-                  borderRadius: "25px",
+                  borderRadius: "5px",
+                  margin:"1px"
                 },
               }}
               className="w=[100%] grid justify-center"
@@ -122,7 +107,7 @@ function Menu() {
                 className={tabsClass}
                 onClick={() => {
                   window.scroll(0, 0);
-                  router.push("/articles/666c1c7dad6166e10de349d4");
+                  router.push("/articles/6683e2680a96760eda33058b");
                   setValue(1);
                 }}
                 // icon={<GrValidate />}
@@ -133,7 +118,7 @@ function Menu() {
                 className={tabsClass}
                 onClick={() => {
                   window.scroll(0, 0);
-                  router.push("/articles/666c1f2ead6166e10de349d5");
+                  router.push("/articles/668501cb72578ae3afe88b2c");
                   setValue(2);
                 }}
                 // icon={<SiRelay />}
@@ -144,7 +129,7 @@ function Menu() {
                 className={tabsClass}
                 onClick={() => {
                   window.scroll(0, 0);
-                  router.push("/articles/666d578ca47c55a489719a16");
+                  router.push("/articles/668504e872578ae3afe88b2d");
                   setValue(3);
                 }}
                 // icon={<IoMdPaper />}
@@ -218,7 +203,12 @@ function Menu() {
               ) : (
                 <PulseLoader size={5} />
               )}
-              <CustomDrawer toggle={toggle} setToggle={setToggle} router={router} setValue={setValue} />
+              <CustomDrawer
+                toggle={toggle}
+                setToggle={setToggle}
+                router={router}
+                setValue={setValue}
+              />
             </div>
           </Col>
         </>

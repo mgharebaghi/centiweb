@@ -1,6 +1,7 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
+@import "./prism.css";
 
 /* Custom CSS for responsive width */
 @media (min-width: 300px) {

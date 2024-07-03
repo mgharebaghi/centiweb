@@ -76,7 +76,7 @@ function Becomes() {
           </Col>
           <Col span={24} className="grid justify-center pt-3">
             <Button
-              onClick={() => route.push("/articles/666c1c7dad6166e10de349d4")}
+              onClick={() => route.push("/articles/6683e2680a96760eda33058b")}
               variant="outlined"
               className="border-slate-600 text-white bg-slate-600 hover:border-slate-600 hover:bg-white hover:text-slate-600"
             >

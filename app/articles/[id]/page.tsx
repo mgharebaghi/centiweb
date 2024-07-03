@@ -8,16 +8,21 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PulseLoader } from "react-spinners";
 import { ThemeProvider, responsiveFontSizes, createTheme } from "@mui/material";
+import Card from "../components/cards";
+
 let theme = createTheme();
 theme = responsiveFontSizes(theme);
 
 function Article({ params }: { params: { id: string } }) {
   const [article, setArticle] = useState<Post>();
   const [loading, setLoading] = useState<boolean>(false);
+  const [articles, setArticles] = useState<Post[]>([]);
+  const [artLoading, setArtLoading] = useState(false);
   const route = useRouter();
 
   useEffect(() => {
     fetchData();
+    getArticles();
   }, []);
 
   const fetchData = async () => {
@@ -44,13 +49,35 @@ function Article({ params }: { params: { id: string } }) {
     }
   };
 
+  const getArticles = async () => {
+    setArtLoading(true);
+    let response = await fetch("/api/articles");
+
+    if (!response.ok) {
+      setArtLoading(false);
+    } else {
+      response
+        .json()
+        .then((data) => {
+          data.data.map((art: Post, index: number) => {
+            if (art._id.toString() !== params.id) {
+              setArticles((prevData) => [...prevData, art]);
+            }
+          });
+        })
+        .then(() => {
+          setArtLoading(false);
+        });
+    }
+  };
+
   return (
     <div className="w-full min-h-[750px]">
       <Container
         maxWidth="lg"
         className="pt-20 pb-10 shadow-md rounded-b-md min-h-[750px] break-words"
       >
-        {!loading && article ? (
+        {!loading && article && !artLoading ? (
           <ThemeProvider theme={theme}>
             <Row>
               <Col
@@ -66,7 +93,9 @@ function Article({ params }: { params: { id: string } }) {
                   {article.title}
                 </Typography>
                 <Divider />
-                <Typography variant="h6">{article.description}</Typography>
+                <Typography variant="h6" fontWeight="bold">
+                  {article.description}
+                </Typography>
               </Col>
               <Col
                 xs={24}
@@ -75,13 +104,13 @@ function Article({ params }: { params: { id: string } }) {
                 lg={6}
                 xl={6}
                 xxl={6}
-                className="flex justify-start items-center pl-3 pt-3"
+                className="flex justify-center items-end pl-3 pt-3"
               >
                 <Image
                   alt={article.title}
                   src={article.image}
-                  width={250}
-                  height={250}
+                  width={300}
+                  height={300}
                   placeholder="blur"
                   blurDataURL={`${(
                     <PulseLoader size={10} className="text-slate-600" />
@@ -90,13 +119,38 @@ function Article({ params }: { params: { id: string } }) {
                 />
               </Col>
               <Col span={24} className="p-3 pt-0">
-                <Typography>
+                <Typography variant="h6">
                   <div
                     dangerouslySetInnerHTML={{ __html: article.content }}
                     className="break-words"
                   />
                 </Typography>
               </Col>
+            </Row>
+            <Divider />
+            <Row>
+              {articles.map((item: Post, index: number) => {
+                return (
+                  <Col
+                    key={index}
+                    xs={24}
+                    sm={24}
+                    md={12}
+                    lg={12}
+                    xl={12}
+                    xxl={12}
+                    className="flex justify-center items-center mb-1 p-3"
+                    data-aos="fade-zoom-in"
+                  >
+                    <Card
+                      id={item._id}
+                      pic={item.image}
+                      title={item.title}
+                      description={item.description}
+                    />
+                  </Col>
+                );
+              })}
             </Row>
           </ThemeProvider>
         ) : (

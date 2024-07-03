@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 export default function Card(props: any) {
   const route = useRouter();
   return (
-    <div className="rounded-md bg-gray-50 w-[100%] min-h-[250px] shadow-md hover:shadow-xl transition duration-150">
+    <div className="rounded-md bg-gray-50 w-[100%] min-h-[200px] shadow-md hover:shadow-xl transition duration-150">
       <Row>
         <Col
           xs={24}
@@ -17,7 +17,7 @@ export default function Card(props: any) {
           xxl={9}
           className="flex justify-center items-center"
         >
-          <Image alt="img" src={props.pic} width={250} height={250} />
+          <Image alt="img" src={props.pic} width={200} height={200} />
         </Col>
         <Col
           xs={24}
@@ -26,29 +26,29 @@ export default function Card(props: any) {
           lg={15}
           xl={15}
           xxl={15}
-          className="min-h-[250px]"
+          className="min-h-[200px]"
         >
-          <Row className="min-h-[90px]">
+          <Row className="min-h-[150px] grid content-center">
             <Col span={24} className="p-3">
               <Typography variant="h5" fontWeight="bold">{props.title}</Typography>
             </Col>
           </Row>
-          <Row>
-            <Col span={24} className="pl-3 min-h-[110px]">
+          {/* <Row>
+            <Col span={24} className="pl-3 min-h-[100px]">
               <Typography>
                 {props.description.length > 200
-                  ? props.description.substring(0, 200) + " ..."
+                  ? props.description.substring(0, 200) + "..."
                   : props.description}
               </Typography>
             </Col>
-          </Row>
+          </Row> */}
           <Row>
-            <Col span={24} className="h-[50px] flex justify-center items-end pb-3">
+            <Col span={24} className="min-h-[50px] flex justify-center items-end pb-3">
               <Button
                 variant="contained"
                 className="w-[90%]"
                 onClick={() => {
-                  route.push(`articles/${props.id}`);
+                  route.push(`${props.id}`);
                   window.scroll(0, 0);
                 }}
               >
