@@ -11,14 +11,16 @@ export async function POST(req: Request, res: NextApiResponse) {
   try {
     const db = client.db("centiweb");
     const collection = db.collection<WithId<Admin>>("admins");
+    const newColl = db.collection("sessions");
     const { email, password } = await req.json();
     const document = await collection.findOne({ email: email });
 
     if (document) {
       if (document.password === password) {
-        cookies().set("loggedin", "true", {
+        cookies().set("loggedin", password, {
           expires: new Date(Date.now() + 60 * 60 * 24 * 1000), //save loged in data into cookies for 24 hours
         });
+        newColl.insertOne({ hash: password });
         return NextResponse.json({
           status: "success",
           description: "done",
