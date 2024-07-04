@@ -29,7 +29,7 @@ export default function ScanedTrx() {
           if (data.status === "success") {
             setLoading(false);
             if (page === 1) {
-              setCount(Number(data.count / 10) + 1);
+              setCount(Number(data.count / 10));
             }
             data.trxs.map((trx: Transaction) => {
               let trxDate = moment.utc(trx.date);
@@ -95,6 +95,7 @@ export default function ScanedTrx() {
             dataSource={dataSource}
             pagination={false}
             className="mb-3 w-full shadow-sm min-h-[500px]"
+            scroll={{ x: 1 }}
           >
             <ColumnGroup
               title="Transactions Scan"
