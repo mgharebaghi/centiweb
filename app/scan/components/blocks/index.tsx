@@ -1,10 +1,10 @@
 "use client";
 import { Block, BlocksScan } from "@/app/api/types/types";
-import { Container, Pagination, Typography } from "@mui/material";
-import { Divider, Table } from "antd";
+import { Pagination, Typography } from "@mui/material";
+import { Table } from "antd";
 import { useEffect, useState } from "react";
 import moment from "moment";
-import { PulseLoader, SyncLoader } from "react-spinners";
+import { SyncLoader } from "react-spinners";
 import ColumnGroup from "antd/es/table/ColumnGroup";
 import Column from "antd/es/table/Column";
 
@@ -81,24 +81,6 @@ export default function ScanedBlocks() {
   const handlePagination = (event: any, pageNum: number) => {
     setPage(pageNum);
   };
-
-  const blocksCol = [
-    {
-      title: "BN",
-      dataIndex: "bn",
-      key: "bn",
-    },
-    {
-      title: "Hash",
-      dataIndex: "hash",
-      key: "hash",
-    },
-    {
-      title: "Transactions",
-      dataIndex: "transactions",
-      key: "bn",
-    },
-  ];
 
   return (
     <div className="w-full min-h-[500px] text-center content-center">

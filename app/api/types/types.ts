@@ -15,9 +15,9 @@ export interface Block {
 }
 
 interface Header {
-  blockhash: string,
-  number: number,
-  date: string
+  blockhash: string;
+  number: number;
+  date: string;
 }
 
 interface Body {
@@ -39,12 +39,32 @@ interface CoinbaseData {
 }
 
 export interface Admin {
-    email: string;
-    password: string;
-  }
+  email: string;
+  password: string;
+}
 
 export interface BlocksScan {
-  bn: any,
-  hash: any,
-  transactions: any
+  bn: any;
+  hash: any;
+  transactions: any;
+}
+
+export interface Transaction {
+  blockNumber: number;
+  hash: string;
+  from: string;
+  to: string;
+  value: Decimal128;
+  fee: Decimal128;
+  status: string;
+  description: string;
+  date: string;
+}
+
+export interface TrxScan {
+  from: any;
+  to: any;
+  value: any;
+  status: any;
+  date: any;
 }
