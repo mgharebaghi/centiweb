@@ -9,8 +9,7 @@ export async function POST(req: NextRequest) {
     let transactions: Transaction[] = [];
     const db = client.db("Blockchain");
     const collection = db.collection<WithId<Transaction>>("reciept");
-    const count = collection.countDocuments();
-    console.log("coun of docs: " + count);
+    const count = await collection.countDocuments();
     const request = await req.json();
     const skip = request.page * 10 - 10;
     const docs = await collection

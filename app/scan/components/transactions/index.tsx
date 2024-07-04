@@ -30,7 +30,6 @@ export default function ScanedTrx() {
             setLoading(false);
             if (page === 1) {
               setCount(Number(data.count / 10) + 1);
-              console.log(data.count);
             }
             data.trxs.map((trx: Transaction) => {
               let trxDate = moment.utc(trx.date);
