@@ -94,8 +94,7 @@ export default function ScanedTrx() {
           <Table
             dataSource={dataSource}
             pagination={false}
-            className="mb-3 w-full shadow-sm min-h-[500px]"
-            scroll={{ x: 0 }}
+            className="mb-3 w-full shadow-sm min-h-[500px] overflow-x-scroll"
           >
             <ColumnGroup
               title="Transactions Scan"
