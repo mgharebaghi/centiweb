@@ -13,6 +13,7 @@ function Generated() {
 
   useEffect(() => {
     generatedBlocks();
+    confirmedTrxs();
   }, []);
 
   const generatedBlocks = async () => {
