@@ -28,7 +28,9 @@ export default function ScanedTrx() {
         res.json().then(async (data) => {
           if (data.status === "success") {
             setLoading(false);
-            setCount(Number(data.count));
+            if (page === 1) {
+              setCount(Number(data.count / 10) + 1);
+            }
             data.trxs.map((trx: Transaction) => {
               let trxDate = moment.utc(trx.date);
               let now = moment.now();
