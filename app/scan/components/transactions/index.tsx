@@ -1,7 +1,7 @@
 "use client";
-import { Block, BlocksScan, Transaction, TrxScan } from "@/app/api/types/types";
-import { Container, Pagination, Typography } from "@mui/material";
-import { Divider, Table } from "antd";
+import { Transaction, TrxScan } from "@/app/api/types/types";
+import { Pagination, Typography } from "@mui/material";
+import { Table } from "antd";
 import { useEffect, useState } from "react";
 import moment from "moment";
 import { PulseLoader, SyncLoader } from "react-spinners";
@@ -30,6 +30,7 @@ export default function ScanedTrx() {
             setLoading(false);
             if (page === 1) {
               setCount(Number(data.count / 10) + 1);
+              console.log(data.count);
             }
             data.trxs.map((trx: Transaction) => {
               let trxDate = moment.utc(trx.date);
@@ -95,7 +96,6 @@ export default function ScanedTrx() {
             dataSource={dataSource}
             pagination={false}
             className="mb-3 w-full shadow-sm min-h-[500px]"
-            scroll={{ x: 1 }}
           >
             <ColumnGroup
               title="Transactions Scan"
