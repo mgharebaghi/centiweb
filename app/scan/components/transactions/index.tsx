@@ -45,7 +45,7 @@ export default function ScanedTrx() {
                         fontWeight="bold"
                         className="text-slate-700"
                       >
-                        {trx.from}
+                        {trx.from.substring(0, 10) + "..."}
                       </Typography>
                       <Typography fontSize={11} className="text-slate-400">
                         {age.humanize() + " ago"}
@@ -54,7 +54,7 @@ export default function ScanedTrx() {
                   ),
                   to: (
                     <Typography fontSize={12} className="text-slate-700">
-                      {trx.to}
+                      {trx.to.substring(0, 10) + "..."}
                     </Typography>
                   ),
                   value: (
@@ -63,7 +63,18 @@ export default function ScanedTrx() {
                     </Typography>
                   ),
                   status: (
-                    <Typography fontSize={12} className="text-slate-700">
+                    <Typography
+                      fontSize={12}
+                      className="text-slate-700"
+                      style={{
+                        color:
+                          trx.status === "Confirmed"
+                            ? "green"
+                            : trx.status === "Pending"
+                            ? "gray"
+                            : "red",
+                      }}
+                    >
                       {trx.status}
                     </Typography>
                   ),
