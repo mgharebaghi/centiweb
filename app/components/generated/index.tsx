@@ -6,24 +6,41 @@ import { useEffect, useState } from "react";
 import { PulseLoader } from "react-spinners";
 
 function Generated() {
-  const [loading, setLoading] = useState<boolean>(false);
+  const [blockLoading, setBlockLoading] = useState<boolean>(false);
   const [blocks, setBlocks] = useState<string>("");
+  const [transactions, setTransactions] = useState(0);
+  const [trxLoading, setTrxLoading] = useState(false);
 
   useEffect(() => {
     generatedBlocks();
   }, []);
 
   const generatedBlocks = async () => {
-    setLoading(true);
+    setBlockLoading(true);
     const res = await fetch("/api/blocks");
 
     if (!res.ok) {
-      setLoading(false);
+      setBlockLoading(false);
       setBlocks("0");
     } else {
       res.json().then((data) => {
-        setLoading(false);
+        setBlockLoading(false);
         setBlocks(data.number);
+      });
+    }
+  };
+
+  const confirmedTrxs = async () => {
+    setTrxLoading(true);
+    const res = await fetch("/api/trxcount");
+
+    if (!res.ok) {
+      setTrxLoading(false);
+      setTransactions(0);
+    } else {
+      res.json().then((data) => {
+        setTrxLoading(false);
+        setTransactions(Number(data.data));
       });
     }
   };
@@ -47,7 +64,7 @@ function Generated() {
               </Col>
               <Col span={24} className="text-center">
                 <Typography variant="h3" className="text-white">
-                  {!loading ? (
+                  {!blockLoading ? (
                     Number(blocks).toLocaleString()
                   ) : (
                     <PulseLoader color="white" size={5} />
@@ -72,7 +89,11 @@ function Generated() {
               </Col>
               <Col span={24} className="text-center">
                 <Typography variant="h3" className="text-white">
-                  {Number(2000).toLocaleString()}
+                  {!trxLoading ? (
+                    transactions.toLocaleString()
+                  ) : (
+                    <PulseLoader color="white" size={5} />
+                  )}
                 </Typography>
                 <Typography>Transactions confirmed</Typography>
               </Col>
