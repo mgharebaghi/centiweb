@@ -1,4 +1,4 @@
-import { Decimal128, ObjectId } from "mongodb";
+import { Decimal128, MongoClient, ObjectId } from "mongodb";
 
 export interface Post {
   _id: ObjectId;
@@ -67,4 +67,12 @@ export interface TrxScan {
   value: any;
   status: any;
   date: any;
+}
+
+export interface Relays {
+  addr: string
+}
+
+export interface RPC {
+  addr: string
 }
