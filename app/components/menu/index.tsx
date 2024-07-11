@@ -52,7 +52,7 @@ function Menu() {
   };
 
   return (
-    <Toolbar className="w-full backdrop-blur bg-white/50 h-[75px] fixed z-10 flex items-center">
+    <Toolbar className="w-full backdrop-blur bg-white/50 h-[75px] fixed z-10 flex items-center shadow-sm">
       {screenMatch ? (
         <>
           <Col xs={4} sm={4} md={4} lg={7} xl={7} xxl={7}>
