@@ -35,12 +35,12 @@ function Footer() {
             >
               <Typography>validator</Typography>
             </Link>
-            <Link
+            {/* <Link
               href="/articles/668540112b7f6349a1f3bbb8"
               className={itemsClass}
             >
               <Typography>relay</Typography>
-            </Link>
+            </Link> */}
           </Col>
           <Col
             xs={12}
@@ -52,6 +52,12 @@ function Footer() {
             className="footer-items"
           >
             <Link
+              href="/articles/668540112b7f6349a1f3bbb8"
+              className={itemsClass}
+            >
+              <Typography>relay</Typography>
+            </Link>
+            <Link
               href="/articles/66854dddbe58431231ea08b8"
               className={itemsClass}
             >
@@ -60,9 +66,9 @@ function Footer() {
             <Link href="/download" className={itemsClass}>
               <Typography>download</Typography>
             </Link>
-            <Link href="/dev" className={itemsClass}>
+            {/* <Link href="/dev" className={itemsClass}>
               <Typography>dev</Typography>
-            </Link>
+            </Link> */}
           </Col>
           <Col
             xs={12}
@@ -76,7 +82,11 @@ function Footer() {
             <Link href="#" className={itemsClass}>
               <VscGithub size={20} />
             </Link>
-            <Link target="_blank" href="https://x.com/centichain" className={itemsClass}>
+            <Link
+              target="_blank"
+              href="https://x.com/centichain"
+              className={itemsClass}
+            >
               <BsTwitterX size={20} />
             </Link>
           </Col>

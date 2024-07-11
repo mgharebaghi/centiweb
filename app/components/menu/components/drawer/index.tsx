@@ -105,7 +105,7 @@ function CustomDrawer(props: any) {
           <IoDownloadOutline className="mr-2 mb-1" />
           <Typography>DOWNLOAD</Typography>
         </ListItem>
-        <ListItem
+        {/* <ListItem
           className="w-full active:bg-slate-700 active:text-white transition duration-150"
           onClick={() => {
             window.scroll(0, 0);
@@ -116,7 +116,7 @@ function CustomDrawer(props: any) {
         >
           <SiDailydotdev className="mr-2 mb-1" />
           <Typography>DEV</Typography>
-        </ListItem>
+        </ListItem> */}
       </List>
     </Drawer>
   );

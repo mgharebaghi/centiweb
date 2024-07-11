@@ -145,7 +145,7 @@ function Menu() {
                 }}
                 // icon={<IoDownloadOutline />}
               />
-              <Tab
+              {/* <Tab
                 key={5}
                 label={<Typography>dev</Typography>}
                 className={tabsClass}
@@ -153,9 +153,9 @@ function Menu() {
                   window.scroll(0, 0);
                   router.push("/dev");
                   setValue(5);
-                }}
-                // icon={<LiaLaptopCodeSolid />}
-              />
+                }} */}
+                {/* // icon={<LiaLaptopCodeSolid />} */}
+              {/* // /> */}
             </Tabs>
           </Col>
           <Col

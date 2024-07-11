@@ -45,14 +45,26 @@ export async function GET() {
   try {
     let addresses: Relays[] = [];
     let cursor = collection.find({});
+    let final_data: Relays[] = [];
 
     await cursor.forEach((doc) => {
       addresses.push({ addr: doc.addr });
     });
 
+    if (addresses.length > 50) {
+      while (final_data.length <= 50) {
+        let index = Math.floor(Math.random() * addresses.length);
+        if (!final_data.includes(addresses[index])) {
+          final_data.push(addresses[index]);
+        }
+      }
+    } else {
+      final_data = addresses;
+    }
+
     return NextResponse.json({
       status: "success",
-      data: addresses,
+      data: final_data,
     });
   } catch (e) {
     return NextResponse.json({
