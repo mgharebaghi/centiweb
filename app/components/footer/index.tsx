@@ -30,7 +30,7 @@ function Footer() {
               <Typography>scan</Typography>
             </Link>
             <Link
-              href="/articles/66853f1a2b7f6349a1f3bbb7"
+              href="/articles/669017ee261897ff8bf5d197"
               className={itemsClass}
             >
               <Typography>validator</Typography>
@@ -52,13 +52,13 @@ function Footer() {
             className="footer-items"
           >
             <Link
-              href="/articles/668540112b7f6349a1f3bbb8"
+              href="/articles/6690198b261897ff8bf5d198"
               className={itemsClass}
             >
               <Typography>relay</Typography>
             </Link>
             <Link
-              href="/articles/66854dddbe58431231ea08b8"
+              href="/articles/66901aa0261897ff8bf5d199"
               className={itemsClass}
             >
               <Typography>whitepaper</Typography>

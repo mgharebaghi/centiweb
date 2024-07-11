@@ -107,7 +107,7 @@ function Menu() {
                 className={tabsClass}
                 onClick={() => {
                   window.scroll(0, 0);
-                  router.push("/articles/66853f1a2b7f6349a1f3bbb7");
+                  router.push("/articles/669017ee261897ff8bf5d197");
                   setValue(1);
                 }}
                 // icon={<GrValidate />}
@@ -118,7 +118,7 @@ function Menu() {
                 className={tabsClass}
                 onClick={() => {
                   window.scroll(0, 0);
-                  router.push("/articles/668540112b7f6349a1f3bbb8");
+                  router.push("/articles/6690198b261897ff8bf5d198");
                   setValue(2);
                 }}
                 // icon={<SiRelay />}
@@ -129,7 +129,7 @@ function Menu() {
                 className={tabsClass}
                 onClick={() => {
                   window.scroll(0, 0);
-                  router.push("/articles/66854dddbe58431231ea08b8");
+                  router.push("/articles/66901aa0261897ff8bf5d199");
                   setValue(3);
                 }}
                 // icon={<IoMdPaper />}
