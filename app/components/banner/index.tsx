@@ -72,7 +72,7 @@ export default function Banner() {
           </Col>
           <Col xs={24} sm={24} md={24} lg={12} xl={12} xxl={12} className="flex justify-center p-3">
             <Link
-              href="/articles/66854dddbe58431231ea08b8"
+              href="/articles/66901aa0261897ff8bf5d199"
               className="w-[100%] h-14 border-[1px] grid justify-center items-center rounded-md transition duration-200 border-slate-600 text-slate-600 bg-white hover:bg-slate-600 hover:border-slate-600 hover:text-white"
             >
               <Typography>Read More</Typography>
