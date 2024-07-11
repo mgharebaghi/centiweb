@@ -29,11 +29,11 @@ function Menu() {
 
     if (pathname === "/scan") {
       setValue(0);
-    } else if (pathname === "/articles/66853f1a2b7f6349a1f3bbb7") {
+    } else if (pathname === "/articles/669017ee261897ff8bf5d197") {
       setValue(1);
-    } else if (pathname === "/articles/668540112b7f6349a1f3bbb8") {
+    } else if (pathname === "/articles/6690198b261897ff8bf5d198") {
       setValue(2);
-    } else if (pathname === "/articles/66854dddbe58431231ea08b8") {
+    } else if (pathname === "/articles/66901aa0261897ff8bf5d199") {
       setValue(3);
     } else if (pathname === "/download") {
       setValue(4);
