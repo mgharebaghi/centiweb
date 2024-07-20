@@ -33,12 +33,12 @@ function Validators() {
             className="flex justify-end pr-3 text-slate-700 items-center"
           >
             <Typography variant="h3" fontWeight="bold">
-              to be
+              To Be
             </Typography>
           </Col>
           <Col span={12} className="flex justify-start items-center">
             <TypeAnimation
-              sequence={["easy", 2800, "free", 2800, "new", 2800]}
+              sequence={["Easy", 2800, "Free", 2800, "New", 2800]}
               wrapper="span"
               speed={5}
               repeat={Infinity}
@@ -64,11 +64,12 @@ function Validators() {
           >
             <Link
               href="#"
-              target="_blank"
+              // target="_blank"
               className="w-[95%] flex justify-center items-center bg-slate-700 text-slate-100 hover:bg-white hover:text-slate-700 border-[1px] border-slate-700 rounded-md h-[80px] transition duration-200"
             >
               <SiWindows className="mr-2" size={40} />
               <Typography variant="h3">Windows</Typography>
+              <span className="ml-1 mt-6">soon...</span>
             </Link>
           </Col>
           <Col

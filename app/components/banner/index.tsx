@@ -20,15 +20,15 @@ export default function Banner() {
         <Col span={24}>
           <TypeAnimation
             sequence={[
-              "Easy use for everyone",
+              "Easy Use For Everyone",
               2800,
-              "Low cost to participate",
+              "Low Cost To Participate",
               2800,
-              "Optimal energy consumption",
+              "Optimal Energy Consumption",
               2800,
-              "Civilized and fair",
+              "Civilized And Fair",
               2800,
-              "New consensus mechanism",
+              "New Consensus Mechanism",
               2800,
             ]}
             wrapper="span"
