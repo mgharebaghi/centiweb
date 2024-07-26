@@ -4,26 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 
 function Make() {
-  const itemsClass = "flex justify-center items-center h-[300px]";
+  const itemsClass = "flex justify-center items-center h-[400px]";
   return (
     <div className="min-h-[400px] w-full">
       <Container maxWidth="lg">
-        <Row>
-          <Col
-            span={24}
-            className="text-center flex justify-center items-center min-h-40px"
-          >
-            <div className="mt-2 bg-gradient-to-l from-white to-slate-300 w-auto p-5 rounded-3xl ">
-              <Typography
-                variant="h4"
-                fontWeight="bold"
-                className="text-slate-700"
-              >
-                Used to make
-              </Typography>
-            </div>
-          </Col>
-        </Row>
         <Row>
           <Col
             xs={24}

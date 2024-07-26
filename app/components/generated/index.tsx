@@ -48,7 +48,7 @@ function Generated() {
 
   return (
     <div className="w-[100%] bg-slate-700">
-      <Container className="min-h-[400px]">
+      <Container className="min-h-[500px]">
         <Row>
           <Col
             xs={24}
@@ -57,7 +57,7 @@ function Generated() {
             lg={12}
             xl={12}
             xxl={12}
-            className="text-white min-h-[400px] flex justify-center items-center"
+            className="text-white min-h-[500px] flex justify-center items-center"
           >
             <Row>
               <Col span={24} className="grid justify-center">
