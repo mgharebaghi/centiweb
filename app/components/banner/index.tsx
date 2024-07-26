@@ -4,15 +4,17 @@ import Link from "next/link";
 import { TypeAnimation } from "react-type-animation";
 
 export default function Banner() {
+  const btn_class =
+    "w-[100%] h-16 border-[1px] grid justify-center items-center rounded-md transition duration-200 border-slate-600 text-white bg-slate-600 hover:bg-white hover:border-slate-600 hover:text-slate-600";
   return (
-    <div className="banner">
+    <div className="banner h-screen">
       <Row className="w-100% items-end text-center pb-1 mt-[75px]">
         <Col span={24}>
           <Typography
             fontWeight="bold"
             className="bg-clip-text text-transparent bg-gradient-to-r from-slate-300 to-slate-900 banner-title"
           >
-            A fully decentralized Network with
+            A Fully Decentralized Network With
           </Typography>
         </Col>
       </Row>
@@ -63,17 +65,22 @@ export default function Banner() {
             xxl={12}
             className="flex justify-center p-3"
           >
-            <Link
-              href="/download"
-              className="w-[100%] h-14 border-[1px] grid justify-center items-center rounded-md transition duration-200 border-slate-600 text-white bg-slate-600 hover:bg-white hover:border-slate-600 hover:text-slate-600"
-            >
+            <Link href="/download" className={btn_class}>
               <Typography>Download</Typography>
             </Link>
           </Col>
-          <Col xs={24} sm={24} md={24} lg={12} xl={12} xxl={12} className="flex justify-center p-3">
+          <Col
+            xs={24}
+            sm={24}
+            md={24}
+            lg={12}
+            xl={12}
+            xxl={12}
+            className="flex justify-center p-3"
+          >
             <Link
               href="/articles/66901aa0261897ff8bf5d199"
-              className="w-[100%] h-14 border-[1px] grid justify-center items-center rounded-md transition duration-200 border-slate-600 text-slate-600 bg-white hover:bg-slate-600 hover:border-slate-600 hover:text-white"
+              className={btn_class}
             >
               <Typography>Read More</Typography>
             </Link>

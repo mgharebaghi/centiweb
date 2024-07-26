@@ -116,10 +116,9 @@
 
 .banner {
   user-select: none;
-  background-image: linear-gradient(#ececec 1px, transparent 1px),
+  background: linear-gradient(#ececec 1px, transparent 1px),
     linear-gradient(90deg, #ececec 1px, transparent 1px);
-  background-size: 1.5rem 1.5rem;
-  min-height: 697px;
+  background-size: 18.8px 18.8px;
   width: 100%;
   display: grid;
   align-content: center;

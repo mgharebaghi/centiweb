@@ -7,15 +7,15 @@ import { TypeAnimation } from "react-type-animation";
 
 function Validators() {
   return (
-    <Row className="min-h-[700px] bg-slate-100 flex items-center">
-      <Container maxWidth="lg" className="pb-10 pt-5 select-none">
+    <Row className="h-screen bg-slate-100 flex items-center">
+      <Container maxWidth="lg" className="pb-[10%] select-none">
         <Row>
           <Col span={24} className="flex justify-center">
             <Image
               alt="Centichanin logo"
               src="/images/Logo.png"
-              width={100}
-              height={100}
+              width={300}
+              height={300}
             />
           </Col>
         </Row>
