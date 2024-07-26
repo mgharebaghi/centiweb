@@ -79,7 +79,7 @@ function Footer() {
             xxl={6}
             className="footer-items"
           >
-            <Link href="#" className={itemsClass}>
+            <Link href="https://github.com/mgharebaghi82/centiweb" target="_blank" className={itemsClass}>
               <VscGithub size={20} />
             </Link>
             <Link
