@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description: "A blockchain network that is easy",
 };
 
-const title = "Centichain: no miners,no stakers,no problem";
+const title = "Centichain: No Mining,No Staking,No Problem";
 const description = "A blockchain network that is easy";
 
 export default function RootLayout({
