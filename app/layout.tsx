@@ -5,7 +5,7 @@ import Menu from "./components/menu";
 import Footer from "./components/footer";
 
 export const metadata: Metadata = {
-  title: "Centichain: no miners,no stakers,no problem",
+  title: "Centichain: No Mining,No Staking,No Problem",
   description: "A blockchain network that is easy",
 };
 
