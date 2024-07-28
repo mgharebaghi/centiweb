@@ -27,15 +27,11 @@ interface Body {
 
 interface CoinbaseTransactions {
   tx_hash: string;
-  coinbase_data: CoinbaseData;
-  output: {};
-  value: Decimal128;
-}
-
-interface CoinbaseData {
-  block_len: number;
-  merkel_root: string;
+  block_len: number,
+  merkel_root: string,
   reward: Decimal128;
+  output: {};
+  fee: Decimal128;
 }
 
 export interface Admin {

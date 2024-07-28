@@ -1,10 +1,10 @@
 import { Container } from "@mui/material";
 import { Col, Row } from "antd";
 import Card from "./cards";
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import { ObjectId } from "mongodb";
 import { PulseLoader } from "react-spinners";
-import AOS from 'aos';
+import AOS from "aos";
 import "aos/dist/aos.css";
 
 interface Post {
@@ -16,13 +16,13 @@ interface Post {
   image: string;
 }
 
-export default function Articles() {
+function Articles() {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [serverMsg, setServerMsg] = useState<string>("");
 
   useEffect(() => {
-    AOS.init({duration: 1000});
+    AOS.init({ duration: 1000 });
     getArticles();
   }, []);
 
@@ -46,7 +46,7 @@ export default function Articles() {
   };
 
   return (
-    <div className="min-h-[500px] w-[100%] pt-3 pb-3">
+    <div className="min-h-[500px] w-[100%] pt-3 pb-3 border-t-[1px]">
       <Container maxWidth="xl">
         <Row>
           {!loading ? (
@@ -82,3 +82,5 @@ export default function Articles() {
     </div>
   );
 }
+
+export default forwardRef(Articles);

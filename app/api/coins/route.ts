@@ -17,7 +17,7 @@ export async function GET() {
     await cursor.forEach((doc) => {
       generated =
         generated +
-        parseFloat(doc.body.coinbase.coinbase_data.reward.toString());
+        parseFloat(doc.body.coinbase.reward.toString());
     });
 
     return NextResponse.json({

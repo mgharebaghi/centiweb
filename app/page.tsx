@@ -6,6 +6,7 @@ import Generated from "./components/generated";
 import Becomes from "./components/becomes";
 import Make from "./components/usedToMake";
 import { ThemeProvider as LightTheme } from "next-themes";
+import { useRef } from "react";
 
 let theme = createTheme();
 theme = responsiveFontSizes(theme);

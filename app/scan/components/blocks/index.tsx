@@ -59,7 +59,7 @@ export default function ScanedBlocks() {
                   ),
                   transactions: (
                     <Typography fontSize={12} className="text-slate-700">
-                      {block.body.coinbase.coinbase_data.block_len.toString()}
+                      {block.body.coinbase.block_len.toString()}
                     </Typography>
                   ),
                 },
