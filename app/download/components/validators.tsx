@@ -69,7 +69,7 @@ function Validators() {
             >
               <SiWindows className="mr-2" size={40} />
               <Typography variant="h3">Windows</Typography>
-              <span className="ml-1 mt-6"></span>
+              <span className="ml-1 mt-6">soon...</span>
             </Link>
           </Col>
           <Col
