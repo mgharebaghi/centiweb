@@ -18,7 +18,7 @@ function Generated() {
 
   const generatedBlocks = async () => {
     setBlockLoading(true);
-    const res = await fetch("/api/blocks");
+    const res = await fetch("/api/blocks", {cache: 'no-store'});
 
     if (!res.ok) {
       setBlockLoading(false);

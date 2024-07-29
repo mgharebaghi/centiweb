@@ -63,13 +63,13 @@ function Validators() {
             className="flex justify-center pt-5"
           >
             <Link
-              href="#"
+              href="https://centichain.org/downloads/updates/windows/x64/v0.9.2/Centichain_0.9.2_x64_en-US.msi"
               // target="_blank"
               className="w-[95%] flex justify-center items-center bg-slate-700 text-slate-100 hover:bg-white hover:text-slate-700 border-[1px] border-slate-700 rounded-md h-[80px] transition duration-200"
             >
               <SiWindows className="mr-2" size={40} />
               <Typography variant="h3">Windows</Typography>
-              <span className="ml-1 mt-6">soon...</span>
+              <span className="ml-1 mt-6"></span>
             </Link>
           </Col>
           <Col

@@ -29,7 +29,7 @@ function Articles() {
   const getArticles = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/articles");
+      const res = await fetch("/api/articles", {cache: "no-store"});
 
       if (!res.ok) {
         setLoading(false);

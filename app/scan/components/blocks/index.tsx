@@ -20,6 +20,7 @@ export default function ScanedBlocks() {
     await fetch("/api/blockscan", {
       method: "POST",
       body: JSON.stringify({ page: page }),
+      cache: "no-store"
     }).then((res) => {
       if (!res.ok) {
         setLoading(false);
