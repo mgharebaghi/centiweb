@@ -4,8 +4,10 @@ import { SiHiveBlockchain } from "react-icons/si";
 import { FaExchangeAlt } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { PulseLoader } from "react-spinners";
+import { useRouter } from "next/navigation";
 
 function Generated() {
+  const router = useRouter();
   const [blockLoading, setBlockLoading] = useState<boolean>(false);
   const [blocks, setBlocks] = useState<string>("");
   const [transactions, setTransactions] = useState(0);
@@ -17,8 +19,9 @@ function Generated() {
   }, []);
 
   const generatedBlocks = async () => {
+    router.refresh();
     setBlockLoading(true);
-    const res = await fetch("/api/blocks", {cache: 'no-store'});
+    const res = await fetch("/api/blocks", { cache: "no-store" });
 
     if (!res.ok) {
       setBlockLoading(false);

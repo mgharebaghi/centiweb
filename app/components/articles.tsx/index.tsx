@@ -6,6 +6,7 @@ import { ObjectId } from "mongodb";
 import { PulseLoader } from "react-spinners";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import { useRouter } from "next/navigation";
 
 interface Post {
   _id: ObjectId;
@@ -20,6 +21,7 @@ function Articles() {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [serverMsg, setServerMsg] = useState<string>("");
+  const router = useRouter();
 
   useEffect(() => {
     AOS.init({ duration: 1000 });
@@ -27,6 +29,7 @@ function Articles() {
   }, []);
 
   const getArticles = async () => {
+    router.refresh();
     setLoading(true);
     try {
       const res = await fetch("/api/articles", {cache: "no-store"});

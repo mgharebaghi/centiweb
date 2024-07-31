@@ -45,6 +45,7 @@ function Menu() {
   }, [pathname]);
 
   const remainingCoins = async () => {
+    router.refresh();
     await fetch("/api/coins")
       .then((res) => res.json())
       .then((data) => setCoins(data.message))
@@ -76,7 +77,7 @@ function Menu() {
                   backgroundColor: " #475569",
                   zIndex: "1",
                   borderRadius: "5px",
-                  margin:"1px"
+                  margin: "1px",
                 },
               }}
               TabIndicatorProps={{
@@ -85,7 +86,7 @@ function Menu() {
                   color: "white",
                   height: "100%",
                   borderRadius: "5px",
-                  margin:"1px"
+                  margin: "1px",
                 },
               }}
               className="w=[100%] grid justify-center"
@@ -154,7 +155,7 @@ function Menu() {
                   router.push("/dev");
                   setValue(5);
                 }} */}
-                {/* // icon={<LiaLaptopCodeSolid />} */}
+              {/* // icon={<LiaLaptopCodeSolid />} */}
               {/* // /> */}
             </Tabs>
           </Col>
