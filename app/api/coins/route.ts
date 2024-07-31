@@ -4,10 +4,10 @@ import { Block } from "../types/types";
 
 const uri = "mongodb://0.0.0.0:27017";
 const client = new MongoClient(uri);
+client.connect();
 
 export async function GET() {
   try {
-    await client.connect();
     let db = client.db("Blockchain");
     let collection = db.collection<WithId<Block>>("Blocks");
     let cursor = await collection.find({});
