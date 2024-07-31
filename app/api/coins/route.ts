@@ -15,14 +15,22 @@ export async function GET() {
     let all: number = 21000000.0;
 
     await cursor.forEach((doc) => {
-      generated =
-        generated +
-        parseFloat(doc.body.coinbase.reward.toString());
+      generated = generated + parseFloat(doc.body.coinbase.reward.toString());
     });
 
-    return NextResponse.json({
-      message: all - generated,
-    });
+    return NextResponse.json(
+      {
+        message: all - generated,
+      },
+      {
+        headers: {
+          "Cache-Control":
+            "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      }
+    );
   } catch (e) {
     return NextResponse.json({
       message: 0,

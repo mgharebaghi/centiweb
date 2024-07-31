@@ -46,7 +46,7 @@ function Menu() {
 
   const remainingCoins = async () => {
     router.refresh();
-    await fetch("/api/coins")
+    await fetch("/api/coins", {cache: "no-cache"})
       .then((res) => res.json())
       .then((data) => setCoins(data.message))
       .catch(() => setCoins(null));
