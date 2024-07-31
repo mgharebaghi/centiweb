@@ -4,6 +4,8 @@ import { MongoClient, WithId } from "mongodb";
 const uri = "mongodb://0.0.0.0:27017";
 const client = new MongoClient(uri);
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: NextRequest) {
   try {
     let transactions: Transaction[] = [];

@@ -5,6 +5,8 @@ import { NextResponse } from "next/server";
 const uri = "mongodb://0.0.0.0:27017";
 const client = new MongoClient(uri);
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const db = client.db("Blockchain");

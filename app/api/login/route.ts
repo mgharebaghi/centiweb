@@ -7,6 +7,8 @@ import { Admin } from "../types/types";
 const uri = "mongodb://0.0.0.0:27017/";
 const client = new MongoClient(uri);
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: Request, res: NextApiResponse) {
   try {
     const db = client.db("centiweb");
