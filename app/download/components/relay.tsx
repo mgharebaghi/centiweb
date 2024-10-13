@@ -1,121 +1,77 @@
-import { Container, Typography } from "@mui/material";
-import { Col, Divider, message, Row } from "antd";
-import Image from "next/image";
+import { Container, Typography, Box, Button, Snackbar, Tooltip } from "@mui/material";
 import { FaCopy } from "react-icons/fa";
+import Image from "next/image";
+import { useState } from "react";
 
 function Relay() {
+  const [openSnackbar, setOpenSnackbar] = useState(false);
   const relayCmd =
     "wget -N https://centichain.org/downloads/relay-service && chmod 777 relay-service && ./relay-service";
 
-  const [messageApi, contextHolder] = message.useMessage();
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(relayCmd);
+    setOpenSnackbar(true);
+  };
 
-  const success = () => {
-    messageApi.open({
-      type: "success",
-      content: "Command copied",
-      style: { marginTop: "70px" },
-    });
+  const handleCloseSnackbar = (event: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackbar(false);
   };
 
   return (
-    <Row className=" min-h-[300px] pr-1">
-      {contextHolder}
-      <Col
-        xs={24}
-        sm={24}
-        md={12}
-        lg={12}
-        xl={12}
-        xxl={12}
-        className="bg-slate-800 flex justify-center items-center rounded-r-full p-2"
-      >
-        <Row>
-          <Col
-            xs={24}
-            sm={24}
-            md={5}
-            lg={5}
-            xl={5}
-            xxl={5}
-            className="grid justify-center content-center"
-          >
-            <Image
-              src="/images/ubuntu.png"
-              alt="centichain relay ubuntu"
-              width={100}
-              height={100}
-            />
-          </Col>
-          <Col
-            xs={24}
-            sm={24}
-            md={19}
-            lg={19}
-            xl={19}
-            xxl={19}
-            className="grid justify-start content-center p-3"
-          >
-            <Typography
-              variant="h4"
-              // fontWeight="bold"
-              className="text-slate-700 bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-white"
+    <Box className="bg-gray-800 min-h-[500px] flex items-center justify-center py-12">
+      <Container maxWidth="md" className="text-center">
+        <Typography variant="h2" className="text-gray-100 mb-8 font-bold">
+          Run a Centichain Relay Node
+        </Typography>
+        <Typography variant="h5" className="text-gray-400 mb-12">
+          Maximize Your Earnings with Centichain's Relay Node
+        </Typography>
+        <Box className="flex justify-center mb-8">
+          <Image
+            src="/images/ubuntu.png"
+            alt="centichain relay ubuntu"
+            width={100}
+            height={100}
+            className="transition-transform duration-300 hover:scale-110"
+          />
+        </Box>
+        <Typography variant="body1" className="text-gray-300 mb-6">
+          Copy this command into your Ubuntu server:
+        </Typography>
+        <Box className="bg-gray-700 p-4 rounded-lg mb-6 flex items-center justify-between overflow-x-auto">
+          <Tooltip title="Click to copy" placement="top" arrow>
+            <Typography 
+              variant="body2" 
+              className="text-gray-200 font-mono mr-4 cursor-pointer"
+              onClick={copyToClipboard}
             >
-              Maximize Your Earnings with Centichain’s Relay Node
+              {relayCmd}
             </Typography>
-          </Col>
-        </Row>
-      </Col>
-      <Col
-        xs={24}
-        sm={24}
-        md={12}
-        lg={12}
-        xl={12}
-        xxl={12}
-        className="grid justify-center content-center p-1"
-      >
-        <Row>
-          <Col span={24} className="pr-5 text-center">
-            <Typography
-              variant="h5"
-              className="text-slate-300"
-              fontWeight="bold"
-            >
-              Copy this command into your ubuntu server
-            </Typography>
-          </Col>
-        </Row>
-        <Divider />
-        <Row className="p-4">
-          <Col
-            xs={24}
-            sm={24}
-            md={22}
-            lg={22}
-            xl={22}
-            xxl={22}
-            className="min-h-40px p-3 bg-slate-200 rounded-l-md select-none"
+          </Tooltip>
+          <Button
+            variant="contained"
+            className="bg-blue-600 hover:bg-blue-700 transition-colors duration-300 min-w-[100px]"
+            onClick={copyToClipboard}
+            startIcon={<FaCopy />}
           >
-            <Typography fontWeight="bold">{relayCmd}</Typography>
-          </Col>
-          <Col
-            xs={24}
-            sm={24}
-            md={2}
-            lg={2}
-            xl={2}
-            xxl={2}
-            className="min-h-[40px] bg-slate-700 rounded-r-md grid justify-center content-center text-white hover:bg-slate-200 hover:text-slate-700 cursor-pointer transition duration-200"
-            onClick={() => {
-              navigator.clipboard.writeText(relayCmd);
-              success();
-            }}
-          >
-            <FaCopy size={30} />
-          </Col>
-        </Row>
-      </Col>
-    </Row>
+            Copy
+          </Button>
+        </Box>
+        <Typography variant="body2" className="text-gray-500 mt-12">
+          Version 1.0.0
+        </Typography>
+      </Container>
+      <Snackbar
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        open={openSnackbar}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        message="Command copied to clipboard!"
+      />
+    </Box>
   );
 }
 

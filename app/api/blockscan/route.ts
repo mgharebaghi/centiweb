@@ -11,10 +11,10 @@ export async function POST(req: NextRequest) {
   try {
     
     let data: Block[] = [];
-    const db = client.db("Blockchain");
+    const db = client.db("Centichain");
     const collection = db.collection<WithId<Block>>("Blocks");
     const request = await req.json();
-    const skip = request.page * 10 - 10;
+    const skip = request.page * 9 - 9;
     const docs = await collection
       .find({})
       .sort({"header.number": -1})

@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    let db = client.db("Blockchain");
+    let db = client.db("Centichain");
     let collection = db.collection<WithId<Block>>("Blocks");
     let cursor = await collection.find({});
     let generated: number = 0;

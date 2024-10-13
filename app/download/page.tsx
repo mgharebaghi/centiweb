@@ -12,7 +12,7 @@ function Download() {
     document.title = "Centichain - Download";
   }, []);
   return (
-    <div className="w-full pt-[75px] min-h-[750px]">
+    <div className="w-full min-h-[750px]">
       <ThemeProvider theme={theme}>
         <Validators />
         <Relay />

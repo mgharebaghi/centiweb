@@ -1,63 +1,49 @@
-import { Button, Typography } from "@mui/material";
-import { Col, Row } from "antd";
+import { Typography, Paper } from "@mui/material";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 
-export default function Card(props: any) {
-  const route = useRouter();
+interface CardProps {
+  id: string;
+  pic: string;
+  title: string;
+  description: string;
+}
+
+export default function Card({ id, pic, title, description }: CardProps) {
+  const router = useRouter();
+
   return (
-    <div className="rounded-md bg-gray-50 w-[100%] min-h-[250px] shadow-md hover:shadow-xl transition duration-150">
-      <Row>
-        <Col
-          xs={24}
-          sm={24}
-          md={24}
-          lg={9}
-          xl={9}
-          xxl={9}
-          className="flex justify-center items-center"
-        >
-          <Image alt="img" src={props.pic} width={250} height={250} />
-        </Col>
-        <Col
-          xs={24}
-          sm={24}
-          md={24}
-          lg={15}
-          xl={15}
-          xxl={15}
-          className="min-h-[250px]"
-        >
-          <Row className="min-h-[90px]">
-            <Col span={24} className="p-3">
-              <Typography variant="h5" fontWeight="bold">{props.title}</Typography>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={24} className="pl-3 min-h-[110px]">
-              <Typography>
-                {props.description.length > 200
-                  ? props.description.substring(0, 200) + " ..."
-                  : props.description}
-              </Typography>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={24} className="h-[50px] flex justify-center items-end pb-3">
-              <Button
-                variant="contained"
-                className="w-[90%]"
-                onClick={() => {
-                  route.push(`articles/${props.id}`);
-                  window.scroll(0, 0);
-                }}
-              >
-                read more
-              </Button>
-            </Col>
-          </Row>
-        </Col>
-      </Row>
-    </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      whileHover={{ scale: 1.03 }}
+      whileTap={{ scale: 0.97 }}
+      className="cursor-pointer w-full aspect-square"
+      onClick={() => {
+        router.push(`/articles/${id}`);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }}
+    >
+      <Paper elevation={3} className="bg-gray-900 rounded-lg overflow-hidden w-[100%] h-[100%] flex flex-col">
+        <div className="relative flex-grow">
+          <Image
+            alt={title}
+            src={pic}
+            layout="fill"
+            className="transition-all duration-300 filter brightness-75 hover:brightness-100"
+          />
+        </div>
+        <div className="p-4">
+          <Typography variant="h6" className="font-bold mb-2 text-gray-100 line-clamp-2">
+            {title}
+          </Typography>
+          <Typography variant="body2" className="text-gray-400 line-clamp-2">
+            {description}
+          </Typography>
+        </div>
+      </Paper>
+    </motion.div>
   );
 }

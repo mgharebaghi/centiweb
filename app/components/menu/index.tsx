@@ -1,220 +1,134 @@
 "use client";
 
-import { Tab, Tabs, Toolbar, Typography, useMediaQuery } from "@mui/material";
-import { Col, Row } from "antd";
+import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { BiArrowBack } from "react-icons/bi";
-import { BsBack } from "react-icons/bs";
-import { GrValidate } from "react-icons/gr";
-import { IoReorderThree } from "react-icons/io5";
-import { MdOutlineDocumentScanner } from "react-icons/md";
-import { PulseLoader } from "react-spinners";
-import CustomDrawer from "./components/drawer";
 import Link from "next/link";
+import { useMediaQuery } from "@mui/material";
+import { PulseLoader } from "react-spinners";
+import { IoReorderThree } from "react-icons/io5";
+import { FaHome } from "react-icons/fa";
+import CustomDrawer from "./components/drawer";
+import { motion, AnimatePresence } from "framer-motion";
+import { FaQrcode, FaCheckCircle, FaBroadcastTower, FaFileAlt, FaDownload } from "react-icons/fa";
+
+const menuItems = [
+  { label: "Scan", path: "/scan", color: "#FF6B6B", icon: <FaQrcode /> },
+  { label: "Validator", path: "/articles/669017ee261897ff8bf5d197", color: "#4ECDC4", icon: <FaCheckCircle /> },
+  { label: "Relay", path: "/articles/6690198b261897ff8bf5d198", color: "#45B7D1", icon: <FaBroadcastTower /> },
+  { label: "Whitepaper", path: "/articles/66901aa0261897ff8bf5d199", color: "#FFA07A", icon: <FaFileAlt /> },
+  { label: "Download", path: "/download", color: "#98D8C8", icon: <FaDownload /> },
+];
 
 function Menu() {
-  const tabsClass =
-    "transition duration-190 text-slate-500 m-[1px] hover:bg-slate-600 hover:text-white rounded-[5px]";
-
-  const [value, setValue] = useState(Number);
+  const [activeItem, setActiveItem] = useState("");
+  const [coins, setCoins] = useState(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
-  const [coins, setCoins] = useState(null);
-  const screenMatch = useMediaQuery("(min-width: 1366px)");
-  const [toggle, setToggle] = useState(Boolean);
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
 
   useEffect(() => {
-    remainingCoins(); //get coins from server
-
-    if (pathname === "/scan") {
-      setValue(0);
-    } else if (pathname === "/articles/669017ee261897ff8bf5d197") {
-      setValue(1);
-    } else if (pathname === "/articles/6690198b261897ff8bf5d198") {
-      setValue(2);
-    } else if (pathname === "/articles/66901aa0261897ff8bf5d199") {
-      setValue(3);
-    } else if (pathname === "/download") {
-      setValue(4);
-    } else if (pathname === "/dev") {
-      setValue(5);
-    } else {
-      setValue(-1);
-    }
+    setActiveItem(pathname);
+    fetchCoins();
   }, [pathname]);
 
-  const remainingCoins = async () => {
-    router.refresh();
-    await fetch("/api/coins", {cache: "no-cache"})
-      .then((res) => res.json())
-      .then((data) => setCoins(data.message))
-      .catch(() => setCoins(null));
+  const fetchCoins = async () => {
+    try {
+      const res = await fetch("/api/coins", { cache: "no-store" });
+      const data = await res.json();
+      setCoins(data.message);
+    } catch (error) {
+      console.error("Failed to fetch coins:", error);
+      setCoins(null);
+    }
   };
 
   return (
-    <Toolbar className="w-full backdrop-blur bg-white/50 h-[75px] fixed z-10 flex items-center shadow-sm">
-      {screenMatch ? (
-        <>
-          <Col xs={4} sm={4} md={4} lg={7} xl={7} xxl={7}>
-            <img
-              src="/images/Logo.png"
-              onClick={() => {
-                router.push("/");
-                setValue(-1);
-              }}
-              className="w-[60px] h-[60px] cursor-pointer"
-            />
-          </Col>
-          <Col xs={5} sm={5} md={5} lg={10} xl={10} xxl={10}>
-            <Tabs
-              key={0}
-              value={value >= 0 ? value : null}
-              sx={{
-                marginLeft: "auto",
-                "& button.Mui-selected": {
-                  color: "white",
-                  backgroundColor: " #475569",
-                  zIndex: "1",
-                  borderRadius: "5px",
-                  margin: "1px",
-                },
-              }}
-              TabIndicatorProps={{
-                style: {
-                  backgroundColor: " #475569",
-                  color: "white",
-                  height: "100%",
-                  borderRadius: "5px",
-                  margin: "1px",
-                },
-              }}
-              className="w=[100%] grid justify-center"
-            >
-              <Tab
-                key={1}
-                label={<Typography>scan</Typography>}
-                className={tabsClass}
-                onClick={() => {
-                  window.scroll(0, 0);
-                  router.push("/scan");
-                  setValue(0);
-                }}
-                // icon={<MdOutlineDocumentScanner />}
-              />
-              <Tab
-                key={2}
-                label={<Typography>validator</Typography>}
-                className={tabsClass}
-                onClick={() => {
-                  window.scroll(0, 0);
-                  router.push("/articles/669017ee261897ff8bf5d197");
-                  setValue(1);
-                }}
-                // icon={<GrValidate />}
-              />
-              <Tab
-                key={3}
-                label={<Typography>relay</Typography>}
-                className={tabsClass}
-                onClick={() => {
-                  window.scroll(0, 0);
-                  router.push("/articles/6690198b261897ff8bf5d198");
-                  setValue(2);
-                }}
-                // icon={<SiRelay />}
-              />
-              <Tab
-                key={4}
-                label={<Typography>whitepaper</Typography>}
-                className={tabsClass}
-                onClick={() => {
-                  window.scroll(0, 0);
-                  router.push("/articles/66901aa0261897ff8bf5d199");
-                  setValue(3);
-                }}
-                // icon={<IoMdPaper />}
-              />
-              <Tab
-                key={4}
-                label={<Typography>download</Typography>}
-                className={tabsClass}
-                onClick={() => {
-                  window.scroll(0, 0);
-                  router.push("/download");
-                  setValue(4);
-                }}
-                // icon={<IoDownloadOutline />}
-              />
-              {/* <Tab
-                key={5}
-                label={<Typography>dev</Typography>}
-                className={tabsClass}
-                onClick={() => {
-                  window.scroll(0, 0);
-                  router.push("/dev");
-                  setValue(5);
-                }} */}
-              {/* // icon={<LiaLaptopCodeSolid />} */}
-              {/* // /> */}
-            </Tabs>
-          </Col>
-          <Col
-            xs={15}
-            sm={15}
-            md={15}
-            lg={7}
-            xl={7}
-            xxl={7}
-            className="text-slate-600 select-none text-right"
+    <motion.nav
+      initial={{ opacity: 0, y: -50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="fixed top-0 left-0 right-0 z-50 bg-gray-900 bg-opacity-90 backdrop-blur-md shadow-lg w-full"
+    >
+      <div className="w-full px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            className="flex-shrink-0 cursor-pointer"
+            onClick={() => router.push("/")}
           >
-            {coins ? (
-              <Typography fontWeight="bold">
-                Remaining CENTIs: {Number(coins).toLocaleString()}
-              </Typography>
-            ) : (
-              <PulseLoader size="5" />
-            )}
-          </Col>
-        </>
-      ) : (
-        <>
-          <Col xs={3} sm={3} md={2} lg={2} className="grid justify-center">
-            <img
-              src="/images/Logo.png"
-              onClick={() => {
-                router.push("/");
-                setValue(-1);
-              }}
-              className="w-[100%] h-[100%] cursor-pointer"
-            />
-          </Col>
-          <Col xs={18} sm={18} md={20} lg={20}>
-            {coins ? (
-              <>Remaining CENTIs: {Number(coins).toLocaleString()}</>
-            ) : null}
-          </Col>
-          <Col xs={3} sm={3} md={2} lg={2}>
-            <div className="text-slate-600 float-right">
-              {coins ? (
-                <IoReorderThree
-                  className="w-8 h-8"
-                  onClick={() => setToggle(!toggle)}
-                />
-              ) : (
-                <PulseLoader size={5} />
-              )}
-              <CustomDrawer
-                toggle={toggle}
-                setToggle={setToggle}
-                router={router}
-                setValue={setValue}
-              />
+            <FaHome className="h-8 w-8 text-white hover:text-blue-400 transition-colors duration-300" />
+          </motion.div>
+          
+          {isDesktop ? (
+            <div className="hidden lg:flex items-center space-x-4 flex-grow justify-center">
+              {menuItems.map((item) => (
+                <motion.div
+                  key={item.path}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <Link
+                    href={item.path}
+                    className={`px-3 py-2 rounded-md text-sm font-medium transition duration-300 ease-in-out flex items-center ${
+                      activeItem === item.path
+                        ? `bg-opacity-20 text-white`
+                        : "text-gray-300 hover:text-white hover:bg-opacity-10"
+                    }`}
+                    style={{
+                      backgroundColor: activeItem === item.path ? item.color : "transparent",
+                      boxShadow: activeItem === item.path ? `0 0 10px ${item.color}` : "none",
+                    }}
+                  >
+                    <span className="mr-2">{item.icon}</span>
+                    {item.label}
+                  </Link>
+                </motion.div>
+              ))}
             </div>
-          </Col>
-        </>
+          ) : (
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setIsDrawerOpen(true)}
+              className="lg:hidden p-2 rounded-md text-gray-300 hover:text-white focus:outline-none"
+            >
+              <IoReorderThree className="h-6 w-6" />
+            </motion.button>
+          )}
+
+          <AnimatePresence>
+            <motion.div
+              key={coins}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              className="flex items-center"
+            >
+              {coins !== null ? (
+                <span className="text-sm font-medium text-gray-300">
+                  Remaining CENTIs: {Number(coins).toLocaleString()}
+                </span>
+              ) : (
+                <PulseLoader size={5} color="#E5E7EB" />
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
+
+      {!isDesktop && (
+        <CustomDrawer
+          isOpen={isDrawerOpen}
+          onClose={() => setIsDrawerOpen(false)}
+          menuItems={menuItems}
+          activeItem={activeItem}
+          setActiveItem={setActiveItem}
+        />
       )}
-    </Toolbar>
+    </motion.nav>
   );
 }
 

@@ -1,123 +1,94 @@
-import { Drawer, List, ListItem, Typography } from "@mui/material";
+import { Drawer, List, ListItem, Typography, Button } from "@mui/material";
 import { Col, Row } from "antd";
 import Image from "next/image";
 import { BiArrowBack } from "react-icons/bi";
-import { GrValidate } from "react-icons/gr";
-import { IoMdPaper } from "react-icons/io";
-import { IoDownloadOutline } from "react-icons/io5";
-import { MdOutlineDocumentScanner } from "react-icons/md";
-import { SiDailydotdev, SiRelay } from "react-icons/si";
+import { Dispatch, SetStateAction, ReactNode } from 'react';
+import Link from 'next/link';
 
-function CustomDrawer(props: any) {
+function CustomDrawer({
+  isOpen,
+  onClose,
+  menuItems,
+  activeItem,
+  setActiveItem
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  menuItems: Array<{ path: string; label: string; icon: ReactNode; color: string }>;
+  activeItem: string;
+  setActiveItem: Dispatch<SetStateAction<string>>;
+}) {
   return (
     <Drawer
       PaperProps={{
         elevation: 0,
         sx: {
           width: "65%",
-          backgroundColor: "white",
+          backgroundColor: "#1F2937",
+          color: "white",
           position: "absolute",
         },
       }}
-      open={props.toggle}
-      onClose={() => props.setToggle(!props.toggle)}
+      open={isOpen}
+      onClose={onClose}
       anchor="right"
     >
-      <Row className="shadow-sm">
-        <Col span={12} className="p-3 flex items-center">
-          <BiArrowBack
-            size={25}
-            onClick={() => props.setToggle(!props.toggle)}
-          />
+      <Row className="shadow-sm border-b border-gray-700">
+        <Col span={12} className="p-4 flex items-center">
+          <Button
+            startIcon={<BiArrowBack size={25} />}
+            onClick={onClose}
+            className="text-white hover:text-gray-300 transition-colors duration-200"
+          >
+            Back
+          </Button>
         </Col>
-        <Col span={12} className="p-3 flex justify-end">
-          <Image
-            alt="centichain logo"
-            src="/images/Logo.png"
-            width={40}
-            height={40}
-            onClick={() => {
-              props.router.push("/");
-              props.setValue(-1);
-              props.setToggle(!props.toggle);
-            }}
-          />
+        <Col span={12} className="p-4 flex justify-end">
+          <Link href="/">
+            <Image
+              alt="centichain logo"
+              src="/images/Logo.png"
+              width={40}
+              height={40}
+              onClick={() => {
+                onClose();
+                setActiveItem("");
+              }}
+              className="cursor-pointer"
+            />
+          </Link>
         </Col>
       </Row>
-      <List>
-        <ListItem
-          className="w-full active:bg-slate-700 active:text-white transition duration-150"
-          onClick={() => {
-            window.scroll(0, 0);
-            props.router.push("/scan");
-            props.setValue(0);
-            props.setToggle(!props.toggle);
-          }}
-        >
-          <MdOutlineDocumentScanner className="mr-2 mb-1" />
-          <Typography>SCAN</Typography>
-        </ListItem>
-        <ListItem
-          className="w-full active:bg-slate-700 active:text-white transition duration-150"
-          onClick={() => {
-            window.scroll(0, 0);
-            props.router.push("/articles/669017ee261897ff8bf5d197");
-            props.setValue(0);
-            props.setToggle(!props.toggle);
-          }}
-        >
-          <GrValidate className="mr-2 mb-1" />
-          <Typography>VALIDATOR</Typography>
-        </ListItem>
-        <ListItem
-          className="w-full active:bg-slate-700 active:text-white transition duration-150"
-          onClick={() => {
-            window.scroll(0, 0);
-            props.router.push("/articles/6690198b261897ff8bf5d198");
-            props.setValue(0);
-            props.setToggle(!props.toggle);
-          }}
-        >
-          <SiRelay className="mr-2 mb-1" />
-          <Typography>RELAY</Typography>
-        </ListItem>
-        <ListItem
-          className="w-full active:bg-slate-700 active:text-white transition duration-150"
-          onClick={() => {
-            window.scroll(0, 0);
-            props.router.push("/articles/66901aa0261897ff8bf5d199");
-            props.setValue(0);
-            props.setToggle(!props.toggle);
-          }}
-        >
-          <IoMdPaper className="mr-2 mb-1" />
-          <Typography>WHITEPAPER</Typography>
-        </ListItem>
-        <ListItem
-          className="w-full active:bg-slate-700 active:text-white transition duration-150"
-          onClick={() => {
-            window.scroll(0, 0);
-            props.router.push("/download");
-            props.setValue(0);
-            props.setToggle(!props.toggle);
-          }}
-        >
-          <IoDownloadOutline className="mr-2 mb-1" />
-          <Typography>DOWNLOAD</Typography>
-        </ListItem>
-        {/* <ListItem
-          className="w-full active:bg-slate-700 active:text-white transition duration-150"
-          onClick={() => {
-            window.scroll(0, 0);
-            props.router.push("/dev");
-            props.setValue(0);
-            props.setToggle(!props.toggle);
-          }}
-        >
-          <SiDailydotdev className="mr-2 mb-1" />
-          <Typography>DEV</Typography>
-        </ListItem> */}
+      <List className="py-4">
+        {menuItems.map((menuItem, index) => (
+          <ListItem
+            key={index}
+            className={`w-full transition duration-200 hover:bg-gray-700 ${
+              activeItem === menuItem.path ? 'bg-gray-800' : ''
+            }`}
+            onClick={() => {
+              window.scroll(0, 0);
+              onClose();
+              setActiveItem(menuItem.path);
+            }}
+          >
+            <Link href={menuItem.path} passHref>
+              <div className="flex items-center space-x-4 py-2 px-4 w-full">
+                <div
+                  className="text-2xl"
+                  style={{ color: menuItem.color }}
+                >
+                  {menuItem.icon}
+                </div>
+                <Typography className="text-white">{menuItem.label}</Typography>
+              </div>
+            </Link>
+          </ListItem>
+        ))}
       </List>
+      <Typography variant="body2" className="text-gray-400 text-center mt-4">
+        Note: Some links may not be functional at the moment.
+      </Typography>
     </Drawer>
   );
 }

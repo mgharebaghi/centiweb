@@ -1,165 +1,157 @@
 "use client";
 
 import { Post } from "@/app/api/types/types";
-import { Container, Typography } from "@mui/material";
-import { Col, Divider, Row } from "antd";
+import { Container, Typography, Box, Divider, Grid, Paper, CircularProgress } from "@mui/material";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { PulseLoader } from "react-spinners";
 import { ThemeProvider, responsiveFontSizes, createTheme } from "@mui/material";
 import Card from "../components/cards";
+import { motion } from "framer-motion";
+import ErrorBoundary from "../../components/ErrorBoundary";
 
-let theme = createTheme();
+let theme = createTheme({
+  palette: {
+    mode: 'dark',
+    background: {
+      default: '#121212',
+      paper: '#1E1E1E',
+    },
+    text: {
+      primary: '#FFFFFF',
+      secondary: '#B0B0B0',
+    },
+  },
+});
 theme = responsiveFontSizes(theme);
 
 function Article({ params }: { params: { id: string } }) {
-  const [article, setArticle] = useState<Post>();
-  const [loading, setLoading] = useState<boolean>(false);
-  const [articles, setArticles] = useState<Post[]>([]);
-  const [artLoading, setArtLoading] = useState(false);
-  const route = useRouter();
+  const [article, setArticle] = useState<Post | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [relatedArticles, setRelatedArticles] = useState<Post[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
-    fetchData();
-    getArticles();
-  }, []);
+    const fetchData = async () => {
+      try {
+        const [articleRes, articlesRes] = await Promise.all([
+          fetch("/api/article", {
+            method: "POST",
+            body: JSON.stringify({ id: params.id }),
+          }),
+          fetch("/api/articles")
+        ]);
 
-  const fetchData = async () => {
-    setLoading(true);
-    const res = await fetch("/api/article", {
-      method: "POST",
-      body: JSON.stringify({ id: params.id }),
-    });
-
-    if (!res.ok) {
-      setLoading(false);
-      route.push("/404");
-    } else {
-      res.json().then((data) => {
-        if (data.status === "success") {
-          setLoading(false);
-          setArticle(data.article);
-          document.title = data.article.title;
-        } else {
-          setLoading(false);
-          route.push("/404");
+        if (!articleRes.ok || !articlesRes.ok) {
+          throw new Error('Failed to fetch data');
         }
-      });
-    }
-  };
 
-  const getArticles = async () => {
-    setArtLoading(true);
-    let response = await fetch("/api/articles");
+        const articleData = await articleRes.json();
+        const articlesData = await articlesRes.json();
 
-    if (!response.ok) {
-      setArtLoading(false);
-    } else {
-      response
-        .json()
-        .then((data) => {
-          data.data.map((art: Post, index: number) => {
-            if (art._id.toString() !== params.id) {
-              setArticles((prevData) => [...prevData, art]);
-            }
-          });
-        })
-        .then(() => {
-          setArtLoading(false);
-        });
-    }
-  };
+        if (articleData.status === "success") {
+          setArticle(articleData.article);
+          document.title = articleData.article.title;
+          setRelatedArticles(articlesData.data.filter((art: Post) => art._id.toString() !== params.id));
+        } else {
+          throw new Error('Failed to fetch article');
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        router.push("/404");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [params.id, router]);
+
+  if (loading) {
+    return (
+      <Box className="w-full min-h-screen flex justify-center items-center bg-gray-900">
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
-    <div className="w-full min-h-[750px]">
-      <Container
-        maxWidth="lg"
-        className="pt-20 pb-10 shadow-md rounded-b-md min-h-[750px] break-words"
-      >
-        {!loading && article && !artLoading ? (
-          <ThemeProvider theme={theme}>
-            <Row>
-              <Col
-                xs={24}
-                sm={24}
-                md={18}
-                lg={18}
-                xl={18}
-                xxl={18}
-                className="p-3 pb-0"
+    <ErrorBoundary>
+      <ThemeProvider theme={theme}>
+        <Box className="w-full min-h-screen bg-gray-900 text-white">
+          <Container maxWidth="lg" className="pt-24 pb-16">
+            {article && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
               >
-                <Typography variant="h3" fontWeight="bold">
-                  {article.title}
+                <Paper elevation={3} className="p-6 mb-8 bg-gray-900">
+                  <Grid container spacing={4}>
+                    <Grid item xs={12} md={8}>
+                      <Typography variant="h3" fontWeight="bold" gutterBottom>
+                        {article.title}
+                      </Typography>
+                      <Divider className="my-4" />
+                      <Typography variant="h6" fontWeight="medium" gutterBottom>
+                        {article.description}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} md={4} className="flex justify-center items-center">
+                      <Image
+                        alt={article.title}
+                        src={article.image}
+                        width={300}
+                        height={300}
+                        placeholder="blur"
+                        blurDataURL={`data:image/svg+xml;base64,${btoa(
+                          '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300"><rect width="100%" height="100%" fill="#1E1E1E"/></svg>'
+                        )}`}
+                        className="rounded-md shadow-lg"
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Typography variant="body1" component="div">
+                        <div
+                          dangerouslySetInnerHTML={{ __html: article.content }}
+                          className="prose prose-invert max-w-none"
+                        />
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </Paper>
+              </motion.div>
+            )}
+
+            {relatedArticles.length > 0 && (
+              <>
+                <Typography variant="h4" fontWeight="bold" className="mb-6 mt-12">
+                  Related Articles
                 </Typography>
-                <Divider />
-                <Typography variant="h6" fontWeight="bold">
-                  {article.description}
-                </Typography>
-              </Col>
-              <Col
-                xs={24}
-                sm={24}
-                md={6}
-                lg={6}
-                xl={6}
-                xxl={6}
-                className="flex justify-center items-end pl-3 pt-3"
-              >
-                <Image
-                  alt={article.title}
-                  src={article.image}
-                  width={300}
-                  height={300}
-                  placeholder="blur"
-                  blurDataURL={`${(
-                    <PulseLoader size={10} className="text-slate-600" />
-                  )}`}
-                  className="rounded-sm"
-                />
-              </Col>
-              <Col span={24} className="p-3 pt-0">
-                <Typography variant="h6">
-                  <div
-                    dangerouslySetInnerHTML={{ __html: article.content }}
-                    className="break-words"
-                  />
-                </Typography>
-              </Col>
-            </Row>
-            <Divider />
-            <Row>
-              {articles.map((item: Post, index: number) => {
-                return (
-                  <Col
-                    key={index}
-                    xs={24}
-                    sm={24}
-                    md={12}
-                    lg={12}
-                    xl={12}
-                    xxl={12}
-                    className="flex justify-center items-center mb-1 p-3"
-                    data-aos="fade-zoom-in"
-                  >
-                    <Card
-                      id={item._id}
-                      pic={item.image}
-                      title={item.title}
-                      description={item.description}
-                    />
-                  </Col>
-                );
-              })}
-            </Row>
-          </ThemeProvider>
-        ) : (
-          <div className="w-full min-h-[700px] flex justify-center items-center">
-            <PulseLoader size={5} />
-          </div>
-        )}
-      </Container>
-    </div>
+                <Grid container spacing={4}>
+                  {relatedArticles.map((item: Post, index: number) => (
+                    <Grid item xs={12} sm={6} key={item._id.toString()}>
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: index * 0.1 }}
+                      >
+                        <Card
+                          id={item._id.toString()}
+                          pic={item.image}
+                          title={item.title}
+                          description={item.description}
+                        />
+                      </motion.div>
+                    </Grid>
+                  ))}
+                </Grid>
+              </>
+            )}
+          </Container>
+        </Box>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
 

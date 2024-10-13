@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: NextRequest) {
   try {
     let transactions: Transaction[] = [];
-    const db = client.db("Blockchain");
+    const db = client.db("Centichain");
     const collection = db.collection<WithId<Transaction>>("reciept");
     const count = await collection.countDocuments();
     const request = await req.json();

@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const db = client.db("Blockchain");
+    const db = client.db("Centichain");
     const collection = db.collection("Blocks");
     const number = await collection.countDocuments();
 
