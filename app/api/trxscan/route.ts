@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     const collection = db.collection<WithId<Transaction>>("reciepts");
     const count = await collection.countDocuments();
     const request = await req.json();
-    const skip = request.page * 10 - 10;
+    const skip = request.page * 9 - 9;
     const docs = await collection
       .find({})
       .sort({ date: -1 })

@@ -81,32 +81,38 @@ export default function ScanedTrx() {
               {dataSource.map((transaction, index) => (
                 <Grid item xs={12} sm={6} md={4} key={index}>
                   <Card 
-                    className="bg-gray-900 text-gray-300 hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-105 h-full flex flex-col justify-between"
+                    className="bg-gray-900 text-gray-300 hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-105 h-[190px] flex flex-col justify-between"
                     onClick={() => handleTransactionClick(transaction)}
                   >
                     <CardContent className="p-4 flex flex-col h-full">
-                      <Typography variant="h6" className="text-blue-400 mb-4 font-bold text-center">
-                        <span className="mr-2">💼</span>
-                        Transaction #{index + 1}
-                      </Typography>
                       <div className="flex-grow flex flex-col justify-center">
-                        <Typography variant="body2" className="mb-3 text-gray-400 text-center">
-                          <span className="mr-2">📤</span>
-                          From: {transaction.from.substring(0, 20)}...
+                        <Typography variant="body2" className="mb-3 text-gray-400 text-left">
+                          <div className="flex">
+                            <span className="mr-2">📤 From:</span>
+                            <span>{transaction.from.substring(0, 10)}...</span>
+                          </div>
                         </Typography>
-                        <Typography variant="body2" className="mb-3 text-gray-400 text-center">
-                          <span className="mr-2">📥</span>
-                          To: {transaction.to.substring(0, 20)}...
+                        <Typography variant="body2" className="mb-3 text-gray-400 text-left">
+                          <div className="flex">
+                            <span className="mr-2">📥 To:</span>
+                            <span>{transaction.to.substring(0, 10)}...</span>
+                          </div>
                         </Typography>
-                        <Typography variant="body2" className="mb-3 text-gray-400 text-center">
+                        <Typography variant="body2" className="mb-3 text-gray-400 text-left">
                           <span className="mr-2">💰</span>
                           Value: {Number(transaction.value).toLocaleString()}
                         </Typography>
-                        <Typography variant="body2" className="mb-3 text-gray-400 text-center">
+                        <Typography variant="body2" className="mb-3 text-left">
                           <span className="mr-2">🚦</span>
-                          Status: {transaction.status}
+                          Status: <span className={`
+                            ${transaction.status.toLowerCase() === 'confirmed' ? 'text-green-400' : ''}
+                            ${transaction.status.toLowerCase() === 'pending' ? 'text-gray-400' : ''}
+                            ${!['confirmed', 'pending'].includes(transaction.status.toLowerCase()) ? 'text-red-400' : ''}
+                          `}>
+                            {transaction.status}
+                          </span>
                         </Typography>
-                        <Typography variant="body2" className="text-gray-400 text-center">
+                        <Typography variant="body2" className="text-gray-400 text-left">
                           <span className="mr-2">⏳</span>
                           Age: {getAge(transaction.date)}
                         </Typography>

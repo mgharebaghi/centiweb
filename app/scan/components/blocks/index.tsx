@@ -84,24 +84,24 @@ export default function ScanedBlocks() {
               {dataSource.map((item, index) => (
                 <Grid item xs={12} sm={6} md={4} key={index}>
                   <Card 
-                    className="bg-gray-900 text-gray-300 hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-105 h-full flex flex-col justify-between"
+                    className="bg-gray-900 text-gray-300 hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-105 h-[190px] flex flex-col justify-between"
                     onClick={() => handleBlockClick(item)}
                   >
                     <CardContent className="p-4 flex flex-col h-full">
-                      <Typography variant="h6" className="text-blue-400 mb-4 font-bold text-center">
+                      <Typography variant="h6" className="text-blue-400 mb-4 font-bold text-left">
                         <span className="mr-2">📦</span>
                         Block #{item.header.number.toLocaleString()}
                       </Typography>
                       <div className="flex-grow flex flex-col justify-center">
-                        <Typography variant="body2" className="mb-3 text-gray-400 text-center">
+                        <Typography variant="body2" className="mb-3 text-gray-400 text-left">
                           <span className="mr-2">🔗</span>
-                          Hash: {item.header.hash.substring(0, 20)}...
+                          Hash: {item.header.hash.substring(0, 10)}...
                         </Typography>
-                        <Typography variant="body2" className="mb-3 text-gray-400 text-center">
+                        <Typography variant="body2" className="mb-3 text-gray-400 text-left">
                           <span className="mr-2">⏳</span>
                           Age: {getAge(item.header.date)}
                         </Typography>
-                        <Typography variant="body2" className="text-gray-400 text-center">
+                        <Typography variant="body2" className="text-gray-400 text-left">
                           <span className="mr-2">💼</span>
                           Transactions: {item.body.transactions.length.toLocaleString()}
                         </Typography>
