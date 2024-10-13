@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   try {
     let transactions: Transaction[] = [];
     const db = client.db("Centichain");
-    const collection = db.collection<WithId<Transaction>>("reciept");
+    const collection = db.collection<WithId<Transaction>>("reciepts");
     const count = await collection.countDocuments();
     const request = await req.json();
     const skip = request.page * 10 - 10;
