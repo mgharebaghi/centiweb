@@ -27,7 +27,7 @@ function Relay() {
           Run a Centichain Relay Node
         </Typography>
         <Typography variant="h5" className="text-gray-400 mb-12">
-          Maximize Your Earnings with Centichain's Relay Node
+          Maximize Your Earnings with Centichain&apos;s Relay Node
         </Typography>
         <Box className="flex justify-center mb-8">
           <Image
