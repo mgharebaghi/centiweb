@@ -96,7 +96,7 @@ export default function Banner() {
         >
           <motion.div variants={blockVariants} className="flex justify-center">
             <Image
-              src="/images/logo.png"
+              src="/images/Logo.png"
               alt="Centichain Logo"
               width={300}
               height={300}

@@ -28,7 +28,7 @@ function Validators() {
           >
             <div className="flex justify-center mb-4 sm:mb-6 md:mb-8">
               <Image
-                src="/images/logo.png"
+                src="/images/Logo.png"
                 alt="Centichain Logo"
                 width={150}
                 height={150}

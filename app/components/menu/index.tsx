@@ -60,7 +60,7 @@ function Menu() {
             onClick={() => router.push("/")}
           >
             <Image
-              src="/images/logo.png"
+              src="/images/Logo.png"
               alt="Centichain Logo"
               width={48}
               height={48}
