@@ -13,9 +13,7 @@ import { FaQrcode, FaCheckCircle, FaBroadcastTower, FaFileAlt, FaDownload } from
 
 const menuItems = [
   { label: "Explorer", path: "/scan", color: "#FF6B6B", icon: <FaQrcode /> },
-  { label: "Validator", path: "/articles/670cede89914a8bf6e60fb17", color: "#4ECDC4", icon: <FaCheckCircle /> },
-  { label: "Relay", path: "/articles/670cedb89914a8bf6e60fb16", color: "#45B7D1", icon: <FaBroadcastTower /> },
-  { label: "Whitepaper", path: "/articles/670cee159914a8bf6e60fb18", color: "#FFA07A", icon: <FaFileAlt /> },
+  { label: "Whitepaper", path: "/articles/670cfeb91efba523d1178a4d", color: "#FFA07A", icon: <FaFileAlt /> },
   { label: "Download", path: "/download", color: "#98D8C8", icon: <FaDownload /> },
 ];
 

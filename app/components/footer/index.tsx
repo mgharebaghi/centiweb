@@ -20,9 +20,7 @@ function Footer() {
   const footerLinks = [
     { text: "Home", href: "/" },
     { text: "Scan", href: "/scan" },
-    { text: "Validator", href: "/articles/669017ee261897ff8bf5d197" },
-    { text: "Relay", href: "/articles/6690198b261897ff8bf5d198" },
-    { text: "Whitepaper", href: "/articles/66901aa0261897ff8bf5d199" },
+    { text: "Whitepaper", href: "/articles/670cfeb91efba523d1178a4d" },
     { text: "Download", href: "/download" },
   ];
 
