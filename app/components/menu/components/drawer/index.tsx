@@ -85,9 +85,6 @@ function CustomDrawer({
           </Link>
         ))}
       </List>
-      <Typography variant="body2" className="text-gray-400 text-center mt-4">
-        Note: Some links may not be functional at the moment.
-      </Typography>
     </Drawer>
   );
 }
