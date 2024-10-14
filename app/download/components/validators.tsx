@@ -44,7 +44,7 @@ function Validators() {
           </motion.div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {[
-              { icon: SiWindows, text: "Windows", link: "#" },
+              { icon: SiWindows, text: "Windows", link: "https://centichain.org/downloads/updates/windows/x64/v0.9.0/Centichain_0.9.0_x64_en-US.msi" },
               { icon: SiApple, text: "Mac", link: "#" },
               { icon: SiLinux, text: "Linux", link: "#" },
             ].map((item, index) => (
@@ -53,24 +53,28 @@ function Validators() {
                 variants={buttonVariants}
                 whileHover="hover"
                 whileTap="tap"
+                className="h-full"
               >
                 <Button
                   variant="contained"
                   href={item.link}
-                  className="w-full py-4 sm:py-5 md:py-6 px-2 sm:px-3 md:px-4 bg-gray-800 hover:bg-gray-700 rounded-lg transition duration-300 ease-in-out flex flex-col items-center justify-center"
-                  disabled
-                  style={{ opacity: 0.7 }}
+                  className={`w-full h-full py-4 sm:py-5 md:py-6 px-2 sm:px-3 md:px-4 bg-gray-800 hover:bg-gray-800 rounded-lg transition duration-300 ease-in-out flex flex-col items-center justify-center`}
+                  disabled={item.text !== "Windows"}
+                  style={{ opacity: item.text === "Windows" ? 1 : 0.7 }}
+                  onClick={item.text === "Windows" ? () => window.location.href = item.link : undefined}
                 >
                   <item.icon size={32} color="white" className="mb-2 sm:mb-3" />
                   <span className="text-gray-100 text-lg sm:text-xl font-semibold">{item.text}</span>
-                  <span className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-300 font-bold">(Coming Soon)</span>
+                  {item.text !== "Windows" && (
+                    <span className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-300 font-bold">(Coming Soon)</span>
+                  )}
                 </Button>
               </motion.div>
             ))}
           </div>
           
           <Typography variant="body2" className="text-gray-500 mt-8 sm:mt-10 md:mt-12 mb-2 sm:mb-3">
-            Version 0.9.2
+            Version 0.9.0
           </Typography>
           <Typography variant="body2" className="text-gray-400 mb-4 sm:mb-6 md:mb-8 text-xs sm:text-sm">
             By running a Validator Node, you help secure the network and earn rewards.

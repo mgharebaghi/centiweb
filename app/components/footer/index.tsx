@@ -19,7 +19,7 @@ function Footer() {
 
   const footerLinks = [
     { text: "Home", href: "/" },
-    { text: "Scan", href: "/scan" },
+    { text: "Explorer", href: "/scan" },
     { text: "Whitepaper", href: "/articles/670cfeb91efba523d1178a4d" },
     { text: "Download", href: "/download" },
   ];
