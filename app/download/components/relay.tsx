@@ -1,7 +1,7 @@
 import { Container, Typography, Box, Button, Snackbar, Tooltip } from "@mui/material";
-import { FaCopy } from "react-icons/fa";
-import Image from "next/image";
+import { FaCopy, FaServer, FaChevronUp } from "react-icons/fa";
 import { useState } from "react";
+import Link from 'next/link';
 
 function Relay() {
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -20,58 +20,75 @@ function Relay() {
     setOpenSnackbar(false);
   };
 
+  const scrollToValidator = () => {
+    const validatorSection = document.getElementById('validator-section');
+    if (validatorSection) {
+      validatorSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
-    <Box className="bg-gray-800 min-h-[500px] flex items-center justify-center py-12">
-      <Container maxWidth="md" className="text-center">
-        <Typography variant="h2" className="text-gray-100 mb-8 font-bold">
-          Run a Centichain Relay Node
-        </Typography>
-        <Typography variant="h5" className="text-gray-400 mb-12">
-          Maximize Your Earnings with Centichain&apos;s Relay Node
-        </Typography>
-        <Box className="flex justify-center mb-8">
-          <Image
-            src="/images/ubuntu.png"
-            alt="centichain relay ubuntu"
-            width={100}
-            height={100}
-            className="transition-transform duration-300 hover:scale-110"
-          />
-        </Box>
-        <Typography variant="body1" className="text-gray-300 mb-6">
-          Copy this command into your Ubuntu server:
-        </Typography>
-        <Box className="bg-gray-700 p-4 rounded-lg mb-6 flex items-center justify-between overflow-x-auto">
-          <Tooltip title="Click to copy" placement="top" arrow>
-            <Typography 
-              variant="body2" 
-              className="text-gray-200 font-mono mr-4 cursor-pointer"
+    <div id="relay-section" className="h-screen flex flex-col justify-center">
+      <Box className="bg-gradient-to-b from-gray-900 to-gray-800 h-full flex items-center">
+        <Container maxWidth="lg" className="text-center">
+          <Typography variant="h2" className="text-gray-100 mb-4 sm:mb-6 md:mb-8 font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl">
+            Run a Centichain Relay Node
+          </Typography>
+          <Typography variant="h5" className="text-gray-300 mb-6 sm:mb-8 md:mb-12 text-base sm:text-lg md:text-xl lg:text-2xl">
+            Maximize Your Earnings and Support the Network
+          </Typography>
+          <Box className="flex justify-center mb-6 sm:mb-8 md:mb-12">
+            <FaServer className="text-4xl sm:text-5xl md:text-6xl text-blue-400 animate-pulse" />
+          </Box>
+          <Typography variant="body1" className="text-gray-300 mb-4 sm:mb-6 text-sm sm:text-base md:text-lg">
+            To set up your Relay Node, run this command on your Ubuntu server:
+          </Typography>
+          <Box className="bg-gray-700 p-2 sm:p-3 md:p-4 rounded-lg mb-4 sm:mb-6 flex flex-col sm:flex-row items-center justify-between overflow-x-auto shadow-lg">
+            <Tooltip title="Click to copy" placement="top" arrow>
+              <Typography 
+                variant="body2" 
+                className="text-gray-200 font-mono mb-2 sm:mb-0 sm:mr-4 cursor-pointer hover:text-blue-300 transition-colors duration-300 text-xs sm:text-sm md:text-base break-all"
+                onClick={copyToClipboard}
+              >
+                {relayCmd}
+              </Typography>
+            </Tooltip>
+            <Button
+              variant="contained"
+              className="bg-blue-600 hover:bg-blue-700 transition-colors duration-300 min-w-[100px] mt-2 sm:mt-0"
               onClick={copyToClipboard}
+              startIcon={<FaCopy />}
             >
-              {relayCmd}
-            </Typography>
-          </Tooltip>
+              Copy
+            </Button>
+          </Box>
+          <Typography variant="body2" className="text-gray-400 mt-6 sm:mt-8 md:mt-12 text-xs sm:text-sm">
+            Relay Node Version: 1.0.0
+          </Typography>
+          <Typography variant="body2" className="text-gray-500 mt-2 sm:mt-4 mb-4 sm:mb-6 md:mb-8 text-xs sm:text-sm">
+            By running a Relay Node, you contribute to the network's stability and earn rewards.
+          </Typography>
           <Button
             variant="contained"
-            className="bg-blue-600 hover:bg-blue-700 transition-colors duration-300 min-w-[100px]"
-            onClick={copyToClipboard}
-            startIcon={<FaCopy />}
+            className="bg-blue-600 hover:bg-blue-700 transition-colors duration-300 py-2 sm:py-3 px-4 sm:px-6 rounded-full shadow-lg text-sm sm:text-base"
+            onClick={scrollToValidator}
+            startIcon={<FaChevronUp />}
           >
-            Copy
+            Set Up Validator Node
           </Button>
-        </Box>
-        <Typography variant="body2" className="text-gray-500 mt-12">
-          Version 1.0.0
-        </Typography>
-      </Container>
+        </Container>
+      </Box>
       <Snackbar
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         open={openSnackbar}
         autoHideDuration={3000}
         onClose={handleCloseSnackbar}
         message="Command copied to clipboard!"
+        ContentProps={{
+          className: 'bg-blue-600 text-white'
+        }}
       />
-    </Box>
+    </div>
   );
 }
 

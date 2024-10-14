@@ -1,7 +1,7 @@
 "use client";
 
 import { Post } from "@/app/api/types/types";
-import { Container, Typography, Box, Divider, Grid, Paper, CircularProgress } from "@mui/material";
+import { Container, Typography, Box, Divider, Grid, Paper, CircularProgress, Chip } from "@mui/material";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -9,10 +9,14 @@ import { ThemeProvider, responsiveFontSizes, createTheme } from "@mui/material";
 import Card from "../components/cards";
 import { motion } from "framer-motion";
 import ErrorBoundary from "../../components/ErrorBoundary";
+import { FaCalendarAlt, FaUser, FaClock } from "react-icons/fa";
 
 let theme = createTheme({
   palette: {
     mode: 'dark',
+    primary: {
+      main: '#4ECDC4',
+    },
     background: {
       default: '#121212',
       paper: '#1E1E1E',
@@ -20,6 +24,24 @@ let theme = createTheme({
     text: {
       primary: '#FFFFFF',
       secondary: '#B0B0B0',
+    },
+  },
+  typography: {
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    h3: {
+      fontWeight: 700,
+    },
+    h6: {
+      fontWeight: 500,
+    },
+  },
+  components: {
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))',
+        },
+      },
     },
   },
 });
@@ -86,35 +108,42 @@ function Article({ params }: { params: { id: string } }) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                <Paper elevation={3} className="p-6 mb-8 bg-gray-900">
+                <Paper elevation={3} className="p-8 mb-8 bg-gray-900 rounded-lg">
                   <Grid container spacing={4}>
                     <Grid item xs={12} md={8}>
-                      <Typography variant="h3" fontWeight="bold" gutterBottom>
+                      <Typography variant="h3" fontWeight="bold" gutterBottom className="text-4xl md:text-5xl lg:text-6xl">
                         {article.title}
                       </Typography>
+                      <Box className="flex flex-wrap gap-4 my-4">
+                        <Chip icon={<FaCalendarAlt />} label={new Date(article.createdAt).toLocaleDateString()} color="primary" />
+                        <Chip icon={<FaUser />} label={article.author || 'Anonymous'} color="primary" />
+                        <Chip icon={<FaClock />} label={`${Math.ceil(article.content.split(' ').length / 200)} min read`} color="primary" />
+                      </Box>
                       <Divider className="my-4" />
-                      <Typography variant="h6" fontWeight="medium" gutterBottom>
+                      <Typography variant="h6" fontWeight="medium" gutterBottom className="text-gray-300">
                         {article.description}
                       </Typography>
                     </Grid>
                     <Grid item xs={12} md={4} className="flex justify-center items-center">
-                      <Image
-                        alt={article.title}
-                        src={article.image}
-                        width={300}
-                        height={300}
-                        placeholder="blur"
-                        blurDataURL={`data:image/svg+xml;base64,${btoa(
-                          '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300"><rect width="100%" height="100%" fill="#1E1E1E"/></svg>'
-                        )}`}
-                        className="rounded-md shadow-lg"
-                      />
+                      <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
+                        <Image
+                          alt={article.title}
+                          src={article.image}
+                          width={400}
+                          height={400}
+                          placeholder="blur"
+                          blurDataURL={`data:image/svg+xml;base64,${btoa(
+                            '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="100%" height="100%" fill="#1E1E1E"/></svg>'
+                          )}`}
+                          className="rounded-lg shadow-lg"
+                        />
+                      </motion.div>
                     </Grid>
                     <Grid item xs={12}>
                       <Typography variant="body1" component="div">
                         <div
                           dangerouslySetInnerHTML={{ __html: article.content }}
-                          className="prose prose-invert max-w-none"
+                          className="prose prose-invert prose-lg max-w-none"
                         />
                       </Typography>
                     </Grid>
@@ -124,13 +153,17 @@ function Article({ params }: { params: { id: string } }) {
             )}
 
             {relatedArticles.length > 0 && (
-              <>
-                <Typography variant="h4" fontWeight="bold" className="mb-6 mt-12">
-                  Related Articles
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
+                <Typography variant="h4" fontWeight="bold" className="mb-6 mt-12 text-3xl md:text-4xl">
+                  Suggested Articles
                 </Typography>
                 <Grid container spacing={4}>
-                  {relatedArticles.map((item: Post, index: number) => (
-                    <Grid item xs={12} sm={6} key={item._id.toString()}>
+                  {relatedArticles.slice(0, 3).map((item: Post, index: number) => (
+                    <Grid item xs={12} sm={6} md={4} key={item._id.toString()}>
                       <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -146,7 +179,7 @@ function Article({ params }: { params: { id: string } }) {
                     </Grid>
                   ))}
                 </Grid>
-              </>
+              </motion.div>
             )}
           </Container>
         </Box>

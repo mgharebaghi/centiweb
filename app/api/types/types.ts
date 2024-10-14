@@ -7,6 +7,8 @@ export interface Post {
   type: string;
   description: string;
   image: string;
+  createdAt: string | Date;
+  author?: string;
 }
 
 export interface Block {

@@ -6,16 +6,16 @@ import Link from "next/link";
 import { useMediaQuery } from "@mui/material";
 import { PulseLoader } from "react-spinners";
 import { IoReorderThree } from "react-icons/io5";
-import { FaHome } from "react-icons/fa";
+import Image from "next/image";
 import CustomDrawer from "./components/drawer";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaQrcode, FaCheckCircle, FaBroadcastTower, FaFileAlt, FaDownload } from "react-icons/fa";
 
 const menuItems = [
-  { label: "Scan", path: "/scan", color: "#FF6B6B", icon: <FaQrcode /> },
-  { label: "Validator", path: "/articles/669017ee261897ff8bf5d197", color: "#4ECDC4", icon: <FaCheckCircle /> },
-  { label: "Relay", path: "/articles/6690198b261897ff8bf5d198", color: "#45B7D1", icon: <FaBroadcastTower /> },
-  { label: "Whitepaper", path: "/articles/66901aa0261897ff8bf5d199", color: "#FFA07A", icon: <FaFileAlt /> },
+  { label: "Explorer", path: "/scan", color: "#FF6B6B", icon: <FaQrcode /> },
+  { label: "Validator", path: "/articles/670cede89914a8bf6e60fb17", color: "#4ECDC4", icon: <FaCheckCircle /> },
+  { label: "Relay", path: "/articles/670cedb89914a8bf6e60fb16", color: "#45B7D1", icon: <FaBroadcastTower /> },
+  { label: "Whitepaper", path: "/articles/670cee159914a8bf6e60fb18", color: "#FFA07A", icon: <FaFileAlt /> },
   { label: "Download", path: "/download", color: "#98D8C8", icon: <FaDownload /> },
 ];
 
@@ -26,6 +26,7 @@ function Menu() {
   const pathname = usePathname();
   const router = useRouter();
   const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const isMobile = useMediaQuery("(max-width: 640px)");
 
   useEffect(() => {
     setActiveItem(pathname);
@@ -50,19 +51,25 @@ function Menu() {
       transition={{ duration: 0.5 }}
       className="fixed top-0 left-0 right-0 z-50 bg-gray-900 bg-opacity-90 backdrop-blur-md shadow-lg w-full"
     >
-      <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+      <div className="w-full px-2 sm:px-4 md:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-14 sm:h-16">
           <motion.div
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.2 }}
+            whileTap={{ scale: 0.95 }}
             className="flex-shrink-0 cursor-pointer"
             onClick={() => router.push("/")}
           >
-            <FaHome className="h-8 w-8 text-white hover:text-blue-400 transition-colors duration-300" />
+            <Image
+              src="/images/logo.png"
+              alt="Centichain Logo"
+              width={48}
+              height={48}
+              className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 lg:h-14 lg:w-14"
+            />
           </motion.div>
           
-          {isDesktop ? (
-            <div className="hidden lg:flex items-center space-x-4 flex-grow justify-center">
+          {isDesktop && (
+            <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center space-x-2 md:space-x-4">
               {menuItems.map((item) => (
                 <motion.div
                   key={item.path}
@@ -71,7 +78,7 @@ function Menu() {
                 >
                   <Link
                     href={item.path}
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition duration-300 ease-in-out flex items-center ${
+                    className={`px-2 md:px-3 py-1 md:py-2 rounded-md text-xs md:text-sm font-medium transition duration-300 ease-in-out flex items-center ${
                       activeItem === item.path
                         ? `bg-opacity-20 text-white`
                         : "text-gray-300 hover:text-white hover:bg-opacity-10"
@@ -81,41 +88,45 @@ function Menu() {
                       boxShadow: activeItem === item.path ? `0 0 10px ${item.color}` : "none",
                     }}
                   >
-                    <span className="mr-2">{item.icon}</span>
+                    <span className="mr-1 md:mr-2">{item.icon}</span>
                     {item.label}
                   </Link>
                 </motion.div>
               ))}
             </div>
-          ) : (
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setIsDrawerOpen(true)}
-              className="lg:hidden p-2 rounded-md text-gray-300 hover:text-white focus:outline-none"
-            >
-              <IoReorderThree className="h-6 w-6" />
-            </motion.button>
           )}
 
-          <AnimatePresence>
-            <motion.div
-              key={coins}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-              className="flex items-center"
-            >
-              {coins !== null ? (
-                <span className="text-sm font-medium text-gray-300">
-                  Remaining CENTIs: {Number(coins).toLocaleString()}
-                </span>
-              ) : (
-                <PulseLoader size={5} color="#E5E7EB" />
-              )}
-            </motion.div>
-          </AnimatePresence>
+          <div className="flex items-center">
+            <AnimatePresence>
+              <motion.div
+                key={coins}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                className="mr-2 sm:mr-4"
+              >
+                {coins !== null ? (
+                  <span className="text-xs sm:text-sm font-medium text-gray-300">
+                    {isMobile ? `CENTIs: ${Number(coins).toLocaleString()}` : `Remaining CENTIs: ${Number(coins).toLocaleString()}`}
+                  </span>
+                ) : (
+                  <PulseLoader size={4} color="#E5E7EB" />
+                )}
+              </motion.div>
+            </AnimatePresence>
+
+            {!isDesktop && (
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setIsDrawerOpen(true)}
+                className="p-1 sm:p-2 rounded-md text-gray-300 hover:text-white focus:outline-none"
+              >
+                <IoReorderThree className="h-5 w-5 sm:h-6 sm:w-6" />
+              </motion.button>
+            )}
+          </div>
         </div>
       </div>
 

@@ -15,6 +15,7 @@ function Production(props: any) {
   const [msgColor, setMsgColor] = useState("");
   const [file, setFile] = useState<File>();
   const [postImg, setPostImg] = useState("");
+  const [author, setAuthor] = useState("");
 
   const selectOpt = [
     { value: "article", label: "Article" },
@@ -30,7 +31,8 @@ function Production(props: any) {
       content !== "" &&
       desc !== "" &&
       file &&
-      select !== ""
+      select !== "" &&
+      author !== ""
     ) {
       const formData = new FormData();
       formData.set("file", file ?? new Blob());
@@ -69,6 +71,8 @@ function Production(props: any) {
       type: select,
       description: desc,
       image: postImg,
+      author,
+      createdAt: new Date().toISOString(),
     };
     await fetch("./api/insert", {
       method: "POST",
@@ -110,10 +114,20 @@ function Production(props: any) {
         </Col>
         <Col xs={24} sm={24} md={8} lg={8} xl={8} xxl={8} className="p-1">
           <Select
-            placeholder="Choos a category"
+            placeholder="Choose a category"
             className="w-[100%]"
             options={selectOpt}
             onChange={(val) => setSelect(val)}
+          />
+        </Col>
+      </Row>
+      <Row className="mb-3">
+        <Col xs={24} sm={24} md={24} lg={24} xl={24} xxl={24} className="p-1">
+          <Input
+            type="text"
+            className="w-[100%]"
+            placeholder="Enter author's name"
+            onChange={(e) => setAuthor(e.target.value)}
           />
         </Col>
       </Row>
@@ -128,14 +142,6 @@ function Production(props: any) {
       </Row>
       <Row className="mb-3 min-h-[400px]">
         <Col span={24}>
-          {/* <ReactQuill
-            theme="snow"
-            modules={modules}
-            style={{ height: "350px" }}
-            onChange={(txt) => {
-              setContent(txt);
-            }}
-          /> */}
           <Editor
             apiKey="2xuwpiwtg6dpym37fkznj8mvxvgl0yknv717zz9p0jpyffrx"
             init={{
@@ -152,8 +158,7 @@ function Production(props: any) {
               content_style:
                 "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
               image_class_list: [
-                // Bootstrap class
-                { title: "Responsive", value: "img-fluid" }, // Materialize class
+                { title: "Responsive", value: "img-fluid" },
               ],
             }}
             onEditorChange={(txt) => setContent(txt)}

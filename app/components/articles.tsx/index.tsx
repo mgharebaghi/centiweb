@@ -1,4 +1,4 @@
-import { Container, Grid, Typography } from "@mui/material";
+import { Container, Grid, Typography, Box } from "@mui/material";
 import Card from "./cards";
 import { forwardRef, useEffect, useState } from "react";
 import { ObjectId } from "mongodb";
@@ -44,24 +44,37 @@ function Articles() {
 
   if (loading) {
     return (
-      <div className="w-full min-h-[500px] flex justify-center items-center">
-        <PulseLoader color="gray" size={10} />
-      </div>
+      <Box className="w-full min-h-screen flex justify-center items-center bg-gray-100">
+        <PulseLoader color="#4A5568" size={15} />
+      </Box>
     );
   }
 
   if (error) {
     return (
-      <div className="w-full min-h-[500px] flex justify-center items-center">
-        <Typography variant="h6" color="error">{error}</Typography>
-      </div>
+      <Box className="w-full min-h-screen flex justify-center items-center bg-gray-100">
+        <Typography variant="h6" color="error" className="text-red-500">
+          {error}
+        </Typography>
+      </Box>
     );
   }
 
   return (
-    <div className="min-h-[500px] w-full py-12 bg-gray-100">
-      <Container maxWidth="xl">
-        <Grid container spacing={4}>
+    <Box className="min-h-screen w-full py-16 bg-gray-100 bg-opacity-90 relative">
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-100 to-purple-100 opacity-50"></div>
+      <div className="absolute inset-0" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+        backgroundSize: '60px 60px'
+      }}></div>
+      <Container maxWidth="xl" className="relative z-10">
+        <Typography
+          variant="h2"
+          className="text-slate-800 mb-12 text-center font-bold tracking-wide"
+        >
+          Latest Articles
+        </Typography>
+        <Grid container spacing={6}>
           {articles.map((item: Post, index: number) => (
             <Grid item xs={12} sm={6} md={4} key={item._id.toString()}>
               <motion.div
@@ -80,7 +93,7 @@ function Articles() {
           ))}
         </Grid>
       </Container>
-    </div>
+    </Box>
   );
 }
 

@@ -61,18 +61,17 @@ function CustomDrawer({
       </Row>
       <List className="py-4">
         {menuItems.map((menuItem, index) => (
-          <ListItem
-            key={index}
-            className={`w-full transition duration-200 hover:bg-gray-700 ${
-              activeItem === menuItem.path ? 'bg-gray-800' : ''
-            }`}
-            onClick={() => {
-              window.scroll(0, 0);
-              onClose();
-              setActiveItem(menuItem.path);
-            }}
-          >
-            <Link href={menuItem.path} passHref>
+          <Link href={menuItem.path} passHref key={index}>
+            <ListItem
+              className={`w-full transition duration-200 hover:bg-gray-700 ${
+                activeItem === menuItem.path ? 'bg-gray-800' : ''
+              } cursor-pointer`}
+              onClick={() => {
+                window.scroll(0, 0);
+                onClose();
+                setActiveItem(menuItem.path);
+              }}
+            >
               <div className="flex items-center space-x-4 py-2 px-4 w-full">
                 <div
                   className="text-2xl"
@@ -82,8 +81,8 @@ function CustomDrawer({
                 </div>
                 <Typography className="text-white">{menuItem.label}</Typography>
               </div>
-            </Link>
-          </ListItem>
+            </ListItem>
+          </Link>
         ))}
       </List>
       <Typography variant="body2" className="text-gray-400 text-center mt-4">

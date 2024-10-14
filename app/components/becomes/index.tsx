@@ -49,8 +49,8 @@ function Becomes() {
         <Button
           variant="contained"
           onClick={onClick}
-          className="py-2 px-6 text-lg font-semibold"
-          style={{ backgroundColor: '#4A5568', color: 'white' }}
+          className="py-2 px-6 text-lg font-light"
+          style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }}
         >
           {buttonText}
         </Button>
