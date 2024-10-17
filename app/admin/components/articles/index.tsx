@@ -22,7 +22,7 @@ function Articles(props: any) {
                 className="p-3"
               >
                 <Card
-                  id={item._id}
+                  id={item._id.toString()}
                   pic={item.image}
                   title={item.title}
                   description={item.description}
