@@ -109,7 +109,7 @@ function Dev() {
                  item.title.includes("Keypair") ? <GiHouseKeys /> :
                  item.title.includes("UTXO") ? <CiMoneyBill /> :
                  item.title.includes("Transaction") ? <GrTransaction /> :
-                 item.title.includes("Reciepts") ? <FaFileExport /> :
+                 item.title.includes("Reciept") ? <FaFileExport /> :
                  item.title.includes("Blockchain") ? <SiBnbchain /> : null;
       return {
         key: index.toString(),
