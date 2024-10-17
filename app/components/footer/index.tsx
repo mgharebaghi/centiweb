@@ -22,6 +22,7 @@ function Footer() {
     { text: "Explorer", href: "/scan" },
     { text: "Whitepaper", href: "/articles/670cfeb91efba523d1178a4d" },
     { text: "Download", href: "/download" },
+    { text: "DEV", href: "/dev" },
   ];
 
   const socialLinks = [
