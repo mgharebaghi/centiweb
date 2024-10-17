@@ -1,10 +1,12 @@
+import React, { useState, useCallback } from "react";
 import { Button, Typography } from "@mui/material";
-import { Col, Input, Row, Select } from "antd";
+import { Col, Input, Row, Select, Upload, message } from "antd";
+import { InboxOutlined } from '@ant-design/icons';
 import TextArea from "antd/es/input/TextArea";
-import React, { useState } from "react";
-import "react-quill/dist/quill.snow.css";
+import { Editor as TinyMCEEditor } from "@tinymce/tinymce-react";
 import { PulseLoader } from "react-spinners";
-import { Editor as Editor1 } from "@tinymce/tinymce-react";
+
+const { Dragger } = Upload;
 
 function Editor(props: any) {
   const [title, setTitle] = useState(props.title);
@@ -20,41 +22,55 @@ function Editor(props: any) {
   const selectOpt = [
     { value: "article", label: "Article" },
     { value: "dev", label: "DEV" },
+    { value: "becomes", label: "Becomes" },
+    { value: "whitepaper", label: "Whitepaper" },
   ];
 
-  async function update() {
-    // e.preventDefault();
+  const handleFileUpload = useCallback((info: any) => {
+    const { status } = info.file;
+    if (status === 'done') {
+      setFile(info.file.originFileObj);
+      setPostImg(`/images/${info.file.name}`);
+      message.success(`${info.file.name} file uploaded successfully.`);
+    } else if (status === 'error') {
+      message.error(`${info.file.name} file upload failed.`);
+    }
+  }, []);
+
+  const update = useCallback(async () => {
     setLoading(true);
-    if (title !== "" && content !== "" && desc !== "" && file) {
+    if (title && content && desc && file) {
       const formData = new FormData();
-      formData.set("file", file ?? new Blob());
+      formData.set("file", file);
 
-      const imgUpload = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!imgUpload.ok) {
-        setLoading(false);
-        setMsgColor("red");
-        setMsg("Image Upload problem!");
-      } else {
-        imgUpload.json().then((message) => {
-          if (message.status === "success") {
-            postData();
-          } else {
-            setMsgColor("red");
-            setLoading(false);
-            setMsg("Image upload Problem!");
-          }
+      try {
+        const imgUpload = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
         });
+
+        if (!imgUpload.ok) {
+          throw new Error("Image Upload problem!");
+        }
+
+        const imgUploadData = await imgUpload.json();
+        if (imgUploadData.status === "success") {
+          await postData();
+        } else {
+          throw new Error("Image upload Problem!");
+        }
+      } catch (error: any) {
+        setMsgColor("red");
+        setMsg(error.message);
+      } finally {
+        setLoading(false);
       }
     } else {
       setLoading(false);
       setMsgColor("red");
       setMsg("Please fill in all inputs correctly!");
     }
-  }
+  }, [title, content, desc, file]);
 
   const postData = async () => {
     const data = {
@@ -65,124 +81,174 @@ function Editor(props: any) {
       description: desc,
       image: postImg,
     };
-    await fetch("/api/update", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    }).then((res) => {
+    try {
+      const res = await fetch("/api/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
       if (!res.ok) {
-        setMsg("server error!");
-        setLoading(false);
-      } else {
-        res.json().then((message) => {
-          if (message.message === "success") {
-            props.getData(props.getUrl, props.setData);
-            setMsg("Your data updated :)");
-            setLoading(false);
-            setMsgColor("green");
-          }
-        });
+        throw new Error("Server error!");
       }
-    });
+
+      const message = await res.json();
+      if (message.message === "success") {
+        props.getData(props.getUrl, props.setData);
+        setMsg("Your data updated :)");
+        setMsgColor("green");
+      }
+    } catch (error: any) {
+      setMsg(error.message);
+      setMsgColor("red");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="w-[100%]">
-      <Row className="mb-3">
-        <Col xs={24} sm={24} md={16} lg={16} xl={16} xxl={16} className="p-1">
+    <div className="w-full max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
+      <Row gutter={[16, 16]} className="mb-6">
+        <Col xs={24} md={16}>
           <Input
             value={title}
-            type="text"
-            className="w-[100%]"
+            size="large"
             placeholder="Enter your text's title"
             onChange={(e) => setTitle(e.target.value)}
           />
         </Col>
-        <Col xs={24} sm={24} md={8} lg={8} xl={8} xxl={8} className="p-1">
+        <Col xs={24} md={8}>
           <Select
             value={select}
-            placeholder="Choos a category"
-            className="w-[100%]"
+            size="large"
+            placeholder="Choose a category"
+            className="w-full"
             options={selectOpt}
             onChange={(val) => setSelect(val)}
           />
         </Col>
       </Row>
-      <Row className="w-[100%] mb-3">
+      <Row className="mb-6">
         <Col span={24}>
           <TextArea
             value={desc}
+            rows={4}
             placeholder="Enter your description"
-            className="w-[100%]"
             onChange={(e) => setDesc(e.target.value)}
           />
         </Col>
       </Row>
-      <Row className="mb-3">
+      <Row className="mb-6">
         <Col span={24}>
-          <Editor1
+          <TinyMCEEditor
             apiKey="2xuwpiwtg6dpym37fkznj8mvxvgl0yknv717zz9p0jpyffrx"
-            initialValue={content}
+            initialValue={props.content}
             init={{
               height: 500,
               menubar: true,
-              plugins:
-                "advlist autolink lists link image charmap preview anchor searchreplace visualblocks code codesample fullscreen insertdatetime media table code help wordcount linebreak",
-              toolbar:
-                "undo redo | blocks | " +
-                "bold italic forecolor | alignleft aligncenter " +
-                "alignright alignjustify | bullist numlist outdent indent | " +
-                "removeformat | help" +
-                "code | codesample",
-              content_style:
-                "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-              image_class_list: [
-                // Bootstrap class
-                { title: "Responsive", value: "img-fluid" }, // Materialize class
+              plugins: [
+                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount',
+                'codesample', 'emoticons', 'hr', 'nonbreaking', 'pagebreak', 'paste',
+                'print', 'save', 'directionality', 'fullscreen', 'template', 'textpattern',
+                'toc', 'visualchars'
               ],
+              toolbar: 'undo redo | formatselect | ' +
+                'bold italic backcolor | alignleft aligncenter ' +
+                'alignright alignjustify | bullist numlist outdent indent | ' +
+                'removeformat | help | code | codesample | link image | ' +
+                'emoticons hr nonbreaking pagebreak paste | ' +
+                'print save | ltr rtl | fullscreen | template | ' +
+                'toc visualchars',
+              content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+              image_class_list: [
+                { title: 'Responsive', value: 'img-fluid' },
+              ],
+              codesample_languages: [
+                { text: 'HTML/XML', value: 'markup' },
+                { text: 'JavaScript', value: 'javascript' },
+                { text: 'CSS', value: 'css' },
+                { text: 'PHP', value: 'php' },
+                { text: 'Ruby', value: 'ruby' },
+                { text: 'Python', value: 'python' },
+                { text: 'Java', value: 'java' },
+                { text: 'C', value: 'c' },
+                { text: 'C#', value: 'csharp' },
+                { text: 'C++', value: 'cpp' }
+              ],
+              setup: function(editor) {
+                editor.on('init', function() {
+                  editor.getBody().addEventListener('click', function(e) {
+                    const target = e.target as HTMLElement;
+                    if (target.classList.contains('copy-button')) {
+                      e.preventDefault();
+                      const codeBlock = target.closest('pre');
+                      if (codeBlock) {
+                        const code = codeBlock.querySelector('code');
+                        if (code) {
+                          navigator.clipboard.writeText(code.innerText);
+                          message.success('Code copied to clipboard!');
+                        }
+                      }
+                    }
+                  });
+                });
+
+                editor.on('NodeChange SetContent', function() {
+                  const codeBlocks = editor.getBody().querySelectorAll('pre');
+                  codeBlocks.forEach((block) => {
+                    if (!block.querySelector('.copy-button')) {
+                      const button = editor.dom.create('button', {
+                        'class': 'copy-button absolute bottom-2 right-2 bg-gray-800 text-white px-3 py-1 rounded-full shadow-md hover:bg-gray-700 transition-colors duration-200 flex items-center space-x-1',
+                        'innerHTML': '<span class="icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg></span><span>Copy</span>'
+                      });
+                      editor.dom.setStyles(block, { position: 'relative', paddingBottom: '2.5rem' });
+                      block.appendChild(button);
+                    }
+                  });
+                });
+              }
             }}
             onEditorChange={(txt) => setContent(txt)}
           />
         </Col>
       </Row>
-      <Row className="mb-3">
-        <Col xs={12} sm={12} md={8} lg={8} xl={8} xxl={8} className="p-1">
-          <input
-            type="file"
-            accept="image/"
-            onChange={({ target }) => {
-              if (target.files) {
-                const file = target.files[0];
-                setPostImg(`/images/${file.name}`);
-                setFile(file);
-              }
-            }}
-          />
+      <Row className="mb-6">
+        <Col span={24}>
+          <Dragger
+            name="file"
+            multiple={false}
+            action="/api/upload"
+            onChange={handleFileUpload}
+          >
+            <p className="ant-upload-drag-icon">
+              <InboxOutlined />
+            </p>
+            <p className="ant-upload-text">Click or drag file to this area to upload</p>
+            <p className="ant-upload-hint">
+              Support for a single image upload. Strictly prohibited from uploading company data or other sensitive files.
+            </p>
+          </Dragger>
         </Col>
       </Row>
-      <Row className="w-[100%]">
-        <Col xs={24} sm={24} md={8} lg={8} xl={8} xxl={8}>
+      <Row gutter={16} align="middle">
+        <Col>
           <Button
-            variant="outlined"
-            className="w-[250px] border-gray-600 text-gray-600 hover:bg-gray-600 hover:text-white"
-            onClick={(e) => update()}
+            variant="contained"
+            color="primary"
+            className="px-8 py-2"
+            onClick={update}
+            disabled={loading}
           >
             Update post
           </Button>
         </Col>
-        <Col
-          xs={24}
-          sm={24}
-          md={16}
-          lg={16}
-          xl={16}
-          xxl={16}
-          className="flex items-center"
-        >
+        <Col>
           {loading ? (
-            <PulseLoader size={5} color="gray" />
+            <PulseLoader size={10} color="#1890ff" />
           ) : (
-            <Typography color={msgColor}>{msg}</Typography>
+            <Typography style={{ color: msgColor }}>{msg}</Typography>
           )}
         </Col>
       </Row>

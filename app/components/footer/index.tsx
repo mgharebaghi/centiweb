@@ -27,7 +27,7 @@ function Footer() {
   const socialLinks = [
     { icon: <VscGithub />, href: "https://github.com/mgharebaghi82/centiweb" },
     { icon: <BsTwitterX />, href: "https://x.com/centichain" },
-    { icon: <MdEmail />, href: "#" },
+    // { icon: <MdEmail />, href: "#" },
     { icon: <FaTelegram />, href: "https://t.me/centichain" },
   ];
 

@@ -9,12 +9,13 @@ import { IoReorderThree } from "react-icons/io5";
 import Image from "next/image";
 import CustomDrawer from "./components/drawer";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaQrcode, FaCheckCircle, FaBroadcastTower, FaFileAlt, FaDownload } from "react-icons/fa";
+import { FaQrcode, FaCheckCircle, FaBroadcastTower, FaFileAlt, FaDownload, FaCode } from "react-icons/fa";
 
 const menuItems = [
   { label: "Explorer", path: "/scan", color: "#FF6B6B", icon: <FaQrcode /> },
   { label: "Whitepaper", path: "/articles/670cfeb91efba523d1178a4d", color: "#FFA07A", icon: <FaFileAlt /> },
   { label: "Download", path: "/download", color: "#98D8C8", icon: <FaDownload /> },
+  { label: "DEV", path: "/dev", color: "#4CAF50", icon: <FaCode /> },
 ];
 
 function Menu() {

@@ -1,9 +1,13 @@
-import { Button, Typography } from "@mui/material";
-import { Col, Divider, Input, Row, Select } from "antd";
+import React, { useState, useEffect } from "react";
+import { Button, Typography, Container, Paper } from "@mui/material";
+import { Col, Divider, Input, Row, Select, Upload, message } from "antd";
+import { InboxOutlined } from '@ant-design/icons';
 import TextArea from "antd/es/input/TextArea";
-import React, { useState } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import { PulseLoader } from "react-spinners";
+import { FaCopy } from "react-icons/fa";
+
+const { Dragger } = Upload;
 
 function Production(props: any) {
   const [title, setTitle] = useState("");
@@ -24,42 +28,46 @@ function Production(props: any) {
     { value: "whitepaper", label: "Whitepaper" },
   ];
 
+  const handleFileUpload = (info: any) => {
+    const { status } = info.file;
+    if (status === 'done') {
+      setFile(info.file.originFileObj);
+      setPostImg(`/images/${info.file.name}`);
+      message.success(`${info.file.name} file uploaded successfully.`);
+    } else if (status === 'error') {
+      message.error(`${info.file.name} file upload failed.`);
+    }
+  };
+
   async function insert() {
     setLoading(true);
-    if (
-      title !== "" &&
-      content !== "" &&
-      desc !== "" &&
-      file &&
-      select !== "" &&
-      author !== ""
-    ) {
+    if (title && content && desc && file && select && author) {
       const formData = new FormData();
-      formData.set("file", file ?? new Blob());
+      formData.set("file", file);
 
-      const imgUpload = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!imgUpload.ok) {
-        setLoading(false);
-        setMsgColor("red");
-        setMsg("Image Upload problem!");
-      } else {
-        imgUpload.json().then((message: any) => {
-          if (message.status === "success") {
-            postData();
-          } else {
-            setMsgColor("red");
-            setLoading(false);
-            setMsg("Image upload Problem!");
-          }
+      try {
+        const imgUpload = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
         });
+
+        if (!imgUpload.ok) throw new Error("Image Upload problem!");
+
+        const imgUploadData = await imgUpload.json();
+        if (imgUploadData.status === "success") {
+          await postData();
+        } else {
+          throw new Error("Image upload Problem!");
+        }
+      } catch (error: any) {
+        setMsgColor("error");
+        setMsg(error.message);
+      } finally {
+        setLoading(false);
       }
     } else {
       setLoading(false);
-      setMsgColor("red");
+      setMsgColor("error");
       setMsg("Please fill in all inputs correctly!");
     }
   }
@@ -74,74 +82,68 @@ function Production(props: any) {
       author,
       createdAt: new Date().toISOString(),
     };
-    await fetch("./api/insert", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    }).then((res) => {
-      if (!res.ok) {
-        setMsg("server error!");
-        setLoading(false);
-      } else {
-        res.json().then((message) => {
-          if (message.message === "success") {
-            if (select === "dev") {
-              props.fetchData("/api/devs", props.setDevs);
-            } else if (select === "article") {
-              props.fetchData("/api/articles", props.setArticles);
-            } else {
-              props.fetchData("/api/others", props.setOtehrs);
-            }
-            setMsg("Your data inserted :)");
-            setLoading(false);
-            setMsgColor("green");
-          }
-        });
+    try {
+      const response = await fetch("./api/insert", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) throw new Error("Server error!");
+
+      const responseData = await response.json();
+      if (responseData.message === "success") {
+        if (select === "dev") {
+          props.fetchData("/api/devs", props.setDevs);
+        } else if (select === "article") {
+          props.fetchData("/api/articles", props.setArticles);
+        } else {
+          props.fetchData("/api/others", props.setOtehrs);
+        }
+        setMsg("Your data inserted successfully!");
+        setMsgColor("success");
       }
-    });
+    } catch (error: any) {
+      setMsg(error.message);
+      setMsgColor("error");
+    }
   };
 
   return (
-    <div className="w-[100%]">
-      <Row className="mb-3">
-        <Col xs={24} sm={24} md={16} lg={16} xl={16} xxl={16} className="p-1">
-          <Input
-            type="text"
-            className="w-[100%]"
-            placeholder="Enter your text's title"
-            onChange={(e) => setTitle(e.target.value)}
-          />
-        </Col>
-        <Col xs={24} sm={24} md={8} lg={8} xl={8} xxl={8} className="p-1">
-          <Select
-            placeholder="Choose a category"
-            className="w-[100%]"
-            options={selectOpt}
-            onChange={(val) => setSelect(val)}
-          />
-        </Col>
-      </Row>
-      <Row className="mb-3">
-        <Col xs={24} sm={24} md={24} lg={24} xl={24} xxl={24} className="p-1">
-          <Input
-            type="text"
-            className="w-[100%]"
-            placeholder="Enter author's name"
-            onChange={(e) => setAuthor(e.target.value)}
-          />
-        </Col>
-      </Row>
-      <Row className="w-[100%] mb-3">
-        <Col span={24}>
-          <TextArea
-            placeholder="Enter your description"
-            className="w-[100%]"
-            onChange={(e) => setDesc(e.target.value)}
-          />
-        </Col>
-      </Row>
-      <Row className="mb-3 min-h-[400px]">
-        <Col span={24}>
+    <Container maxWidth="lg">
+      <Paper elevation={3} className="p-6 mt-8">
+        <Typography variant="h4" className="mb-6 text-center font-bold text-gray-800">Create New Post</Typography>
+        <Row gutter={[16, 16]}>
+          <Col xs={24} md={16}>
+            <Input
+              size="large"
+              placeholder="Enter your text's title"
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </Col>
+          <Col xs={24} md={8}>
+            <Select
+              size="large"
+              placeholder="Choose a category"
+              className="w-full"
+              options={selectOpt}
+              onChange={(val) => setSelect(val)}
+            />
+          </Col>
+        </Row>
+        <Input
+          size="large"
+          placeholder="Enter author's name"
+          onChange={(e) => setAuthor(e.target.value)}
+          className="mt-4"
+        />
+        <TextArea
+          rows={4}
+          placeholder="Enter your description"
+          onChange={(e) => setDesc(e.target.value)}
+          className="mt-4"
+        />
+        <div className="mt-6">
           <Editor
             apiKey="2xuwpiwtg6dpym37fkznj8mvxvgl0yknv717zz9p0jpyffrx"
             init={{
@@ -151,12 +153,17 @@ function Production(props: any) {
                 'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
                 'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
                 'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount',
-                'codesample'
+                'codesample', 'emoticons', 'hr', 'nonbreaking', 'pagebreak', 'paste',
+                'print', 'save', 'directionality', 'fullscreen', 'template', 'textpattern',
+                'toc', 'visualchars'
               ],
-              toolbar: 'undo redo | blocks | ' +
-                'bold italic forecolor | alignleft aligncenter ' +
+              toolbar: 'undo redo | formatselect | ' +
+                'bold italic backcolor | alignleft aligncenter ' +
                 'alignright alignjustify | bullist numlist outdent indent | ' +
-                'removeformat | help | code | codesample',
+                'removeformat | help | code | codesample | link image | ' +
+                'emoticons hr nonbreaking pagebreak paste | ' +
+                'print save | ltr rtl | fullscreen | template | ' +
+                'toc visualchars',
               content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
               image_class_list: [
                 { title: 'Responsive', value: 'img-fluid' },
@@ -173,54 +180,94 @@ function Production(props: any) {
                 { text: 'C#', value: 'csharp' },
                 { text: 'C++', value: 'cpp' }
               ],
+              setup: function(editor) {
+                editor.on('init', function() {
+                  editor.getBody().addEventListener('click', function(e) {
+                    const target = e.target as HTMLElement;
+                    if (target.classList.contains('copy-button')) {
+                      e.preventDefault();
+                      const codeBlock = target.closest('pre');
+                      if (codeBlock) {
+                        const code = codeBlock.querySelector('code');
+                        if (code) {
+                          navigator.clipboard.writeText(code.innerText);
+                          message.success('Code copied to clipboard!');
+                        }
+                      }
+                    }
+                  });
+                });
+
+                editor.on('NodeChange', function(e) {
+                  const codeBlocks = editor.getBody().querySelectorAll('pre');
+                  codeBlocks.forEach((block) => {
+                    if (!block.querySelector('.copy-button')) {
+                      const button = editor.dom.create('button', {
+                        'class': 'copy-button absolute bottom-2 right-2 bg-gray-800 text-white px-3 py-1 rounded-full shadow-md hover:bg-gray-700 transition-colors duration-200 flex items-center space-x-1',
+                        'innerHTML': '<span class="icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg></span><span>Copy</span>'
+                      });
+                      editor.dom.setStyles(block, { position: 'relative', paddingBottom: '2.5rem' });
+                      block.appendChild(button);
+                    }
+                  });
+                });
+
+                editor.on('SetContent', function() {
+                  const codeBlocks = editor.getBody().querySelectorAll('pre');
+                  codeBlocks.forEach((block) => {
+                    if (!block.querySelector('.copy-button')) {
+                      const button = editor.dom.create('button', {
+                        'class': 'copy-button absolute bottom-2 right-2 bg-gray-800 text-white px-3 py-1 rounded-full shadow-md hover:bg-gray-700 transition-colors duration-200 flex items-center space-x-1',
+                        'innerHTML': '<span class="icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg></span><span>Copy</span>'
+                      });
+                      editor.dom.setStyles(block, { position: 'relative', paddingBottom: '2.5rem' });
+                      block.appendChild(button);
+                    }
+                  });
+                });
+              }
             }}
             onEditorChange={(txt) => setContent(txt)}
           />
-        </Col>
-      </Row>
-      <Divider />
-      <Row className="mb-3">
-        <Col xs={12} sm={12} md={8} lg={8} xl={8} xxl={8} className="p-1">
-          <input
-            type="file"
-            accept="image/"
-            onChange={({ target }) => {
-              if (target.files) {
-                const file = target.files[0];
-                setPostImg(`/images/${file.name}`);
-                setFile(file);
-              }
-            }}
-          />
-        </Col>
-      </Row>
-      <Row className="w-[100%]">
-        <Col xs={24} sm={24} md={8} lg={8} xl={8} xxl={8}>
-          <Button
-            variant="outlined"
-            className="border-slate-600 text-slate-600 w-[250px] hover:bg-gray-600 hover:text-white"
-            onClick={insert}
-          >
-            Create post
-          </Button>
-        </Col>
-        <Col
-          xs={24}
-          sm={24}
-          md={16}
-          lg={16}
-          xl={16}
-          xxl={16}
-          className="flex items-center"
+        </div>
+        <Divider />
+        <Dragger
+          name="file"
+          multiple={false}
+          action="/api/upload"
+          onChange={handleFileUpload}
+          className="mt-4"
         >
-          {loading ? (
-            <PulseLoader size="5px" color="gray" />
-          ) : (
-            <Typography color={msgColor}>{msg}</Typography>
-          )}
-        </Col>
-      </Row>
-    </div>
+          <p className="ant-upload-drag-icon">
+            <InboxOutlined />
+          </p>
+          <p className="ant-upload-text">Click or drag file to this area to upload</p>
+          <p className="ant-upload-hint">
+            Support for a single image upload. Strictly prohibit from uploading company data or other
+            sensitive files.
+          </p>
+        </Dragger>
+        <Row justify="space-between" align="middle" className="mt-6">
+          <Col>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={insert}
+              disabled={loading}
+            >
+              {loading ? <PulseLoader size={10} color="white" /> : "Create Post"}
+            </Button>
+          </Col>
+          <Col>
+            {msg && (
+              <Typography color={msgColor === "error" ? "error" : "success"}>
+                {msg}
+              </Typography>
+            )}
+          </Col>
+        </Row>
+      </Paper>
+    </Container>
   );
 }
 
