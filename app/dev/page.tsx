@@ -29,7 +29,11 @@ import ReactQuill from 'react-quill';
 import ReactDOM from 'react-dom';
 
 const DynamicReactQuill = dynamic(() => 
-  import('react-quill').then((mod) => forwardRef<ReactQuill, ReactQuillProps>((props, ref) => <mod.default {...props} ref={ref} />)),
+  import('react-quill').then((mod) => {
+    const Component = forwardRef<ReactQuill, ReactQuillProps>((props, ref) => <mod.default {...props} ref={ref} />);
+    Component.displayName = 'DynamicReactQuill';
+    return Component;
+  }),
   { ssr: false }
 );
 
