@@ -27,6 +27,7 @@ import { forwardRef } from 'react';
 import { ReactQuillProps } from 'react-quill';
 import ReactQuill from 'react-quill';
 import ReactDOM from 'react-dom';
+import { useRouter, useParams } from 'next/navigation';
 
 const DynamicReactQuill = dynamic(() => 
   import('react-quill').then((mod) => {
@@ -66,6 +67,8 @@ function Dev() {
   const contentRef = useRef<HTMLDivElement>(null);
   const [titles, setTitles] = useState<TitleItem[]>([]);
   const [activeTitle, setActiveTitle] = useState<string>("");
+  const router = useRouter();
+  const params = useParams();
 
   useEffect(() => {
     document.title = "Centichain - DEV";
@@ -79,6 +82,15 @@ function Dev() {
   }, []);
 
   useEffect(() => {
+    if (posts.length > 0 && params.slug) {
+      const index = posts.findIndex(post => post.title.toLowerCase().replace(/\s+/g, '-') === params.slug);
+      if (index !== -1) {
+        setKey(index.toString());
+      }
+    }
+  }, [posts, params.slug]);
+
+  useEffect(() => {
     if (quillRef.current) {
       const editor = quillRef.current.getEditor();
       editor.options.modules.syntax = true;
@@ -87,19 +99,23 @@ function Dev() {
         editor.theme.modules.toolbar.container.style.display = 'none';
       }
     }
+    highlightCode();
   }, [key, posts]);
 
   const getItems = async () => {
     setLoading(true);
-    const res = await fetch("/api/devs");
-
-    if (!res.ok) {
-      setLoading(false);
-      console.log("get data problem!");
-    } else {
+    try {
+      const res = await fetch("/api/devs");
+      if (!res.ok) {
+        throw new Error("Failed to fetch data");
+      }
       const data = await res.json();
       setLoading(false);
       setPosts(data.data);
+    } catch (error) {
+      setLoading(false);
+      console.error("Error fetching data:", error);
+      message.error("Failed to load content. Please try again later.");
     }
   };
 
@@ -118,19 +134,17 @@ function Dev() {
       };
     });
     setItems(newItems);
+    setTimeout(() => {
+      highlightCode();
+    }, 1000);
   }, [posts]);
 
   const highlightCode = useCallback(() => {
-    if (quillRef.current) {
-      const editor = quillRef.current.getEditor();
-      const content = editor.root;
-      const codeBlocks = content.querySelectorAll('pre');
-      codeBlocks.forEach((block: HTMLElement) => {
-        const codeElement = block.querySelector('code');
-        if (codeElement) {
-          hljs.highlightElement(codeElement);
-        }
-        addCopyButton(block);
+    if (contentRef.current) {
+      const codeBlocks = contentRef.current.querySelectorAll('pre code');
+      codeBlocks.forEach((block: Element) => {
+        hljs.highlightElement(block as HTMLElement);
+        addCopyButton(block.parentElement as HTMLElement);
       });
     }
   }, []);
@@ -190,20 +204,14 @@ function Dev() {
   const handleCollapse = (isCollapsed: boolean) => {
     setCollapsed(isCollapsed);
     setTimeout(() => {
-      if (quillRef.current) {
-        const editor = quillRef.current.getEditor();
-        editor.update();
-        highlightCode();
-      }
-    }, 500);
+      highlightCode();
+    }, 0);
   };
 
   const extractTitles = useCallback(() => {
-    if (quillRef.current) {
-      const editor = quillRef.current.getEditor();
-      const content = editor.root;
-      const headings = content.querySelectorAll('h1, h2, h3, h4, h5, h6');
-      const newTitles: TitleItem[] = Array.from(headings as NodeListOf<HTMLHeadingElement>).map((heading, index) => ({
+    if (contentRef.current) {
+      const headings = contentRef.current.querySelectorAll('h1, h2, h3, h4, h5, h6');
+      const newTitles: TitleItem[] = Array.from(headings).map((heading, index) => ({
         id: `heading-${index}`,
         text: heading.textContent || '',
         level: parseInt(heading.tagName[1]),
@@ -214,7 +222,10 @@ function Dev() {
 
   useEffect(() => {
     extractTitles();
-  }, [key, posts, extractTitles]);
+    setTimeout(() => {
+      highlightCode();
+    }, 0);
+  }, [key, posts, extractTitles, highlightCode]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -234,6 +245,16 @@ function Dev() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (posts.length > 0 && key) {
+      const currentPost = posts[Number(key)];
+      if (currentPost) {
+        const slug = currentPost.title.toLowerCase().replace(/\s+/g, '-');
+        router.push(`/dev/${slug}`);
+      }
+    }
+  }, [key, posts, router]);
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 pt-[64px] flex flex-col">
@@ -297,7 +318,7 @@ function Dev() {
               </Menu>
             </Sider>
             <Layout className="p-6 bg-gray-900">
-              <Content className="bg-gray-800 rounded-lg p-6 shadow-xl" ref={contentRef}>
+              <Content className="bg-gray-800 rounded-lg p-6 shadow-xl overflow-hidden" ref={contentRef}>
                 <AnimatePresence mode="wait">
                   {!loading && Number(key) < posts.length ? (
                     <motion.div
@@ -305,23 +326,28 @@ function Dev() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
-                      transition={{ duration: 0.5 }}
+                      transition={{ duration: 0.5, ease: "easeInOut" }}
                       className="prose prose-invert max-w-none"
-                      onAnimationComplete={highlightCode}
                     >
-                      <h1 className="text-3xl font-bold mb-6">{posts[Number(key)].title}</h1>
-                      <DynamicReactQuill
-                        ref={quillRef}
-                        value={posts[Number(key)].content}
-                        readOnly={true}
-                        theme="snow"
-                        modules={{
-                          syntax: true,
-                          toolbar: false,
-                        }}
-                        onChange={highlightCode}
-                        className="bg-gray-700 rounded-lg text-gray-100"
-                      />
+                      <motion.h1 
+                        className="text-3xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.2, duration: 0.5 }}
+                      >
+                        {posts[Number(key)].title}
+                      </motion.h1>
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.3, duration: 0.5 }}
+                        className="content-wrapper"
+                      >
+                        <div 
+                          dangerouslySetInnerHTML={{ __html: posts[Number(key)].content }}
+                          className="bg-gray-700 rounded-lg text-gray-100 shadow-inner p-4 code-content"
+                        />
+                      </motion.div>
                     </motion.div>
                   ) : (
                     <motion.div
@@ -329,9 +355,10 @@ function Dev() {
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.5 }}
-                      className="flex justify-center items-center h-64"
+                      className="flex flex-col justify-center items-center h-64 space-y-4"
                     >
                       <PulseLoader color="#3498db" size={15} />
+                      <p className="text-gray-400">Loading content...</p>
                     </motion.div>
                   )}
                 </AnimatePresence>
