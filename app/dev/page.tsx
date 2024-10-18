@@ -345,7 +345,7 @@ function Dev() {
                       >
                         <div 
                           dangerouslySetInnerHTML={{ __html: posts[Number(key)].content }}
-                          className="bg-gray-700 rounded-lg text-gray-100 shadow-inner p-4 code-content"
+                          className="bg-gray-700 rounded-lg text-gray-100 shadow-inner p-4 code-content overflow-x-auto whitespace-pre-wrap"
                         />
                       </motion.div>
                     </motion.div>
