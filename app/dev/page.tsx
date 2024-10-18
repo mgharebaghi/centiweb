@@ -390,7 +390,6 @@ function Dev() {
                         dangerouslySetInnerHTML={{
                           __html: posts[Number(key)].content,
                         }}
-                        className="p-4 code-content text-wrap break-words prose prose-invert max-w-none"
                       />
                     </motion.div>
                   ) : (
