@@ -1,7 +1,16 @@
 "use client";
 import "../prism";
 import Typography from "@mui/material/Typography";
-import { Layout, Menu, ConfigProvider, theme, message, Button, Typography as AntTypography, Tabs } from "antd";
+import {
+  Layout,
+  Menu,
+  ConfigProvider,
+  theme,
+  message,
+  Button,
+  Typography as AntTypography,
+  Tabs,
+} from "antd";
 import { Content, Footer, Header } from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
 import { ObjectId } from "mongodb";
@@ -16,25 +25,28 @@ import { CiMoneyBill } from "react-icons/ci";
 import { GrTransaction } from "react-icons/gr";
 import { FaFileExport, FaCopy } from "react-icons/fa6";
 import { SiBnbchain } from "react-icons/si";
-import dynamic from 'next/dynamic';
-import hljs from 'highlight.js/lib/core';
-import javascript from 'highlight.js/lib/languages/javascript';
-import ruby from 'highlight.js/lib/languages/ruby';
-import python from 'highlight.js/lib/languages/python';
-import 'highlight.js/styles/atom-one-dark.css';
-import { motion, AnimatePresence } from 'framer-motion';
-import { forwardRef } from 'react';
-import { ReactQuillProps } from 'react-quill';
-import ReactQuill from 'react-quill';
-import ReactDOM from 'react-dom';
-import { useRouter, useParams } from 'next/navigation';
+import dynamic from "next/dynamic";
+import hljs from "highlight.js/lib/core";
+import javascript from "highlight.js/lib/languages/javascript";
+import ruby from "highlight.js/lib/languages/ruby";
+import python from "highlight.js/lib/languages/python";
+import "highlight.js/styles/atom-one-dark.css";
+import { motion, AnimatePresence } from "framer-motion";
+import { forwardRef } from "react";
+import { ReactQuillProps } from "react-quill";
+import ReactQuill from "react-quill";
+import ReactDOM from "react-dom";
+import { useRouter, useParams } from "next/navigation";
 
-const DynamicReactQuill = dynamic(() => 
-  import('react-quill').then((mod) => {
-    const Component = forwardRef<ReactQuill, ReactQuillProps>((props, ref) => <mod.default {...props} ref={ref} />);
-    Component.displayName = 'DynamicReactQuill';
-    return Component;
-  }),
+const DynamicReactQuill = dynamic(
+  () =>
+    import("react-quill").then((mod) => {
+      const Component = forwardRef<ReactQuill, ReactQuillProps>(
+        (props, ref) => <mod.default {...props} ref={ref} />
+      );
+      Component.displayName = "DynamicReactQuill";
+      return Component;
+    }),
   { ssr: false }
 );
 
@@ -73,17 +85,19 @@ function Dev() {
   useEffect(() => {
     document.title = "Centichain - DEV";
     getItems();
-    
-    hljs.registerLanguage('javascript', javascript);
-    hljs.registerLanguage('ruby', ruby);
-    hljs.registerLanguage('python', python);
-    
+
+    hljs.registerLanguage("javascript", javascript);
+    hljs.registerLanguage("ruby", ruby);
+    hljs.registerLanguage("python", python);
+
     (window as any).hljs = hljs;
   }, []);
 
   useEffect(() => {
     if (posts.length > 0 && params.slug) {
-      const index = posts.findIndex(post => post.title.toLowerCase().replace(/\s+/g, '-') === params.slug);
+      const index = posts.findIndex(
+        (post) => post.title.toLowerCase().replace(/\s+/g, "-") === params.slug
+      );
       if (index !== -1) {
         setKey(index.toString());
       }
@@ -96,7 +110,7 @@ function Dev() {
       editor.options.modules.syntax = true;
       editor.options.modules.toolbar = false;
       if (editor.theme.modules.toolbar) {
-        editor.theme.modules.toolbar.container.style.display = 'none';
+        editor.theme.modules.toolbar.container.style.display = "none";
       }
     }
     highlightCode();
@@ -121,12 +135,19 @@ function Dev() {
 
   useEffect(() => {
     const newItems = posts.map((item, index) => {
-      let icon = item.title.includes("API") ? <TbApi /> :
-                 item.title.includes("Keypair") ? <GiHouseKeys /> :
-                 item.title.includes("UTXO") ? <CiMoneyBill /> :
-                 item.title.includes("Transaction") ? <GrTransaction /> :
-                 item.title.includes("Reciept") ? <FaFileExport /> :
-                 item.title.includes("Blockchain") ? <SiBnbchain /> : null;
+      let icon = item.title.includes("API") ? (
+        <TbApi />
+      ) : item.title.includes("Keypair") ? (
+        <GiHouseKeys />
+      ) : item.title.includes("UTXO") ? (
+        <CiMoneyBill />
+      ) : item.title.includes("Transaction") ? (
+        <GrTransaction />
+      ) : item.title.includes("Reciept") ? (
+        <FaFileExport />
+      ) : item.title.includes("Blockchain") ? (
+        <SiBnbchain />
+      ) : null;
       return {
         key: index.toString(),
         icon,
@@ -141,7 +162,7 @@ function Dev() {
 
   const highlightCode = useCallback(() => {
     if (contentRef.current) {
-      const codeBlocks = contentRef.current.querySelectorAll('pre code');
+      const codeBlocks = contentRef.current.querySelectorAll("pre code");
       codeBlocks.forEach((block: Element) => {
         hljs.highlightElement(block as HTMLElement);
         addCopyButton(block.parentElement as HTMLElement);
@@ -150,25 +171,26 @@ function Dev() {
   }, []);
 
   const addCopyButton = (block: HTMLElement) => {
-    if (block.querySelector('.copy-button')) return;
+    if (block.querySelector(".copy-button")) return;
 
-    const button = document.createElement('button');
-    button.innerHTML = '<FaCopy /> Copy';
-    button.className = 'copy-button absolute top-2 right-2 bg-gray-700 text-white px-2 py-1 rounded';
+    const button = document.createElement("button");
+    button.innerHTML = "<FaCopy /> Copy";
+    button.className =
+      "copy-button absolute top-2 right-2 bg-gray-700 text-white px-2 py-1 rounded";
     button.onclick = (e) => {
       e.preventDefault();
-      const code = block.querySelector('code');
+      const code = block.querySelector("code");
       if (code) {
         navigator.clipboard.writeText(code.innerText);
-        message.success('Code copied to clipboard!');
+        message.success("Code copied to clipboard!");
       }
     };
-    block.style.position = 'relative';
+    block.style.position = "relative";
     block.appendChild(button);
   };
 
   useEffect(() => {
-    const style = document.createElement('style');
+    const style = document.createElement("style");
     style.textContent = `
       pre {
         position: relative;
@@ -210,12 +232,16 @@ function Dev() {
 
   const extractTitles = useCallback(() => {
     if (contentRef.current) {
-      const headings = contentRef.current.querySelectorAll('h1, h2, h3, h4, h5, h6');
-      const newTitles: TitleItem[] = Array.from(headings).map((heading, index) => ({
-        id: `heading-${index}`,
-        text: heading.textContent || '',
-        level: parseInt(heading.tagName[1]),
-      }));
+      const headings = contentRef.current.querySelectorAll(
+        "h1, h2, h3, h4, h5, h6"
+      );
+      const newTitles: TitleItem[] = Array.from(headings).map(
+        (heading, index) => ({
+          id: `heading-${index}`,
+          text: heading.textContent || "",
+          level: parseInt(heading.tagName[1]),
+        })
+      );
       setTitles(newTitles);
     }
   }, []);
@@ -230,8 +256,10 @@ function Dev() {
   useEffect(() => {
     const handleScroll = () => {
       if (contentRef.current) {
-        const headings = contentRef.current.querySelectorAll('h1, h2, h3, h4, h5, h6');
-        let currentActiveTitle = '';
+        const headings = contentRef.current.querySelectorAll(
+          "h1, h2, h3, h4, h5, h6"
+        );
+        let currentActiveTitle = "";
         headings.forEach((heading: Element) => {
           const rect = heading.getBoundingClientRect();
           if (rect.top <= 100) {
@@ -242,15 +270,15 @@ function Dev() {
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
     if (posts.length > 0 && key) {
       const currentPost = posts[Number(key)];
       if (currentPost) {
-        const slug = currentPost.title.toLowerCase().replace(/\s+/g, '-');
+        const slug = currentPost.title.toLowerCase().replace(/\s+/g, "-");
         router.push(`/dev/${slug}`);
       }
     }
@@ -262,9 +290,9 @@ function Dev() {
         theme={{
           algorithm: theme.darkAlgorithm,
           token: {
-            colorPrimary: '#3498db',
-            colorBgBase: '#111827',
-            colorTextBase: '#f3f4f6',
+            colorPrimary: "#3498db",
+            colorBgBase: "#111827",
+            colorTextBase: "#f3f4f6",
           },
         }}
       >
@@ -277,9 +305,16 @@ function Dev() {
                 onClick={() => handleCollapse(!collapsed)}
                 className="text-gray-300 hover:text-white mr-4 focus:outline-none transition-colors duration-200"
               >
-                {collapsed ? <RiMenuUnfold2Fill size={24} /> : <RiMenuFold2Fill size={24} />}
+                {collapsed ? (
+                  <RiMenuUnfold2Fill size={24} />
+                ) : (
+                  <RiMenuFold2Fill size={24} />
+                )}
               </motion.button>
-              <Typography variant="h4" className="text-gray-100 font-bold text-2xl">
+              <Typography
+                variant="h4"
+                className="text-gray-100 font-bold text-2xl"
+              >
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
                   Centichain DEV
                 </span>
@@ -303,13 +338,23 @@ function Dev() {
                     onClick={() => setKey(item.key)}
                     className={`
                       text-gray-300 hover:text-white transition-colors duration-200
-                      ${item.key === key ? 'bg-gradient-to-r from-slate-800 to-slate-600 text-white font-bold shadow-md' : ''}
+                      ${
+                        item.key === key
+                          ? "bg-gradient-to-r from-slate-800 to-slate-600 text-white font-bold shadow-md"
+                          : ""
+                      }
                     `}
                   >
                     {!collapsed && (
-                      <span className={`
-                        ${item.key === key ? 'border-l-4 border-white pl-2 text-white' : ''}
-                      `}>
+                      <span
+                        className={`
+                        ${
+                          item.key === key
+                            ? "border-l-4 border-white pl-2 text-white"
+                            : ""
+                        }
+                      `}
+                      >
                         {item.label}
                       </span>
                     )}
@@ -318,7 +363,10 @@ function Dev() {
               </Menu>
             </Sider>
             <Layout className="p-6 bg-gray-900">
-              <Content className="bg-gray-800 rounded-lg p-6 shadow-xl overflow-hidden" ref={contentRef}>
+              <Content
+                className="bg-gray-800 rounded-lg p-6 shadow-xl overflow-hidden"
+                ref={contentRef}
+              >
                 <AnimatePresence mode="wait">
                   {!loading && Number(key) < posts.length ? (
                     <motion.div
@@ -329,7 +377,7 @@ function Dev() {
                       transition={{ duration: 0.5, ease: "easeInOut" }}
                       className="prose prose-invert max-w-none"
                     >
-                      <motion.h1 
+                      <motion.h1
                         className="text-3xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500"
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -337,17 +385,13 @@ function Dev() {
                       >
                         {posts[Number(key)].title}
                       </motion.h1>
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.3, duration: 0.5 }}
-                        className="content-wrapper"
-                      >
-                        <div 
-                          dangerouslySetInnerHTML={{ __html: posts[Number(key)].content }}
-                          className="bg-gray-700 rounded-lg text-gray-100 shadow-inner p-4 code-content text-wrap break-words"
-                        />
-                      </motion.div>
+
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: posts[Number(key)].content,
+                        }}
+                        className="p-4 code-content text-wrap break-words"
+                      />
                     </motion.div>
                   ) : (
                     <motion.div
