@@ -37,7 +37,6 @@ import { ReactQuillProps } from "react-quill";
 import ReactQuill from "react-quill";
 import ReactDOM from "react-dom";
 import { useRouter, useParams } from "next/navigation";
-import DOMPurify from 'isomorphic-dompurify';
 
 const DynamicReactQuill = dynamic(
   () =>
@@ -389,9 +388,9 @@ function Dev() {
 
                       <div
                         dangerouslySetInnerHTML={{
-                          __html: DOMPurify.sanitize(posts[Number(key)].content),
+                          __html: posts[Number(key)].content,
                         }}
-                        className="p-4 code-content text-wrap break-words"
+                        className="p-4 code-content text-wrap break-words prose prose-invert max-w-none"
                       />
                     </motion.div>
                   ) : (
