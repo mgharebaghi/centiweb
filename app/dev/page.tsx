@@ -37,6 +37,7 @@ import { ReactQuillProps } from "react-quill";
 import ReactQuill from "react-quill";
 import ReactDOM from "react-dom";
 import { useRouter, useParams } from "next/navigation";
+import DOMPurify from "isomorphic-dompurify";
 
 const DynamicReactQuill = dynamic(
   () =>
@@ -369,28 +370,30 @@ function Dev() {
               >
                 <AnimatePresence mode="wait">
                   {!loading && Number(key) < posts.length ? (
-                    // <motion.div
-                    //   key={key}
-                    //   initial={{ opacity: 0, y: 20 }}
-                    //   animate={{ opacity: 1, y: 0 }}
-                    //   exit={{ opacity: 0, y: -20 }}
-                    //   transition={{ duration: 0.5, ease: "easeInOut" }}
-                    //   className="prose prose-invert max-w-none"
-                    // >
-                    //   <motion.h1
-                    //     className="text-3xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500"
-                    //     initial={{ opacity: 0, x: -20 }}
-                    //     animate={{ opacity: 1, x: 0 }}
-                    //     transition={{ delay: 0.2, duration: 0.5 }}
-                    //   >
-                    //     {posts[Number(key)].title}
-                    //   </motion.h1>
-                    // </motion.div>
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html: posts[Number(key)].content,
-                      }}
-                    />
+                    <motion.div
+                      key={key}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.5, ease: "easeInOut" }}
+                      className="prose prose-invert max-w-none"
+                    >
+                      <motion.h1
+                        className="text-3xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.2, duration: 0.5 }}
+                      >
+                        {posts[Number(key)].title}
+                      </motion.h1>
+
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: posts[Number(key)].content,
+                        }}
+                        className="p-4 code-content text-wrap break-words prose prose-invert max-w-none"
+                      />
+                    </motion.div>
                   ) : (
                     <motion.div
                       initial={{ opacity: 0 }}
