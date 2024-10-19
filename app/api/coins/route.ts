@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { MongoClient, WithId, Decimal128 } from "mongodb";
+import { MongoClient, WithId } from "mongodb";
 import { Block } from "../types/types";
 
 const uri = "mongodb://0.0.0.0:27017";

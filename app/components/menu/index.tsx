@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useMediaQuery } from "@mui/material";
@@ -9,7 +9,7 @@ import { IoReorderThree } from "react-icons/io5";
 import Image from "next/image";
 import CustomDrawer from "./components/drawer";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaQrcode, FaCheckCircle, FaBroadcastTower, FaFileAlt, FaDownload, FaCode } from "react-icons/fa";
+import { FaQrcode, FaFileAlt, FaDownload, FaCode } from "react-icons/fa";
 
 const menuItems = [
   { label: "Explorer", path: "/scan", color: "#FF6B6B", icon: <FaQrcode /> },
@@ -19,6 +19,8 @@ const menuItems = [
 ];
 
 function Menu() {
+  const [websocket, setWebsocket] = useState<WebSocket | null>(null);
+  const websocketRef = useRef<WebSocket | null>(null);
   const [activeItem, setActiveItem] = useState("");
   const [coins, setCoins] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -37,10 +39,41 @@ function Menu() {
       const res = await fetch("/api/coins", { cache: "no-store" });
       const data = await res.json();
       setCoins(data.message);
+
+      establishWebSocketConnection();
     } catch (error) {
-      console.error("Failed to fetch coins:", error);
       setCoins(null);
     }
+  };
+
+
+  const establishWebSocketConnection = () => {
+    const ws = new WebSocket('wss://centichain.org/api/sockets');
+    
+    ws.onopen = () => {
+      console.log('WebSocket connection established');
+      setWebsocket(ws);
+      websocketRef.current = ws;
+    };
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      // Handle incoming WebSocket messages
+      console.log('Received WebSocket message:', data);
+      // Update state based on the received data if needed
+      // For example, if the server sends updated coin count:
+      // setCoins(data.coins);
+    };
+
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
+    ws.onclose = () => {
+      console.log('WebSocket connection closed');
+      setWebsocket(null);
+      websocketRef.current = null;
+    };
   };
 
   return (
