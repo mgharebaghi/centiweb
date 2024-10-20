@@ -36,55 +36,50 @@ function Menu() {
   const router = useRouter();
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const isMobile = useMediaQuery("(max-width: 640px)");
-  const [isWebSocketConnected, setIsWebSocketConnected] = useState(false);
+  // const [isWebSocketConnected, setIsWebSocketConnected] = useState(false);
 
   useEffect(() => {
     setActiveItem(pathname);
-    if (!isWebSocketConnected) {
-      fetchCoins();
-      establishWebSocketConnection();
-    }
-  }, [pathname, isWebSocketConnected]);
+
+    fetchCoins();
+    // establishWebSocketConnection();
+  }, [pathname]);
 
   const fetchCoins = async () => {
     try {
-      await fetch("/api/coins", { cache: "no-store" }).then(
-        async (res) => {
-          const data = await res.json();
-          setCoins(Number(data.message));
-        }
-      );
+      await fetch("/api/coins", { cache: "no-store" }).then(async (res) => {
+        const data = await res.json();
+        setCoins(Number(data.message));
+      });
     } catch (error) {
       setCoins(null);
     }
   };
 
-  useEffect(() => {
-    
-  }, [coins]);
+  useEffect(() => {}, [coins]);
 
-  const establishWebSocketConnection = () => {
-    const ws = new WebSocket("ws://185.28.22.103:33369/ws");
+  // const establishWebSocketConnection = () => {
+  //   const ws = new WebSocket("ws://185.28.22.103:33369/ws");
 
-    ws.onopen = () => {
-      setIsWebSocketConnected(true);
-    };
+  //   ws.onopen = () => {
+  //     setIsWebSocketConnected(true);
+  //   };
 
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      setCoins((prevCoins) =>
-        prevCoins !== null ? prevCoins - Number(data) : null
-      );
-    };
+  //   ws.onmessage = (event) => {
+  //     const data = JSON.parse(event.data);
+  //     setCoins((prevCoins) =>
+  //       prevCoins !== null ? prevCoins - Number(data) : null
+  //     );
+  //   };
 
-    ws.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    };
+  //   ws.onerror = (error) => {
+  //     console.error("WebSocket error:", error);
+  //   };
 
-    ws.onclose = () => {
-      setIsWebSocketConnected(false);
-    };
-  };
+  //   ws.onclose = () => {
+  //     setIsWebSocketConnected(false);
+  //   };
+  // };
 
   return (
     <motion.nav
