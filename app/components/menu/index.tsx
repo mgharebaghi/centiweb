@@ -47,17 +47,22 @@ function Menu() {
 
   const fetchCoins = async () => {
     try {
-      const res = await fetch("/api/coins", { cache: "no-store" });
-      const data = await res.json();
-      setCoins(Number(data.message));
-
-      if (!isWebSocketConnected) {
-        establishWebSocketConnection();
-      }
+      const res = await fetch("/api/coins", { cache: "no-store" }).then(
+        async (res) => {
+          const data = await res.json();
+          setCoins(Number(data.message));
+        }
+      );
     } catch (error) {
       setCoins(null);
     }
   };
+
+  useEffect(() => {
+    if (!isWebSocketConnected) {
+      establishWebSocketConnection();
+    }
+  }, [coins]);
 
   const establishWebSocketConnection = () => {
     const ws = new WebSocket("ws://185.28.22.103:33369/ws");
