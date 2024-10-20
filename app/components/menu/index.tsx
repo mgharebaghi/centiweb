@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useMediaQuery } from "@mui/material";
@@ -13,66 +13,72 @@ import { FaQrcode, FaFileAlt, FaDownload, FaCode } from "react-icons/fa";
 
 const menuItems = [
   { label: "Explorer", path: "/scan", color: "#FF6B6B", icon: <FaQrcode /> },
-  { label: "Whitepaper", path: "/articles/670cfeb91efba523d1178a4d", color: "#FFA07A", icon: <FaFileAlt /> },
-  { label: "Download", path: "/download", color: "#98D8C8", icon: <FaDownload /> },
+  {
+    label: "Whitepaper",
+    path: "/articles/670cfeb91efba523d1178a4d",
+    color: "#FFA07A",
+    icon: <FaFileAlt />,
+  },
+  {
+    label: "Download",
+    path: "/download",
+    color: "#98D8C8",
+    icon: <FaDownload />,
+  },
   { label: "DEV", path: "/dev", color: "#4CAF50", icon: <FaCode /> },
 ];
 
 function Menu() {
-  const [websocket, setWebsocket] = useState<WebSocket | null>(null);
-  const websocketRef = useRef<WebSocket | null>(null);
   const [activeItem, setActiveItem] = useState("");
-  const [coins, setCoins] = useState(null);
+  const [coins, setCoins] = useState<number | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const isMobile = useMediaQuery("(max-width: 640px)");
+  const [isWebSocketConnected, setIsWebSocketConnected] = useState(false);
 
   useEffect(() => {
     setActiveItem(pathname);
-    fetchCoins();
-  }, [pathname]);
+    if (!isWebSocketConnected) {
+      fetchCoins();
+    }
+  }, [pathname, isWebSocketConnected]);
 
   const fetchCoins = async () => {
     try {
       const res = await fetch("/api/coins", { cache: "no-store" });
       const data = await res.json();
-      setCoins(data.message);
+      setCoins(Number(data.message));
 
-      establishWebSocketConnection();
+      if (!isWebSocketConnected) {
+        establishWebSocketConnection();
+      }
     } catch (error) {
       setCoins(null);
     }
   };
 
-
   const establishWebSocketConnection = () => {
-    const ws = new WebSocket('wss://centichain.org/api/sockets');
-    
+    const ws = new WebSocket("ws://185.28.22.103:33369/ws");
+
     ws.onopen = () => {
-      console.log('WebSocket connection established');
-      setWebsocket(ws);
-      websocketRef.current = ws;
+      setIsWebSocketConnected(true);
     };
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      // Handle incoming WebSocket messages
-      console.log('Received WebSocket message:', data);
-      // Update state based on the received data if needed
-      // For example, if the server sends updated coin count:
-      // setCoins(data.coins);
+      setCoins((prevCoins) =>
+        prevCoins !== null ? prevCoins - Number(data) : null
+      );
     };
 
     ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
+      console.error("WebSocket error:", error);
     };
 
     ws.onclose = () => {
-      console.log('WebSocket connection closed');
-      setWebsocket(null);
-      websocketRef.current = null;
+      setIsWebSocketConnected(false);
     };
   };
 
@@ -99,7 +105,7 @@ function Menu() {
               className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 lg:h-14 lg:w-14"
             />
           </motion.div>
-          
+
           {isDesktop && (
             <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center space-x-2 md:space-x-4">
               {menuItems.map((item) => (
@@ -116,8 +122,12 @@ function Menu() {
                         : "text-gray-300 hover:text-white hover:bg-opacity-10"
                     }`}
                     style={{
-                      backgroundColor: activeItem === item.path ? item.color : "transparent",
-                      boxShadow: activeItem === item.path ? `0 0 10px ${item.color}` : "none",
+                      backgroundColor:
+                        activeItem === item.path ? item.color : "transparent",
+                      boxShadow:
+                        activeItem === item.path
+                          ? `0 0 10px ${item.color}`
+                          : "none",
                     }}
                   >
                     <span className="mr-1 md:mr-2">{item.icon}</span>
@@ -140,7 +150,9 @@ function Menu() {
               >
                 {coins !== null ? (
                   <span className="text-xs sm:text-sm font-medium text-gray-300">
-                    {isMobile ? `CENTIs: ${Number(coins).toLocaleString()}` : `Remaining CENTIs: ${Number(coins).toLocaleString()}`}
+                    {isMobile
+                      ? `CENTIs: ${Number(coins).toLocaleString()}`
+                      : `Remaining CENTIs: ${Number(coins).toLocaleString()}`}
                   </span>
                 ) : (
                   <PulseLoader size={4} color="#E5E7EB" />
