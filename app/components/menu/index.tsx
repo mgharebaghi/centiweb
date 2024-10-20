@@ -42,6 +42,7 @@ function Menu() {
     setActiveItem(pathname);
     if (!isWebSocketConnected) {
       fetchCoins();
+      establishWebSocketConnection();
     }
   }, [pathname, isWebSocketConnected]);
 
@@ -59,9 +60,7 @@ function Menu() {
   };
 
   useEffect(() => {
-    if (!isWebSocketConnected) {
-      establishWebSocketConnection();
-    }
+    
   }, [coins]);
 
   const establishWebSocketConnection = () => {
