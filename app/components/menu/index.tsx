@@ -64,7 +64,7 @@ function Menu() {
   }, [coins]);
 
   const establishWebSocketConnection = () => {
-    const ws = new WebSocket("ws://185.28.22.103:33369/ws");
+    const ws = new WebSocket("wss://185.28.22.103:33369/ws");
 
     ws.onopen = () => {
       setIsWebSocketConnected(true);
