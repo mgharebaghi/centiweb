@@ -47,7 +47,7 @@ function Menu() {
 
   const fetchCoins = async () => {
     try {
-      const res = await fetch("/api/coins", { cache: "no-store" }).then(
+      await fetch("/api/coins", { cache: "no-store" }).then(
         async (res) => {
           const data = await res.json();
           setCoins(Number(data.message));
