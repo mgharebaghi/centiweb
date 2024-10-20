@@ -36,50 +36,48 @@ function Menu() {
   const router = useRouter();
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const isMobile = useMediaQuery("(max-width: 640px)");
-  // const [isWebSocketConnected, setIsWebSocketConnected] = useState(false);
+  const [eventSource, setEventSource] = useState<EventSource | null>(null);
 
   useEffect(() => {
     setActiveItem(pathname);
-
     fetchCoins();
-    // establishWebSocketConnection();
+    const newEventSource = establishSSEConnection();
+    setEventSource(newEventSource);
+
+    return () => {
+      // Clean up SSE connection when component unmounts
+      if (newEventSource) {
+        newEventSource.close();
+      }
+    };
   }, [pathname]);
 
   const fetchCoins = async () => {
     try {
-      await fetch("/api/coins", { cache: "no-store" }).then(async (res) => {
-        const data = await res.json();
-        setCoins(Number(data.message));
-      });
+      const res = await fetch("/api/coins", { cache: "no-store" });
+      const data = await res.json();
+      setCoins(Number(data.message));
     } catch (error) {
+      console.error("Error fetching coins:", error);
       setCoins(null);
     }
   };
 
-  useEffect(() => {}, [coins]);
+  const establishSSEConnection = () => {
+    const newEventSource = new EventSource('http://185.28.22.103:33369/coins-sse');
 
-  // const establishWebSocketConnection = () => {
-  //   const ws = new WebSocket("ws://185.28.22.103:33369/ws");
+    newEventSource.onmessage = (event) => {
+      const newCoins = JSON.parse(event.data);
+      setCoins((prevCoins) => (prevCoins !== null ? prevCoins - Number(newCoins) : null));
+    };
 
-  //   ws.onopen = () => {
-  //     setIsWebSocketConnected(true);
-  //   };
+    newEventSource.onerror = (error) => {
+      console.error('SSE error:', error);
+      newEventSource.close();
+    };
 
-  //   ws.onmessage = (event) => {
-  //     const data = JSON.parse(event.data);
-  //     setCoins((prevCoins) =>
-  //       prevCoins !== null ? prevCoins - Number(data) : null
-  //     );
-  //   };
-
-  //   ws.onerror = (error) => {
-  //     console.error("WebSocket error:", error);
-  //   };
-
-  //   ws.onclose = () => {
-  //     setIsWebSocketConnected(false);
-  //   };
-  // };
+    return newEventSource;
+  };
 
   return (
     <motion.nav
