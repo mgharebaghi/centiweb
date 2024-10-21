@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useMediaQuery } from "@mui/material";
@@ -36,18 +36,18 @@ function Menu() {
   const router = useRouter();
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const isMobile = useMediaQuery("(max-width: 640px)");
-  const [eventSource, setEventSource] = useState<EventSource | null>(null);
+  const [websocket, setWebsocket] = useState<WebSocket | null>(null);
+  const websocketRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
     setActiveItem(pathname);
     fetchCoins();
-    const newEventSource = establishSSEConnection();
-    setEventSource(newEventSource);
+    establishWebSocketConnection();
 
     return () => {
-      // Clean up SSE connection when component unmounts
-      if (newEventSource) {
-        newEventSource.close();
+      // Clean up WebSocket connection when component unmounts
+      if (websocketRef.current) {
+        websocketRef.current.close();
       }
     };
   }, [pathname]);
@@ -63,20 +63,28 @@ function Menu() {
     }
   };
 
-  const establishSSEConnection = () => {
-    const newEventSource = new EventSource('http://185.28.22.103:33369/coins-sse');
+  const establishWebSocketConnection = () => {
+    const ws = new WebSocket('ws://185.28.22.103:33369/coins');
 
-    newEventSource.onmessage = (event) => {
+    ws.onopen = () => {
+      console.log('WebSocket connection established');
+    };
+
+    ws.onmessage = (event) => {
       const newCoins = JSON.parse(event.data);
       setCoins((prevCoins) => (prevCoins !== null ? prevCoins - Number(newCoins) : null));
     };
 
-    newEventSource.onerror = (error) => {
-      console.error('SSE error:', error);
-      newEventSource.close();
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
     };
 
-    return newEventSource;
+    ws.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
+    setWebsocket(ws);
+    websocketRef.current = ws;
   };
 
   return (
