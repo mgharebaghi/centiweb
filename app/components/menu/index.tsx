@@ -36,19 +36,19 @@ function Menu() {
   const router = useRouter();
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const isMobile = useMediaQuery("(max-width: 640px)");
-  const [websocket, setWebsocket] = useState<WebSocket | null>(null);
-  const websocketRef = useRef<WebSocket | null>(null);
+  // const [websocket, setWebsocket] = useState<WebSocket | null>(null);
+  // const websocketRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
     setActiveItem(pathname);
     fetchCoins();
-    establishWebSocketConnection();
+    // establishWebSocketConnection();
 
     return () => {
       // Clean up WebSocket connection when component unmounts
-      if (websocketRef.current) {
-        websocketRef.current.close();
-      }
+      // if (websocketRef.current) {
+      //   websocketRef.current.close();
+      // }
     };
   }, [pathname]);
 
@@ -63,29 +63,29 @@ function Menu() {
     }
   };
 
-  const establishWebSocketConnection = () => {
-    const ws = new WebSocket('ws://185.28.22.103:33369/coins');
+  // const establishWebSocketConnection = () => {
+  //   const ws = new WebSocket('ws://185.28.22.103:33369/coins');
 
-    ws.onopen = () => {
-      console.log('WebSocket connection established');
-    };
+  //   ws.onopen = () => {
+  //     console.log('WebSocket connection established');
+  //   };
 
-    ws.onmessage = (event) => {
-      const newCoins = JSON.parse(event.data);
-      setCoins((prevCoins) => (prevCoins !== null ? prevCoins - Number(newCoins) : null));
-    };
+  //   ws.onmessage = (event) => {
+  //     const newCoins = JSON.parse(event.data);
+  //     setCoins((prevCoins) => (prevCoins !== null ? prevCoins - Number(newCoins) : null));
+  //   };
 
-    ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
+  //   ws.onerror = (error) => {
+  //     console.error('WebSocket error:', error);
+  //   };
 
-    ws.onclose = () => {
-      console.log('WebSocket connection closed');
-    };
+  //   ws.onclose = () => {
+  //     console.log('WebSocket connection closed');
+  //   };
 
-    setWebsocket(ws);
-    websocketRef.current = ws;
-  };
+  //   setWebsocket(ws);
+  //   websocketRef.current = ws;
+  // };
 
   return (
     <motion.nav
