@@ -39,7 +39,7 @@ export default function ContactForm() {
       <div className="max-w-md w-full space-y-8 bg-gray-800/80 backdrop-blur-sm p-8 rounded-2xl shadow-2xl border border-gray-700/50">
         <div className="text-center">
           <h2 className="mt-6 text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Contact Us</h2>
-          <p className="mt-2 text-sm text-gray-300">We'd love to hear from you</p>
+          <p className="mt-2 text-sm text-gray-300">We&apos;d love to hear from you</p>
         </div>
         
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
