@@ -9,7 +9,7 @@ import { IoReorderThree } from "react-icons/io5";
 import Image from "next/image";
 import CustomDrawer from "./components/drawer";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaQrcode, FaFileAlt, FaDownload, FaCode } from "react-icons/fa";
+import { FaQrcode, FaFileAlt, FaDownload, FaCode, FaEnvelope } from "react-icons/fa";
 
 const menuItems = [
   { label: "Explorer", path: "/scan", color: "#FF6B6B", icon: <FaQrcode /> },
@@ -26,6 +26,7 @@ const menuItems = [
     icon: <FaDownload />,
   },
   { label: "DEV", path: "/dev", color: "#4CAF50", icon: <FaCode /> },
+  { label: "Contact", path: "/contact", color: "#9370DB", icon: <FaEnvelope /> },
 ];
 
 function Menu() {

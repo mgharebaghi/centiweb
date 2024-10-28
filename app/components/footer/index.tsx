@@ -23,6 +23,7 @@ function Footer() {
     { text: "Whitepaper", href: "/articles/671fcec5d136b9550a238077" },
     { text: "Download", href: "/download" },
     { text: "DEV", href: "/dev" },
+    { text: "Contact", href: "/contact" }
   ];
 
   const socialLinks = [
