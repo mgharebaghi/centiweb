@@ -68,12 +68,6 @@ function Articles() {
         backgroundSize: '60px 60px'
       }}></div>
       <Container maxWidth="xl" className="relative z-10">
-        <Typography
-          variant="h2"
-          className="text-slate-800 mb-12 text-center font-bold tracking-wide"
-        >
-          Latest Articles
-        </Typography>
         <Grid container spacing={6}>
           {articles.map((item: Post, index: number) => (
             <Grid item xs={12} sm={6} md={4} key={item._id.toString()}>
