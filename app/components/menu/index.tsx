@@ -15,7 +15,7 @@ const menuItems = [
   { label: "Explorer", path: "/scan", color: "#FF6B6B", icon: <FaQrcode /> },
   {
     label: "Whitepaper",
-    path: "/articles/670cfeb91efba523d1178a4d",
+    path: "/articles/671fcec5d136b9550a238077",
     color: "#FFA07A",
     icon: <FaFileAlt />,
   },
