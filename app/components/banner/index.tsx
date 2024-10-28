@@ -218,7 +218,7 @@ export default function Banner() {
                   <FaDownload className="mr-3 text-lg" /> Get Started
                 </Button>
               </Link>
-              <Link href="/articles/670cfeb91efba523d1178a4d" passHref className="w-full sm:w-auto">
+              <Link href="/articles/671fcec5d136b9550a238077" passHref className="w-full sm:w-auto">
                 <Button variant="outlined" className={buttonClass}>
                   <FaBookOpen className="mr-3 text-lg" /> Explore More
                 </Button>
