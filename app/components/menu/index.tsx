@@ -75,13 +75,13 @@ function Menu() {
       };
 
       websocket.onmessage = (event) => {
-        // console.log("Received message:", event);
-        if (event.data.type === "block") {
-          console.log("Received Reward:", event.data.data);
+        const data = JSON.parse(event.data);
+        if (data.type === "block") {
+          console.log("Received Reward:", data.data);
         }
 
-        if (event.data.type === "transaction") {
-          console.log("Received Status:", event.data.data);
+        if (data.type === "transaction") {
+          console.log("Received Status:", data.data);
         }
       };
 
