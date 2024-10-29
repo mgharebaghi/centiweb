@@ -9,7 +9,12 @@ const db = client.db("Centichain");
 const collection = db.collection<WithId<Block>>("Blocks");
 
 // Initialize WebSocket server
-const wss = new WebSocketServer({ port: 8080 })
+const wss = new WebSocketServer({ 
+  port: 8080,
+  perMessageDeflate: false,
+  clientTracking: true,
+  backlog: 100,
+})
 
 wss.on('connection', (ws: WebSocket) => {
   
