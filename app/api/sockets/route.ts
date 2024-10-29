@@ -26,6 +26,6 @@ wss.on('connection', (ws: WebSocket) => {
 export async function GET() {
   return NextResponse.json({ 
     status: 'ok',
-    wsEndpoint: 'ws://centichain.org:8080'
+    wsEndpoint: 'wss://centichain.org:8080'
   })
 }
