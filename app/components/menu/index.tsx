@@ -65,30 +65,36 @@ function Menu() {
 
   const socketInitializer = async () => {
     try {
-      const response = await fetch('/api/sockets');
+      const response = await fetch("/api/sockets");
       const data = await response.json();
-      
+
       const websocket = new WebSocket(data.wsEndpoint);
-      
+
       websocket.onopen = () => {
-        console.log('Connected to WebSocket server');
+        console.log("Connected to WebSocket server");
       };
 
       websocket.onmessage = (event) => {
-        console.log('Received message:', event.data);
+        if (event.type === "block") {
+          console.log("Received Reward:", event.data);
+        }
+
+        if (event.type === "transaction") {
+          console.log("Received Status:", event.data);
+        }
       };
 
       websocket.onerror = (error) => {
-        console.error('WebSocket error:', error);
+        console.error("WebSocket error:", error);
       };
 
       websocket.onclose = () => {
-        console.log('Disconnected from WebSocket server');
+        console.log("Disconnected from WebSocket server");
       };
 
       setWs(websocket);
     } catch (error) {
-      console.error('Failed to initialize WebSocket:', error);
+      console.error("Failed to initialize WebSocket:", error);
     }
   };
 
