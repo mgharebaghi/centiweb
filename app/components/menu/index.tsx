@@ -75,6 +75,7 @@ function Menu() {
       };
 
       websocket.onmessage = (event) => {
+        console.log("Received message:", event);
         if (event.type === "block") {
           console.log("Received Reward:", event.data);
         }
