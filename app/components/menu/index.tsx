@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useMediaQuery } from "@mui/material";
@@ -9,7 +9,13 @@ import { IoReorderThree } from "react-icons/io5";
 import Image from "next/image";
 import CustomDrawer from "./components/drawer";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaQrcode, FaFileAlt, FaDownload, FaCode, FaEnvelope } from "react-icons/fa";
+import {
+  FaQrcode,
+  FaFileAlt,
+  FaDownload,
+  FaCode,
+  FaEnvelope,
+} from "react-icons/fa";
 
 const menuItems = [
   { label: "Explorer", path: "/scan", color: "#FF6B6B", icon: <FaQrcode /> },
@@ -26,32 +32,65 @@ const menuItems = [
     icon: <FaDownload />,
   },
   { label: "DEV", path: "/dev", color: "#4CAF50", icon: <FaCode /> },
-  { label: "Contact", path: "/contact", color: "#9370DB", icon: <FaEnvelope /> },
+  {
+    label: "Contact",
+    path: "/contact",
+    color: "#9370DB",
+    icon: <FaEnvelope />,
+  },
 ];
 
 function Menu() {
-  const [activeItem, setActiveItem] = useState("");
+  const [activeItem, setActiveItem] = useState<string>("");
   const [coins, setCoins] = useState<number | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const isMobile = useMediaQuery("(max-width: 640px)");
-  // const [websocket, setWebsocket] = useState<WebSocket | null>(null);
-  // const websocketRef = useRef<WebSocket | null>(null);
+
+  const [ws, setWs] = useState<WebSocket | null>(null);
 
   useEffect(() => {
-    setActiveItem(pathname);
+    setActiveItem(pathname ?? "");
     fetchCoins();
-    // establishWebSocketConnection();
+    socketInitializer();
 
     return () => {
-      // Clean up WebSocket connection when component unmounts
-      // if (websocketRef.current) {
-      //   websocketRef.current.close();
-      // }
+      if (ws) {
+        ws.close();
+      }
     };
   }, [pathname]);
+
+  const socketInitializer = async () => {
+    try {
+      const response = await fetch('/api/sockets');
+      const data = await response.json();
+      
+      const websocket = new WebSocket(data.wsEndpoint);
+      
+      websocket.onopen = () => {
+        console.log('Connected to WebSocket server');
+      };
+
+      websocket.onmessage = (event) => {
+        console.log('Received message:', event.data);
+      };
+
+      websocket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+
+      websocket.onclose = () => {
+        console.log('Disconnected from WebSocket server');
+      };
+
+      setWs(websocket);
+    } catch (error) {
+      console.error('Failed to initialize WebSocket:', error);
+    }
+  };
 
   const fetchCoins = async () => {
     try {
@@ -63,30 +102,6 @@ function Menu() {
       setCoins(null);
     }
   };
-
-  // const establishWebSocketConnection = () => {
-  //   const ws = new WebSocket('ws://185.28.22.103:33369/coins');
-
-  //   ws.onopen = () => {
-  //     console.log('WebSocket connection established');
-  //   };
-
-  //   ws.onmessage = (event) => {
-  //     const newCoins = JSON.parse(event.data);
-  //     setCoins((prevCoins) => (prevCoins !== null ? prevCoins - Number(newCoins) : null));
-  //   };
-
-  //   ws.onerror = (error) => {
-  //     console.error('WebSocket error:', error);
-  //   };
-
-  //   ws.onclose = () => {
-  //     console.log('WebSocket connection closed');
-  //   };
-
-  //   setWebsocket(ws);
-  //   websocketRef.current = ws;
-  // };
 
   return (
     <motion.nav
