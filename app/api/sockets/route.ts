@@ -30,6 +30,6 @@ wss.on('connection', (ws: WebSocket) => {
 export async function GET() {
   return NextResponse.json({ 
     status: 'ok',
-    wsEndpoint: 'ws://localhost:8080'
+    wsEndpoint: 'wss://localhost:8080'
   })
 }
