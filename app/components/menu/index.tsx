@@ -31,7 +31,7 @@ const menuItems = [
     color: "#98D8C8",
     icon: <FaDownload />,
   },
-  { label: "DEV", path: "/dev", color: "#4CAF50", icon: <FaCode /> },
+  // { label: "DEV", path: "/dev", color: "#4CAF50", icon: <FaCode /> },
   {
     label: "Contact",
     path: "/contact",
