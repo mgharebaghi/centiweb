@@ -31,7 +31,7 @@ const menuItems = [
     color: "#98D8C8",
     icon: <FaDownload />,
   },
-  // { label: "DEV", path: "/dev", color: "#4CAF50", icon: <FaCode /> },
+  { label: "DEV", path: "/dev", color: "#4CAF50", icon: <FaCode /> },
   {
     label: "Contact",
     path: "/contact",
@@ -48,8 +48,6 @@ function Menu() {
   const router = useRouter();
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const isMobile = useMediaQuery("(max-width: 640px)");
-
-  const [ws, setWs] = useState<WebSocket | null>(null);
 
   useEffect(() => {
     setActiveItem(pathname ?? "");
@@ -102,15 +100,15 @@ function Menu() {
                   <Link
                     href={item.path}
                     className={`px-2 md:px-3 py-1 md:py-2 rounded-md text-xs md:text-sm font-medium transition duration-300 ease-in-out flex items-center ${
-                      activeItem === item.path
+                      (activeItem === item.path || (item.path === '/dev' && activeItem.startsWith('/dev')))
                         ? `bg-opacity-20 text-white`
                         : "text-gray-300 hover:text-white hover:bg-opacity-10"
                     }`}
                     style={{
                       backgroundColor:
-                        activeItem === item.path ? item.color : "transparent",
+                        (activeItem === item.path || (item.path === '/dev' && activeItem.startsWith('/dev'))) ? item.color : "transparent",
                       boxShadow:
-                        activeItem === item.path
+                        (activeItem === item.path || (item.path === '/dev' && activeItem.startsWith('/dev')))
                           ? `0 0 10px ${item.color}`
                           : "none",
                     }}

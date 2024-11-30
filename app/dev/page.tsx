@@ -10,6 +10,7 @@ import {
   Button,
   Typography as AntTypography,
   Tabs,
+  Drawer,
 } from "antd";
 import { Content, Footer, Header } from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
@@ -23,33 +24,17 @@ import { TbApi } from "react-icons/tb";
 import { GiHouseKeys } from "react-icons/gi";
 import { CiMoneyBill } from "react-icons/ci";
 import { GrTransaction } from "react-icons/gr";
-import { FaFileExport, FaCopy } from "react-icons/fa6";
+import { FaFileExport, FaCopy, FaBookOpen } from "react-icons/fa6";
 import { SiBnbchain } from "react-icons/si";
-import dynamic from "next/dynamic";
 import hljs from "highlight.js/lib/core";
 import javascript from "highlight.js/lib/languages/javascript";
 import ruby from "highlight.js/lib/languages/ruby";
 import python from "highlight.js/lib/languages/python";
 import "highlight.js/styles/atom-one-dark.css";
 import { motion, AnimatePresence } from "framer-motion";
-import { forwardRef } from "react";
-import { ReactQuillProps } from "react-quill";
-import ReactQuill from "react-quill";
-import ReactDOM from "react-dom";
 import { useRouter, useParams } from "next/navigation";
 import DOMPurify from "isomorphic-dompurify";
-
-const DynamicReactQuill = dynamic(
-  () =>
-    import("react-quill").then((mod) => {
-      const Component = forwardRef<ReactQuill, ReactQuillProps>(
-        (props, ref) => <mod.default {...props} ref={ref} />
-      );
-      Component.displayName = "DynamicReactQuill";
-      return Component;
-    }),
-  { ssr: false }
-);
+import { useMediaQuery } from "@mui/material";
 
 interface Item {
   key: string;
@@ -76,12 +61,15 @@ function Dev() {
   const [posts, setPosts] = useState<Array<Post>>([]);
   const [items, setItems] = useState<Array<Item>>([]);
   const [key, setKey] = useState<string>("0");
+  const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
   const quillRef = useRef<any>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [titles, setTitles] = useState<TitleItem[]>([]);
   const [activeTitle, setActiveTitle] = useState<string>("");
   const router = useRouter();
   const params = useParams();
+  const isMobile = useMediaQuery('(max-width:768px)');
+  const isTablet = useMediaQuery('(max-width:1024px)');
 
   useEffect(() => {
     document.title = "Centichain - DEV";
@@ -92,6 +80,37 @@ function Dev() {
     hljs.registerLanguage("python", python);
 
     (window as any).hljs = hljs;
+
+    // Add styles for bullet lists and mobile responsiveness
+    const style = document.createElement("style");
+    style.textContent = `
+      .prose ul {
+        list-style-type: disc;
+        padding-left: 1.5em;
+        margin: 1em 0;
+      }
+      .prose li {
+        margin: 0.5em 0;
+      }
+      @media (max-width: 768px) {
+        pre {
+          max-width: 100%;
+          overflow-x: auto;
+        }
+        .code-content {
+          font-size: 14px;
+        }
+        .copy-button {
+          padding: 4px 8px;
+          font-size: 12px;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      document.head.removeChild(style);
+    };
   }, []);
 
   useEffect(() => {
@@ -140,7 +159,7 @@ function Dev() {
         <TbApi />
       ) : item.title.includes("Keypair") ? (
         <GiHouseKeys />
-      ) : item.title.includes("UTXO") ? (
+      ) : item.title.includes("Balance") ? (
         <CiMoneyBill />
       ) : item.title.includes("Transaction") ? (
         <GrTransaction />
@@ -148,6 +167,8 @@ function Dev() {
         <FaFileExport />
       ) : item.title.includes("Blockchain") ? (
         <SiBnbchain />
+      ) : item.title.includes("Introduction") ? (
+        <FaBookOpen />
       ) : null;
       return {
         key: index.toString(),
@@ -177,7 +198,7 @@ function Dev() {
     const button = document.createElement("button");
     button.innerHTML = "<FaCopy /> Copy";
     button.className =
-      "copy-button absolute top-2 right-2 bg-gray-700 text-white px-2 py-1 rounded";
+      "copy-button absolute top-2 right-2 bg-gray-700 text-white px-2 py-1 rounded text-sm";
     button.onclick = (e) => {
       e.preventDefault();
       const code = block.querySelector("code");
@@ -195,12 +216,23 @@ function Dev() {
     style.textContent = `
       pre {
         position: relative;
+        max-width: 100%;
+        overflow-x: auto;
       }
       .copy-button {
         position: absolute;
         top: 5px;
         right: 5px;
         z-index: 10;
+      }
+      @media (max-width: 768px) {
+        .ant-layout-sider {
+          position: fixed;
+          height: 100vh;
+          z-index: 999;
+          left: 0;
+          top: 64px;
+        }
       }
     `;
     document.head.appendChild(style);
@@ -225,10 +257,21 @@ function Dev() {
   }, [highlightCode]);
 
   const handleCollapse = (isCollapsed: boolean) => {
-    setCollapsed(isCollapsed);
-    setTimeout(() => {
-      highlightCode();
-    }, 0);
+    if (isMobile) {
+      setDrawerVisible(!drawerVisible);
+    } else {
+      setCollapsed(isCollapsed);
+      setTimeout(() => {
+        highlightCode();
+      }, 0);
+    }
+  };
+
+  const handleMenuClick = (selectedKey: string) => {
+    setKey(selectedKey);
+    if (isMobile) {
+      setDrawerVisible(false);
+    }
   };
 
   const extractTitles = useCallback(() => {
@@ -285,8 +328,46 @@ function Dev() {
     }
   }, [key, posts, router]);
 
+  const renderSideMenu = () => (
+    <Menu
+      mode="inline"
+      selectedKeys={[key]}
+      className="bg-transparent border-r-0 mt-3"
+    >
+      {items.map((item) => (
+        <Menu.Item
+          key={item.key}
+          icon={item.icon}
+          onClick={() => handleMenuClick(item.key)}
+          className={`
+            text-gray-300 hover:text-white transition-colors duration-200
+            ${
+              item.key === key
+                ? "bg-gradient-to-r from-slate-800 to-slate-600 text-white font-bold shadow-md"
+                : ""
+            }
+          `}
+        >
+          {!collapsed && (
+            <span
+              className={`
+              ${
+                item.key === key
+                  ? "border-l-4 border-white pl-2 text-white"
+                  : ""
+              }
+            `}
+            >
+              {item.label}
+            </span>
+          )}
+        </Menu.Item>
+      ))}
+    </Menu>
+  );
+
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 pt-[64px] flex flex-col">
+    <div className="min-h-screen bg-gray-900 text-gray-100 pt-[64px] flex flex-col pt-[60px]">
       <ConfigProvider
         theme={{
           algorithm: theme.darkAlgorithm,
@@ -298,7 +379,7 @@ function Dev() {
         }}
       >
         <Layout className="flex-grow">
-          <Header className="flex items-center justify-between px-6 bg-gradient-to-r from-gray-900 to-black shadow-lg border-b border-gray-800">
+          <Header className="w-full flex items-center justify-between px-4 sm:px-6 bg-gradient-to-r from-gray-900 to-black shadow-lg border-b border-gray-800">
             <div className="flex items-center">
               <motion.button
                 whileHover={{ scale: 1.1 }}
@@ -306,7 +387,7 @@ function Dev() {
                 onClick={() => handleCollapse(!collapsed)}
                 className="text-gray-300 hover:text-white mr-4 focus:outline-none transition-colors duration-200"
               >
-                {collapsed ? (
+                {(isMobile ? !drawerVisible : collapsed) ? (
                   <RiMenuUnfold2Fill size={24} />
                 ) : (
                   <RiMenuFold2Fill size={24} />
@@ -314,7 +395,7 @@ function Dev() {
               </motion.button>
               <Typography
                 variant="h4"
-                className="text-gray-100 font-bold text-2xl"
+                className="text-gray-100 font-bold text-xl sm:text-2xl"
               >
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
                   Centichain DEV
@@ -323,49 +404,30 @@ function Dev() {
             </div>
           </Header>
           <Layout>
-            <Sider
-              collapsed={collapsed}
-              className="bg-gradient-to-b from-gray-900 to-gray-800 shadow-2xl border-r border-gray-700 transition-all duration-300"
-            >
-              <Menu
-                mode="inline"
-                selectedKeys={[key]}
-                className="bg-transparent border-r-0"
+            {isMobile ? (
+              <Drawer
+                placement="left"
+                onClose={() => setDrawerVisible(false)}
+                open={drawerVisible}
+                width={250}
+                className="bg-gray-900"
+                bodyStyle={{ padding: 0, backgroundColor: "#111827" }}
               >
-                {items.map((item) => (
-                  <Menu.Item
-                    key={item.key}
-                    icon={item.icon}
-                    onClick={() => setKey(item.key)}
-                    className={`
-                      text-gray-300 hover:text-white transition-colors duration-200
-                      ${
-                        item.key === key
-                          ? "bg-gradient-to-r from-slate-800 to-slate-600 text-white font-bold shadow-md"
-                          : ""
-                      }
-                    `}
-                  >
-                    {!collapsed && (
-                      <span
-                        className={`
-                        ${
-                          item.key === key
-                            ? "border-l-4 border-white pl-2 text-white"
-                            : ""
-                        }
-                      `}
-                      >
-                        {item.label}
-                      </span>
-                    )}
-                  </Menu.Item>
-                ))}
-              </Menu>
-            </Sider>
-            <Layout className="p-6 bg-gray-900">
+                {renderSideMenu()}
+              </Drawer>
+            ) : (
+              <Sider
+                collapsed={collapsed}
+                className="bg-gradient-to-b from-gray-900 to-gray-800 shadow-2xl border-r border-gray-700 transition-all duration-300"
+                collapsible
+                trigger={null}
+              >
+                {renderSideMenu()}
+              </Sider>
+            )}
+            <Layout className="p-4 sm:p-6 bg-gray-900">
               <Content
-                className="bg-gray-800 rounded-lg p-6 shadow-xl overflow-hidden"
+                className="bg-gray-800 rounded-lg p-4 sm:p-6 shadow-xl overflow-hidden"
                 ref={contentRef}
               >
                 <AnimatePresence mode="wait">
@@ -379,7 +441,7 @@ function Dev() {
                       className="prose prose-invert max-w-none"
                     >
                       <motion.h1
-                        className="text-3xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500"
+                        className="text-2xl sm:text-3xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500"
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.2, duration: 0.5 }}
@@ -389,9 +451,9 @@ function Dev() {
 
                       <div
                         dangerouslySetInnerHTML={{
-                          __html: posts[Number(key)].content,
+                          __html: DOMPurify.sanitize(posts[Number(key)].content),
                         }}
-                        className="p-4 code-content text-wrap break-words prose prose-invert max-w-none"
+                        className="p-2 sm:p-4 code-content text-wrap break-words prose prose-invert max-w-none prose-ul:list-disc prose-li:my-1 text-sm sm:text-base"
                       />
                     </motion.div>
                   ) : (
