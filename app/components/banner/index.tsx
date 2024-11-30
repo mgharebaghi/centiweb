@@ -13,16 +13,14 @@ export default function Banner() {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    if (!mounted) {
-      setMounted(true);
-      const checkMobile = () => {
-        setIsMobile(window.innerWidth < 768);
-      };
-      checkMobile();
-      window.addEventListener('resize', checkMobile);
-      return () => window.removeEventListener('resize', checkMobile);
-    }
-  }, [mounted]);
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    setMounted(true);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const buttonClass = 
     "w-full py-3 px-6 rounded-lg transition-all duration-300 text-slate-200 bg-transparent hover:bg-slate-700/80 hover:text-white border border-slate-300 hover:border-slate-200 flex items-center justify-center font-medium tracking-wide shadow-sm hover:shadow-lg backdrop-blur-sm";
@@ -111,7 +109,7 @@ export default function Banner() {
           initial="hidden"
           animate="visible"
           variants={{
-            visible: { transition: { staggerChildren: 0.3, delayChildren: 0.1 } },
+            visible: { transition: { staggerChildren: 0.3 } },
           }}
         >
           <motion.div variants={blockVariants} className="flex justify-center">
