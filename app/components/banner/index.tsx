@@ -8,13 +8,20 @@ import { useEffect, useState } from "react";
 
 export default function Banner() {
   const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const buttonClass = 
-    "w-full py-3 px-6 rounded-lg transition-all duration-300 text-slate-200 bg-transparent hover:bg-slate-700/80 hover:text-white border border-slate-300 hover:border-slate-200 flex items-center justify-center font-medium tracking-wide shadow-sm hover:shadow-lg";
+    "w-full py-3 px-6 rounded-lg transition-all duration-300 text-slate-200 bg-transparent hover:bg-slate-700/80 hover:text-white border border-slate-300 hover:border-slate-200 flex items-center justify-center font-medium tracking-wide shadow-sm hover:shadow-lg backdrop-blur-sm";
 
   const blockVariants = {
     hidden: { opacity: 0, y: 30 },
@@ -24,7 +31,8 @@ export default function Banner() {
       transition: {
         type: "spring",
         stiffness: 100,
-        damping: 15
+        damping: 15,
+        duration: 0.6
       }
     },
   };
@@ -35,132 +43,71 @@ export default function Banner() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-800 text-slate-300 flex items-center relative overflow-hidden font-sans pt-16 px-4 sm:px-6 lg:px-8">
-      {/* Enhanced animated network background */}
-      <div className="absolute inset-0">
-        <svg className="w-full h-full opacity-30">
-          <defs>
-            <pattern id="network-pattern" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
-              {/* Main nodes */}
-              <circle cx="10" cy="10" r="2.5" fill="rgba(255,255,255,0.6)">
-                <animate attributeName="opacity" values="0.6;1;0.6" dur="1.5s" repeatCount="indefinite" />
-              </circle>
-              <circle cx="70" cy="10" r="2.5" fill="rgba(255,255,255,0.6)">
-                <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite" />
-              </circle>
-              <circle cx="40" cy="40" r="2.5" fill="rgba(255,255,255,0.6)">
-                <animate attributeName="opacity" values="0.6;1;0.6" dur="1.8s" repeatCount="indefinite" />
-              </circle>
-              <circle cx="10" cy="70" r="2.5" fill="rgba(255,255,255,0.6)">
-                <animate attributeName="opacity" values="0.6;1;0.6" dur="1.7s" repeatCount="indefinite" />
-              </circle>
-              <circle cx="70" cy="70" r="2.5" fill="rgba(255,255,255,0.6)">
-                <animate attributeName="opacity" values="0.6;1;0.6" dur="1.6s" repeatCount="indefinite" />
-              </circle>
+      {/* Enhanced Animated Background */}
+      <div className="absolute inset-0 pointer-events-none">
+        {/* Animated gradient orbs */}
+        {Array.from({length: 3}).map((_, i) => (
+          <motion.div
+            key={`orb-${i}`}
+            className="absolute rounded-full blur-3xl"
+            style={{
+              background: i === 0 ? 'radial-gradient(circle, rgba(59,130,246,0.2) 0%, transparent 70%)' :
+                        i === 1 ? 'radial-gradient(circle, rgba(147,51,234,0.15) 0%, transparent 70%)' :
+                                 'radial-gradient(circle, rgba(52,211,153,0.1) 0%, transparent 70%)',
+              width: `${Math.random() * 50 + 30}%`,
+              height: `${Math.random() * 50 + 30}%`,
+              left: `${i * 30}%`,
+              top: `${Math.random() * 60}%`
+            }}
+            animate={{
+              x: [0, 30, 0],
+              y: [0, -30, 0],
+              scale: [1, 1.2, 1],
+            }}
+            transition={{
+              duration: 15,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: i * 2,
+            }}
+          />
+        ))}
 
-              {/* Secondary nodes */}
-              <circle cx="40" cy="10" r="1.5" fill="rgba(255,255,255,0.4)">
-                <animate attributeName="opacity" values="0.4;0.8;0.4" dur="2s" repeatCount="indefinite" />
-              </circle>
-              <circle cx="10" cy="40" r="1.5" fill="rgba(255,255,255,0.4)">
-                <animate attributeName="opacity" values="0.4;0.8;0.4" dur="1.8s" repeatCount="indefinite" />
-              </circle>
-              <circle cx="70" cy="40" r="1.5" fill="rgba(255,255,255,0.4)">
-                <animate attributeName="opacity" values="0.4;0.8;0.4" dur="1.9s" repeatCount="indefinite" />
-              </circle>
-              <circle cx="25" cy="25" r="1.5" fill="rgba(255,255,255,0.4)">
-                <animate attributeName="opacity" values="0.4;0.8;0.4" dur="2.1s" repeatCount="indefinite" />
-              </circle>
-              <circle cx="55" cy="25" r="1.5" fill="rgba(255,255,255,0.4)">
-                <animate attributeName="opacity" values="0.4;0.8;0.4" dur="1.7s" repeatCount="indefinite" />
-              </circle>
-              <circle cx="25" cy="55" r="1.5" fill="rgba(255,255,255,0.4)">
-                <animate attributeName="opacity" values="0.4;0.8;0.4" dur="2.3s" repeatCount="indefinite" />
-              </circle>
-              <circle cx="55" cy="55" r="1.5" fill="rgba(255,255,255,0.4)">
-                <animate attributeName="opacity" values="0.4;0.8;0.4" dur="1.6s" repeatCount="indefinite" />
-              </circle>
-              
-              {/* Enhanced connecting lines with faster animations */}
-              <line x1="10" y1="10" x2="70" y2="10" stroke="rgba(255,255,255,0.3)" strokeWidth="0.8">
-                <animate attributeName="stroke-dasharray" values="0,60;60,0" dur="2s" repeatCount="indefinite" />
-                <animate attributeName="opacity" values="0.2;0.6;0.2" dur="2s" repeatCount="indefinite" />
-              </line>
-              <line x1="70" y1="10" x2="40" y2="40" stroke="rgba(255,255,255,0.3)" strokeWidth="0.8">
-                <animate attributeName="stroke-dasharray" values="0,50;50,0" dur="1.5s" repeatCount="indefinite" />
-                <animate attributeName="opacity" values="0.2;0.6;0.2" dur="1.5s" repeatCount="indefinite" />
-              </line>
-              <line x1="40" y1="40" x2="10" y2="70" stroke="rgba(255,255,255,0.3)" strokeWidth="0.8">
-                <animate attributeName="stroke-dasharray" values="0,50;50,0" dur="1.8s" repeatCount="indefinite" />
-                <animate attributeName="opacity" values="0.2;0.6;0.2" dur="1.8s" repeatCount="indefinite" />
-              </line>
-              <line x1="10" y1="70" x2="70" y2="70" stroke="rgba(255,255,255,0.3)" strokeWidth="0.8">
-                <animate attributeName="stroke-dasharray" values="0,60;60,0" dur="1.6s" repeatCount="indefinite" />
-                <animate attributeName="opacity" values="0.2;0.6;0.2" dur="1.6s" repeatCount="indefinite" />
-              </line>
-              <line x1="70" y1="70" x2="40" y2="40" stroke="rgba(255,255,255,0.3)" strokeWidth="0.8">
-                <animate attributeName="stroke-dasharray" values="0,50;50,0" dur="1.7s" repeatCount="indefinite" />
-                <animate attributeName="opacity" values="0.2;0.6;0.2" dur="1.7s" repeatCount="indefinite" />
-              </line>
-              
-              {/* Additional diagonal connections */}
-              <line x1="10" y1="10" x2="70" y2="70" stroke="rgba(255,255,255,0.2)" strokeWidth="0.5">
-                <animate attributeName="stroke-dasharray" values="0,85;85,0" dur="2.2s" repeatCount="indefinite" />
-                <animate attributeName="opacity" values="0.1;0.4;0.1" dur="2.2s" repeatCount="indefinite" />
-              </line>
-              <line x1="70" y1="10" x2="10" y2="70" stroke="rgba(255,255,255,0.2)" strokeWidth="0.5">
-                <animate attributeName="stroke-dasharray" values="0,85;85,0" dur="2.4s" repeatCount="indefinite" />
-                <animate attributeName="opacity" values="0.1;0.4;0.1" dur="2.4s" repeatCount="indefinite" />
-              </line>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#network-pattern)">
-            <animate attributeName="opacity" values="0.8;1;0.8" dur="3s" repeatCount="indefinite" />
-          </rect>
-        </svg>
-      </div>
-
-      {/* Enhanced floating particles */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="particles-container" style={{position: 'relative', width: '100%', height: '100%'}}>
-          {Array.from({length: 50}).map((_, i) => (
-            <div
-              key={i}
-              className="absolute bg-white rounded-full opacity-30"
+        {/* Subtle floating particles */}
+        <div className="absolute inset-0">
+          {Array.from({length: isMobile ? 20 : 40}).map((_, i) => (
+            <motion.div
+              key={`particle-${i}`}
+              className="absolute rounded-full"
               style={{
-                width: Math.random() * 4 + 1 + 'px',
-                height: Math.random() * 4 + 1 + 'px',
-                left: Math.random() * 100 + '%',
-                top: Math.random() * 100 + '%',
-                animation: `float ${Math.random() * 8 + 6}s linear infinite`
+                width: Math.random() * 3 + 1 + 'px',
+                height: Math.random() * 3 + 1 + 'px',
+                background: `rgba(${Math.random() * 100 + 155}, ${Math.random() * 100 + 155}, 255, ${Math.random() * 0.3 + 0.2})`,
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+              animate={{
+                y: [-20, 20],
+                x: [-20, 20],
+                opacity: [0, 1, 0],
+              }}
+              transition={{
+                duration: Math.random() * 5 + 3,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: Math.random() * 2,
               }}
             />
           ))}
         </div>
       </div>
 
-      <style jsx global>{`
-        @keyframes float {
-          0% {
-            transform: translate(0, 0) rotate(0deg);
-          }
-          33% {
-            transform: translate(${Math.random() * 150}px, ${Math.random() * 150}px) rotate(120deg);
-          }
-          66% {
-            transform: translate(${Math.random() * -150}px, ${Math.random() * 150}px) rotate(240deg);
-          }
-          100% {
-            transform: translate(0, 0) rotate(360deg);
-          }
-        }
-      `}</style>
-
       <Container maxWidth="lg" className="relative z-10">
         <motion.div
           initial="hidden"
           animate="visible"
           variants={{
-            visible: { transition: { staggerChildren: 0.4, delayChildren: 0.2 } },
+            visible: { transition: { staggerChildren: 0.3, delayChildren: 0.1 } },
           }}
         >
           <motion.div variants={blockVariants} className="flex justify-center">
@@ -169,16 +116,16 @@ export default function Banner() {
               alt="Centichain Logo"
               width={300}
               height={300}
-              className="w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 drop-shadow-2xl"
+              className="w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 drop-shadow-2xl hover:scale-105 transition-transform duration-300"
               priority
             />
           </motion.div>
 
           <motion.div variants={blockVariants}>
             <Typography
-              variant="h2"
+              variant="h1"
               fontWeight="bold"
-              className="text-center mb-8 text-slate-100 text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-tight"
+              className="h-20 text-center mb-5 text-slate-100 text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-tight bg-gradient-to-r from-blue-400 via-purple-400 to-green-400 bg-clip-text text-transparent"
             >
               Revolutionizing Decentralization
             </Typography>
@@ -188,25 +135,25 @@ export default function Banner() {
             <TypeAnimation
               sequence={[
                 "Simplicity for All",
-                3000,
+                2500,
                 "Affordable Participation",
-                3000,
+                2500,
                 "Eco-Friendly Operation",
-                3000,
+                2500,
                 "Equitable and Ethical",
-                3000,
+                2500,
                 "Innovative Consensus",
-                3000,
+                2500,
               ]}
               wrapper="div"
-              speed={40}
+              speed={50}
               repeat={Infinity}
-              className="text-2xl sm:text-3xl md:text-4xl text-center h-24 tracking-wide text-green-300 font-bold"
+              className="text-2xl sm:text-3xl md:text-4xl text-center h-20 tracking-wide text-green-300 font-bold"
             />
           </motion.div>
 
           <motion.div variants={blockVariants} className="mb-16">
-            <Typography variant="h6" className="text-center text-slate-300 font-light leading-relaxed tracking-wide text-base sm:text-lg md:text-xl max-w-3xl mx-auto">
+            <Typography variant="h6" className="text-center text-slate-300 font-light leading-relaxed tracking-wide text-base sm:text-lg md:text-xl max-w-3xl mx-auto backdrop-blur-sm bg-slate-900/30 p-6 rounded-xl">
               Empowering everyone with accessible, efficient, and sustainable blockchain technology that shapes the future of decentralized systems
             </Typography>
           </motion.div>
@@ -214,12 +161,12 @@ export default function Banner() {
           <motion.div variants={blockVariants}>
             <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6 max-w-2xl mx-auto">
               <Link href="/download" passHref className="w-full sm:w-auto">
-                <Button variant="outlined" className={buttonClass}>
+                <Button variant="outlined" className={`${buttonClass} hover:scale-105`}>
                   <FaDownload className="mr-3 text-lg" /> Get Started
                 </Button>
               </Link>
               <Link href="/articles/671fcec5d136b9550a238077" passHref className="w-full sm:w-auto">
-                <Button variant="outlined" className={buttonClass}>
+                <Button variant="outlined" className={`${buttonClass} hover:scale-105`}>
                   <FaBookOpen className="mr-3 text-lg" /> Explore More
                 </Button>
               </Link>
