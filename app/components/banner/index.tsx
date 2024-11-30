@@ -13,14 +13,16 @@ export default function Banner() {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+    if (!mounted) {
+      setMounted(true);
+      const checkMobile = () => {
+        setIsMobile(window.innerWidth < 768);
+      };
+      checkMobile();
+      window.addEventListener('resize', checkMobile);
+      return () => window.removeEventListener('resize', checkMobile);
+    }
+  }, [mounted]);
 
   const buttonClass = 
     "w-full py-3 px-6 rounded-lg transition-all duration-300 text-slate-200 bg-transparent hover:bg-slate-700/80 hover:text-white border border-slate-300 hover:border-slate-200 flex items-center justify-center font-medium tracking-wide shadow-sm hover:shadow-lg backdrop-blur-sm";
