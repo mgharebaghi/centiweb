@@ -1,5 +1,5 @@
 import { MongoClient, WithId } from "mongodb";
-import { Transaction } from "../types/types";
+import { BaseTransaction } from "../types/types";
 import { NextResponse } from "next/server";
 
 const uri = "mongodb://0.0.0.0:27017";
@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     const db = client.db("Centichain");
-    const collection = db.collection<WithId<Transaction>>("reciepts");
+    const collection = db.collection<WithId<BaseTransaction>>("reciepts");
     const count = await collection.countDocuments({ status: "Confirmed" });
 
     return NextResponse.json({
