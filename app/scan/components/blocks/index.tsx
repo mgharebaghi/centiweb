@@ -1,298 +1,362 @@
 "use client";
-import { Block, BlocksScan } from "@/app/api/types/types";
-import { Pagination, Typography, Card, CardContent, Grid, Modal, Box, Divider, IconButton } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Block, BaseTransaction } from "@/app/api/types/types";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
 import moment from "moment";
-import { SyncLoader } from "react-spinners";
-import { BiCloset } from "react-icons/bi";
-import { GrClose } from "react-icons/gr";
+import {
+  Container,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  Dialog,
+  IconButton,
+  Tabs,
+  Tab,
+  Box,
+  CircularProgress,
+  Pagination,
+} from "@mui/material";
+import { IoClose } from "react-icons/io5";
+import { FiClock, FiHash, FiBox, FiList } from "react-icons/fi";
 
-export default function ScanedBlocks() {
-  const [loading, setLoading] = useState<boolean>(false);
-  const [dataSource, setDataSource] = useState<BlocksScan[]>([]);
-  const [page, setPage] = useState<number>(1);
-  const [count, setCount] = useState<number>(0);
-  const [selectedBlock, setSelectedBlock] = useState<BlocksScan | null>(null);
-  const [modalOpen, setModalOpen] = useState<boolean>(false);
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
 
-  const fillDataSource = async () => {
-    setLoading(true);
-    setDataSource([]);
-    await fetch("/api/blockscan", {
-      method: "POST",
-      body: JSON.stringify({ page: page }),
-      cache: "no-store"
-    }).then((res) => {
-      if (!res.ok) {
-        setLoading(false);
-        console.log("err from server");
-      } else {
-        res.json().then(async (data) => {
-          if (data.status === "success") {
-            setLoading(false);
-            if (page === 1) {
-              setCount(Math.ceil(data.blocks[0].header.number / 9));
-            }
-            setDataSource(data.blocks.slice(0, 9));
-          } else {
-            setLoading(false);
-            console.log(data.status);
-          }
-        });
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+  return (
+    <div hidden={value !== index} {...other}>
+      {value === index && <Box p={3}>{children}</Box>}
+    </div>
+  );
+}
+
+export default function BlockExplorer() {
+  const [blocks, setBlocks] = useState<Block[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [tabValue, setTabValue] = useState(0);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+
+  const fetchBlocks = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/blockscan`, {
+        method: "POST",
+        body: JSON.stringify({ page }),
+      });
+      const data = await response.json();
+      if (data.status === "success") {
+        setBlocks(data.blocks.slice(0, 9));
+        setTotalPages(Math.ceil(data.count / 9));
       }
-    });
+    } catch (error) {
+      console.error("Failed to fetch blocks:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    fillDataSource();
+    fetchBlocks();
   }, [page]);
 
-  const handlePagination = (event: any, pageNum: number) => {
-    setPage(pageNum);
+  const handlePageChange = (
+    event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
+    setPage(value);
   };
 
-  const handleBlockClick = (block: BlocksScan) => {
+  const handleBlockClick = (block: Block) => {
     setSelectedBlock(block);
-    setModalOpen(true);
+    setDialogOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setModalOpen(false);
-  };
-
-  const getAge = (date: string) => {
-    let blockDate = moment.utc(date);
-    let now = moment.now();
-    let age = moment.duration(blockDate.diff(now));
-    return age.humanize() + " ago";
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
   };
 
   return (
-    <div className="w-full flex flex-col bg-gray-900 p-4">
-      <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-6 rounded-lg shadow-lg mb-6">
-        <Typography variant="h4" className="text-white font-bold text-center">
-          Blockchain Explorer
-        </Typography>
-        <Typography variant="subtitle1" className="text-gray-200 text-center mt-2">
-          Discover the latest blocks
-        </Typography>
-      </div>
-      <div className="flex-grow flex flex-col">
-        <div className="w-full min-h-[650px] mb-4">
-          {!loading ? (
-            <Grid container spacing={4} justifyContent="center" alignItems="stretch">
-              {dataSource.map((item, index) => (
-                <Grid item xs={12} sm={6} md={4} key={index}>
-                  <Card 
-                    className="bg-gray-900 text-gray-300 hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-105 h-[190px] flex flex-col justify-between"
-                    onClick={() => handleBlockClick(item)}
+    <Container maxWidth="xl" className="py-8">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: { opacity: 0 },
+          visible: {
+            opacity: 1,
+            transition: {
+              staggerChildren: 0.1,
+            },
+          },
+        }}
+        className="space-y-8"
+      >
+        <div className="text-center space-y-4">
+          <Typography variant="h3" className="text-gray-100 font-bold">
+            Block Explorer
+          </Typography>
+          <Typography variant="subtitle1" className="text-gray-400">
+            Explore the latest blocks in the Centichain network
+          </Typography>
+        </div>
+
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <CircularProgress />
+          </div>
+        ) : (
+          <Grid container spacing={3}>
+            {blocks.map((block, index) => (
+              <Grid item xs={12} sm={6} md={4} key={block.header.hash}>
+                <motion.div
+                  variants={{
+                    hidden: { y: 20, opacity: 0 },
+                    visible: {
+                      y: 0,
+                      opacity: 1,
+                    },
+                  }}
+                >
+                  <Card
+                    onClick={() => handleBlockClick(block)}
+                    className="bg-gray-800 hover:bg-gray-700 transition-all cursor-pointer border border-gray-700"
                   >
-                    <CardContent className="p-4 flex flex-col h-full">
-                      <Typography variant="h6" className="text-blue-400 mb-4 font-bold text-left">
-                        <span className="mr-2">📦</span>
-                        Block #{item.header.number.toLocaleString()}
-                      </Typography>
-                      <div className="flex-grow flex flex-col justify-center">
-                        <Typography variant="body2" className="mb-3 text-gray-400 text-left">
-                          <span className="mr-2">🔗</span>
-                          Hash: {item.header.hash.substring(0, 10)}...
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <Typography variant="h6" className="text-blue-400">
+                          Block #{block.header.number}
                         </Typography>
-                        <Typography variant="body2" className="mb-3 text-gray-400 text-left">
-                          <span className="mr-2">⏳</span>
-                          Age: {getAge(item.header.date)}
-                        </Typography>
-                        <Typography variant="body2" className="text-gray-400 text-left">
-                          <span className="mr-2">💼</span>
-                          Transactions: {item.body.transactions.length.toLocaleString()}
-                        </Typography>
+                        <FiBox className="text-gray-400" size={20} />
+                      </div>
+
+                      <div className="space-y-2 text-gray-300">
+                        <div className="flex items-center gap-2">
+                          <FiHash size={16} />
+                          <Typography variant="body2" className="truncate">
+                            {block.header.hash.substring(0, 20)}...
+                          </Typography>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <FiClock size={16} />
+                          <Typography variant="body2">
+                            {moment(block.header.date).fromNow()}
+                          </Typography>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <FiList size={16} />
+                          <Typography variant="body2">
+                            {block.body.transactions.length} transactions
+                          </Typography>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
-                </Grid>
-              ))}
-            </Grid>
-          ) : (
-            <div className="h-full flex items-center justify-center">
-              <SyncLoader size={5} color="#9CA3AF" />
-            </div>
-          )}
-        </div>
-        <div className="w-full flex justify-center">
+                </motion.div>
+              </Grid>
+            ))}
+          </Grid>
+        )}
+
+        <div className="flex justify-center pt-4">
           <Pagination
+            count={totalPages}
             page={page}
-            count={count}
-            onChange={handlePagination}
-            size="large"
-            sx={{
-              '& .MuiPaginationItem-root': {
-                color: '#9CA3AF',
-              },
-              '& .Mui-selected': {
-                backgroundColor: '#4B5563',
-              },
-            }}
+            onChange={handlePageChange}
+            color="primary"
+            className="bg-gray-800 p-2 rounded-lg"
           />
         </div>
-      </div>
-      <Modal
-        open={modalOpen}
-        onClose={handleCloseModal}
-        aria-labelledby="block-details-modal"
-        aria-describedby="modal-modal-description"
+      </motion.div>
+
+      <Dialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          className: "bg-gray-900 text-gray-100",
+        }}
       >
-        <Box sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: '90%',
-          maxWidth: 900,
-          maxHeight: '90vh',
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          bgcolor: 'background.paper',
-          border: '2px solid #4B5563',
-          boxShadow: 24,
-          p: 4,
-          backgroundColor: '#1F2937',
-          color: '#E5E7EB',
-          borderRadius: '12px',
-          '&::-webkit-scrollbar': {
-            width: '8px',
-          },
-          '&::-webkit-scrollbar-track': {
-            background: '#374151',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: '#4B5563',
-            borderRadius: '4px',
-          },
-          '&::-webkit-scrollbar-thumb:hover': {
-            background: '#6B7280',
-          },
-        }}>
-          <IconButton
-            aria-label="close"
-            onClick={handleCloseModal}
-            sx={{
-              position: 'absolute',
-              right: 8,
-              top: 8,
-              color: '#9CA3AF',
-            }}
-          >
-            <GrClose />
-          </IconButton>
-          <Typography id="modal-modal-title" variant="h5" component="h2" className="text-blue-400 mb-4 font-bold text-center">
-            Block Details
-          </Typography>
-          {selectedBlock && (
-            <div className="space-y-6">
-              <div className="bg-gray-800 p-6 rounded-lg">
-                <Typography variant="h6" className="text-green-400 mb-4 text-center">Header Information</Typography>
-                <Grid container spacing={3}>
-                  <Grid item xs={12} sm={6}>
-                    <Typography className="text-gray-400">Block Number:</Typography>
-                    <Typography className="font-semibold">{selectedBlock.header.number}</Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
+        {selectedBlock && (
+          <div className="relative">
+            <IconButton
+              onClick={() => setDialogOpen(false)}
+              className="absolute right-2 top-2 text-gray-400 hover:text-gray-200"
+            >
+              <IoClose />
+            </IconButton>
+
+            <Box className="p-6">
+              <Typography
+                variant="h5"
+                className="mb-4 text-center text-blue-400"
+              >
+                Block #{selectedBlock.header.number}
+              </Typography>
+
+              <Tabs
+                value={tabValue}
+                onChange={handleTabChange}
+                centered
+                className="border-b border-gray-700"
+                TabIndicatorProps={{
+                  style: { backgroundColor: "#60A5FA" },
+                }}
+                sx={{
+                  "& .MuiTab-root": { color: "#9CA3AF" },
+                  "& .Mui-selected": { color: "#60A5FA" },
+                }}
+              >
+                <Tab label="Overview" />
+                <Tab label="Transactions" />
+                <Tab label="Coinbase" />
+              </Tabs>
+
+              <TabPanel value={tabValue} index={0}>
+                <div className="space-y-4 bg-gray-800 p-4 rounded-lg">
+                  <div>
                     <Typography className="text-gray-400">Hash:</Typography>
-                    <Typography className="font-semibold break-all">{selectedBlock.header.hash}</Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography className="text-gray-400">Previous Block:</Typography>
-                    <Typography className="font-semibold break-all">{selectedBlock.header.previous}</Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography className="text-gray-400">Validator:</Typography>
-                    <Typography className="font-semibold break-words">{selectedBlock.header.validator}</Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
+                    <Typography className="break-all text-gray-200">
+                      {selectedBlock.header.hash}
+                    </Typography>
+                  </div>
+                  <div>
+                    <Typography className="text-gray-400">
+                      Previous Block:
+                    </Typography>
+                    <Typography className="break-all text-gray-200">
+                      {selectedBlock.header.previous}
+                    </Typography>
+                  </div>
+                  <div>
+                    <Typography className="text-gray-400">
+                      Merkle Root:
+                    </Typography>
+                    <Typography className="break-all text-gray-200">
+                      {selectedBlock.header.merkel}
+                    </Typography>
+                  </div>
+                  <div>
+                    <Typography className="text-gray-400">
+                      Validator:
+                    </Typography>
+                    <Typography className="break-all text-gray-200">
+                      {selectedBlock.header.validator}
+                    </Typography>
+                  </div>
+                  <div>
                     <Typography className="text-gray-400">Relay:</Typography>
-                    <Typography className="font-semibold break-all">{selectedBlock.header.relay}</Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography className="text-gray-400">Merkle Root:</Typography>
-                    <Typography className="font-semibold break-all">{selectedBlock.header.merkel}</Typography>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Typography className="text-gray-400">Signature:</Typography>
-                    <Typography className="font-semibold break-all">{selectedBlock.header.signature.signatgure}</Typography>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Typography className="text-gray-400">Key:</Typography>
-                    <Typography className="font-semibold break-all">{selectedBlock.header.signature.key}</Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography className="text-gray-400">Date:</Typography>
-                    <Typography className="font-semibold">{selectedBlock.header.date}</Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography className="text-gray-400">Age:</Typography>
-                    <Typography className="font-semibold">{getAge(selectedBlock.header.date)}</Typography>
-                  </Grid>
-                </Grid>
-              </div>
-
-              <Divider className="bg-gray-600" />
-
-              <div className="bg-gray-800 p-6 rounded-lg">
-                <Typography variant="h6" className="text-yellow-400 mb-4 text-center">Coinbase Information</Typography>
-                <Grid container spacing={3}>
-                  <Grid item xs={12} sm={6}>
-                    <Typography className="text-gray-400">Hash:</Typography>
-                    <Typography className="font-semibold break-all">{selectedBlock.body.coinbase.hash}</Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography className="text-gray-400">Size:</Typography>
-                    <Typography className="font-semibold">{selectedBlock.body.coinbase.size}</Typography>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Typography className="text-gray-400">Merkle Root:</Typography>
-                    <Typography className="font-semibold break-all">{selectedBlock.body.coinbase.merkel}</Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography className="text-gray-400">Reward:</Typography>
-                    <Typography className="font-semibold break-words">{selectedBlock.body.coinbase.reward}</Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography className="text-gray-400">Fees:</Typography>
-                    <Typography className="font-semibold break-words">{selectedBlock.body.coinbase.fees}</Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography className="text-gray-400">Relay Fee:</Typography>
-                    <Typography className="font-semibold break-words">{selectedBlock.body.coinbase.relay_fee}</Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography className="text-gray-400">Validator Fee:</Typography>
-                    <Typography className="font-semibold break-words">{selectedBlock.body.coinbase.validator_fee}</Typography>
-                  </Grid>
-                </Grid>
-              </div>
-
-              <Divider className="bg-gray-600" />
-
-              <div className="bg-gray-800 p-6 rounded-lg">
-                <Typography variant="h6" className="text-purple-400 mb-4 text-center">Transactions</Typography>
-                <Typography className="mb-4 text-center">Total Transactions: {selectedBlock.body.transactions.length}</Typography>
-                <div className="max-h-60 overflow-y-auto pr-2" style={{
-                  scrollbarWidth: 'thin',
-                  scrollbarColor: '#4B5563 #374151'
-                }}>
-                  {selectedBlock.body.transactions.map((tx, index) => (
-                    <div key={index} className="mb-3 bg-gray-700 p-3 rounded">
-                      <Typography className="text-sm">
-                        <span className="text-gray-400">Transaction {index + 1} Hash: </span>
-                        <span className="font-semibold break-all">{tx.hash}</span>
-                      </Typography>
-                    </div>
-                  ))}
+                    <Typography className="break-all text-gray-200">
+                      {selectedBlock.header.relay}
+                    </Typography>
+                  </div>
+                  <div>
+                    <Typography className="text-gray-400">
+                      Signature:
+                    </Typography>
+                    <Typography className="break-all text-gray-200">
+                      {selectedBlock.header.signature.signatgure}
+                    </Typography>
+                  </div>
+                  <div>
+                    <Typography className="text-gray-400">
+                      Public Key:
+                    </Typography>
+                    <Typography className="break-all text-gray-200">
+                      {selectedBlock.header.signature.key}
+                    </Typography>
+                  </div>
                 </div>
-              </div>
-            </div>
-          )}
-        </Box>
-      </Modal>
-    </div>
+              </TabPanel>
+
+              <TabPanel value={tabValue} index={1}>
+                <div className="space-y-4">
+                  {selectedBlock.body.transactions.map(
+                    (tx: BaseTransaction, index: number) => (
+                      <Card
+                        key={index}
+                        className="bg-gray-800 border border-gray-700"
+                      >
+                        <CardContent>
+                          <Typography className="break-all text-gray-200">
+                            {tx.hash}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    )
+                  )}
+                </div>
+              </TabPanel>
+
+              <TabPanel value={tabValue} index={2}>
+                <div className="space-y-4 bg-gray-800 p-4 rounded-lg">
+                  <div>
+                    <Typography className="text-gray-400">Hash:</Typography>
+                    <Typography className="break-all text-gray-200">
+                      {selectedBlock.body.coinbase.hash}
+                    </Typography>
+                  </div>
+                  <div>
+                    <Typography className="text-gray-400">Size:</Typography>
+                    <Typography className="text-gray-200">
+                      {selectedBlock.body.coinbase.size}
+                    </Typography>
+                  </div>
+                  <div>
+                    <Typography className="text-gray-400">
+                      Merkle Root:
+                    </Typography>
+                    <Typography className="break-all text-gray-200">
+                      {selectedBlock.body.coinbase.merkel}
+                    </Typography>
+                  </div>
+                  <div>
+                    <Typography className="text-gray-400">Reward:</Typography>
+                    <Typography className="text-gray-200">
+                      {selectedBlock.body.coinbase.data.reward.data.value}
+                    </Typography>
+                  </div>
+                  <div>
+                    <Typography className="text-gray-400">Fees:</Typography>
+                    <Typography className="text-gray-200">
+                      {selectedBlock.body.coinbase.data.fees}
+                    </Typography>
+                  </div>
+                  <div>
+                    <Typography className="text-gray-400">
+                      Relay Fee:
+                    </Typography>
+                    <Typography className="text-gray-200">
+                      {selectedBlock.body.coinbase.data.relay_fee.data.value}
+                    </Typography>
+                  </div>
+                  <div>
+                    <Typography className="text-gray-400">
+                      Validator Fee:
+                    </Typography>
+                    <Typography className="text-gray-200">
+                      {
+                        selectedBlock.body.coinbase.data.validator_fee.data
+                          .value
+                      }
+                    </Typography>
+                  </div>
+                </div>
+              </TabPanel>
+            </Box>
+          </div>
+        )}
+      </Dialog>
+    </Container>
   );
 }

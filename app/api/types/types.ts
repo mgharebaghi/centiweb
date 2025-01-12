@@ -12,28 +12,35 @@ export interface Post {
 }
 
 export interface Block {
-  header: Header;
-  body: Body;
+  header: BlockHeader;
+  body: {
+    coinbase: CoinbaseTransactions;
+    transactions: Array<BaseTransaction>;
+  };
 }
 
-interface Header {
-  hash: string;
+interface BlockHeader {
   number: number;
+  hash: string;
+  previous: string;
+  validator: string;
+  relay: string;
+  merkel: string;
+  signature: Signature;
   date: string;
 }
 
-interface Body {
-  coinbase: CoinbaseTransactions;
-  transactions: [{}];
-}
-
-interface CoinbaseTransactions {
-  tx_hash: string;
+export interface CoinbaseTransactions {
+  hash: string;
+  merkel: string;
   size: number;
-  merkel_root: string;
-  reward: Decimal128;
-  output: {};
-  fee: Decimal128;
+  data: {
+    reward: BaseTransaction;
+    fees: string;
+    relay_wallet: string;
+    relay_fee: BaseTransaction;
+    validator_fee: BaseTransaction;
+  };
 }
 
 export interface Admin {
@@ -41,78 +48,28 @@ export interface Admin {
   password: string;
 }
 
-export interface BlocksScan {
-  header: {
-    number: number;
-    hash: string;
-    previous: string;
-    validator: string;
-    relay: string;
-    merkel: string;
-    signature: {
-      signatgure: string;
-      key: string;
-    };
-    date: string;
-  };
-  body: {
-    coinbase: {
-      hash: string;
-      size: number;
-      merkel: string;
-      reward: string;
-      output: {};
-      fees: string;
-      relay_fee: string;
-      validator_fee: string;
-    };
-    transactions: Array<{
-      hash: string;
-      input: {
-        hash: string;
-        number: number;
-        utxos: Array<{
-          block: number;
-          trx_hash: string;
-          output_hash: string;
-          unspent_hash: string;
-          unspent: string;
-        }>;
-      };
-      output: {
-        hash: string;
-        number: number;
-        unspents: Array<{
-          hash: string;
-          data?: {
-            wallet: string;
-            salt: number;
-            value: string;
-          };
-        }>;
-      };
-      value?: string;
-      fee?: string;
-      script?: string;
-      signature: Array<any>;
-      date: string;
-    }>;
-  };
-}
-
-export interface Transaction {
-  blockNumber: number;
+export interface BaseTransaction {
   hash: string;
-  from: string;
-  to: string;
-  value: Decimal128;
-  fee: Decimal128;
-  status: string;
-  description: string;
+  data: TransactionData;
+  sign: Signature;
   date: string;
 }
 
+interface TransactionData {
+  from: string;
+  to: string;
+  value: string;
+  fee: string;
+  salt: number;
+}
+
+interface Signature {
+  signatgure: string; // Note: Keeping the misspelling as it appears in the data
+  key: string;
+}
+
 export interface TrxScan {
+  hash: string;
   from: any;
   to: any;
   value: any;

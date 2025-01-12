@@ -17,7 +17,7 @@ export async function GET() {
     let all: number = 21000000.0;
 
     await cursor.forEach((doc) => {
-      generated = generated + parseFloat(doc.body.coinbase.reward.toString());
+      generated = generated + parseFloat(doc.body.coinbase.data.reward.data.value.toString());
     });
 
     return NextResponse.json(

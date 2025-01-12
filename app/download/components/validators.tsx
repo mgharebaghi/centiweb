@@ -1,13 +1,29 @@
-import { Container, Typography, Box, Button, Tooltip } from "@mui/material";
+import { Container, Typography, Box, Button, Tooltip, Card, CardContent } from "@mui/material";
 import { SiApple, SiLinux, SiWindows } from "react-icons/si";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { FaServer, FaChevronDown } from "react-icons/fa";
+import { FaChevronDown, FaDownload, FaInfoCircle } from "react-icons/fa";
 
 function Validators() {
-  const buttonVariants = {
-    hover: { scale: 1.05, transition: { duration: 0.2 } },
-    tap: { scale: 0.95 }
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.5
+      }
+    }
   };
 
   const scrollToRelay = () => {
@@ -17,88 +33,123 @@ function Validators() {
     }
   };
 
-  return (
-    <div id="validator-section">
-      <Box className="bg-gradient-to-b from-gray-900 to-gray-800 min-h-screen flex items-center justify-center py-8 sm:py-12 md:py-16 px-4 sm:px-6 lg:px-8">
-        <Container maxWidth="lg" className="text-center">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="flex justify-center mb-4 sm:mb-6 md:mb-8">
-              <Image
-                src="/images/Logo.png"
-                alt="Centichain Logo"
-                width={150}
-                height={150}
-                className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-48 lg:h-48"
-              />
-            </div>
-            <Typography variant="h2" className="text-gray-100 mb-2 sm:mb-3 md:mb-4 font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl">
-              Download Centichain Validator
-            </Typography>
-            <Typography variant="h5" className="text-gray-400 mb-4 sm:mb-6 md:mb-8 text-base sm:text-lg md:text-xl lg:text-2xl">
-              Choose your operating system
-            </Typography>
-          </motion.div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {[
-              { icon: SiWindows, text: "Windows", link: "https://centichain.org/downloads/updates/windows/x64/v0.9.0/Centichain_0.9.0_x64_en-US.msi" },
-              { icon: SiApple, text: "Mac", link: "#" },
-              { icon: SiLinux, text: "Linux", link: "#" },
-            ].map((item, index) => (
-              <motion.div
-                key={index}
-                variants={buttonVariants}
-                whileHover="hover"
-                whileTap="tap"
-                className="h-full"
-              >
-                <Button
-                  variant="contained"
-                  href={item.link}
-                  className={`w-full h-full py-4 sm:py-5 md:py-6 px-2 sm:px-3 md:px-4 bg-gray-800 hover:bg-gray-800 rounded-lg transition duration-300 ease-in-out flex flex-col items-center justify-center`}
-                  disabled={item.text !== "Windows"}
-                  style={{ opacity: item.text === "Windows" ? 1 : 0.7 }}
-                  onClick={item.text === "Windows" ? () => window.location.href = item.link : undefined}
-                >
-                  <item.icon size={32} color="white" className="mb-2 sm:mb-3" />
-                  <span className="text-gray-100 text-lg sm:text-xl font-semibold">{item.text}</span>
-                  {item.text !== "Windows" && (
-                    <span className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-300 font-bold">(Coming Soon)</span>
-                  )}
-                </Button>
-              </motion.div>
-            ))}
-          </div>
-          
-          <Typography variant="body2" className="text-gray-500 mt-8 sm:mt-10 md:mt-12 mb-2 sm:mb-3">
-            Version 0.9.0
-          </Typography>
-          <Typography variant="body2" className="text-gray-400 mb-4 sm:mb-6 md:mb-8 text-xs sm:text-sm">
-            By running a Validator Node, you help secure the network and earn rewards.
-          </Typography>
+  const downloadOptions = [
+    {
+      icon: SiWindows,
+      text: "Windows",
+      link: "https://centichain.org/downloads/updates/windows/x64/v0.9.0/Centichain_0.9.0_x64_en-US.msi",
+      available: true,
+      requirements: "Windows 10 or later, 64-bit processor required",
+      size: "15 MB"
+    },
+    {
+      icon: SiApple,
+      text: "macOS",
+      link: "#",
+      available: false,
+      requirements: "macOS 11 (Big Sur) or later versions",
+      size: "Coming soon"
+    },
+    {
+      icon: SiLinux,
+      text: "Linux",
+      link: "#",
+      available: false,
+      requirements: "Ubuntu 20.04 LTS or newer distributions",
+      size: "Coming soon"
+    }
+  ];
 
-          <motion.div
-            variants={buttonVariants}
-            whileHover="hover"
-            whileTap="tap"
-            className="mt-2 sm:mt-3 md:mt-4"
-          >
-            <Tooltip title="Click to scroll" placement="top" arrow>
-              <Button
-                variant="contained"
-                onClick={scrollToRelay}
-                className="bg-blue-600 hover:bg-blue-700 transition-colors duration-300 py-2 sm:py-3 px-4 sm:px-6 rounded-full shadow-lg text-sm sm:text-base"
-                startIcon={<FaChevronDown />}
-              >
-                Set Up Relay Node
-              </Button>
-            </Tooltip>
+  return (
+    <div id="validator-section" className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 flex items-center">
+      <Container maxWidth="lg" className="py-16">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="space-y-12"
+        >
+          {/* Header Section */}
+          <motion.div variants={itemVariants} className="text-center">
+            <div className="flex justify-center mb-8">
+              <div className="relative">
+                <Image
+                  src="/images/Logo.png"
+                  alt="Centichain Logo"
+                  width={120}
+                  height={120}
+                  className="animate-pulse"
+                  priority
+                />
+                <div className="absolute -inset-2 bg-gray-800/20 rounded-full blur-xl" />
+              </div>
+            </div>
+            <Typography variant="h2" className="text-4xl md:text-5xl font-bold text-gray-100 mb-4">
+              Become a Centichain Validator
+            </Typography>
+            <Typography variant="h6" className="text-gray-400 max-w-2xl mx-auto leading-relaxed">
+              Participate in securing the future of blockchain technology. As a validator, you'll help verify transactions, maintain network integrity, and earn rewards for your contribution.
+            </Typography>
           </motion.div>
-        </Container>
-      </Box>
+
+          {/* Download Cards */}
+          <motion.div variants={itemVariants} className="grid md:grid-cols-3 gap-6">
+            {downloadOptions.map((option, index) => (
+              <Card 
+                key={index}
+                className="bg-gray-800 border border-gray-700 hover:border-gray-600 hover:shadow-lg transition-all duration-300"
+              >
+                <CardContent className="p-6 space-y-4">
+                  <div className="flex items-center space-x-4">
+                    <option.icon size={36} className="text-gray-300" />
+                    <div>
+                      <Typography variant="h6" className="text-gray-100 font-semibold">
+                        {option.text}
+                      </Typography>
+                      <Typography variant="caption" className="text-gray-400 font-medium">
+                        {option.size}
+                      </Typography>
+                    </div>
+                  </div>
+
+                  <Typography variant="body2" className="text-gray-400 text-sm leading-relaxed">
+                    {option.requirements}
+                  </Typography>
+
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    disabled={!option.available}
+                    href={option.available ? option.link : undefined}
+                    className={`${option.available ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-800'} normal-case transition-colors duration-300 font-medium`}
+                    startIcon={option.available ? <FaDownload /> : <FaInfoCircle />}
+                  >
+                    {option.available ? 'Download Now' : 'Coming Soon'}
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </motion.div>
+
+          {/* Info Section */}
+          <motion.div variants={itemVariants} className="text-center space-y-6">
+            <Typography variant="body1" className="text-gray-400">
+              Latest Release: <span className="text-gray-300 font-semibold">Version 0.9.0</span>
+            </Typography>
+            
+            <div className="flex justify-center">
+              <Button
+                onClick={scrollToRelay}
+                variant="outlined"
+                className="border-gray-700 text-gray-300 hover:bg-gray-800/50 transition-colors duration-300 font-medium"
+                endIcon={<FaChevronDown />}
+              >
+                Discover Relay Node Opportunities
+              </Button>
+            </div>
+          </motion.div>
+        </motion.div>
+      </Container>
     </div>
   );
 }
