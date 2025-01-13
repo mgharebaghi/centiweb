@@ -75,6 +75,13 @@ function Menu() {
     }
   };
 
+  const isPathActive = (menuPath: string) => {
+    if (menuPath === '/dev') {
+      return pathname.startsWith('/dev');
+    }
+    return pathname === menuPath;
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-lg">
       <div className="max-w-7xl mx-auto px-4">
@@ -106,7 +113,7 @@ function Menu() {
                   className={`
                     flex items-center space-x-2 px-3 py-2 rounded-md text-sm
                     transition-all duration-200
-                    ${pathname === item.path ? 
+                    ${isPathActive(item.path) ? 
                       'text-emerald-400 bg-emerald-900/20' : 
                       'text-gray-300 hover:text-emerald-400 hover:bg-emerald-900/10'
                     }
@@ -168,7 +175,7 @@ function Menu() {
                     className={`
                       flex items-center space-x-3 px-3 py-2 rounded-md text-base
                       transition-all duration-200
-                      ${pathname === item.path ?
+                      ${isPathActive(item.path) ?
                         'text-emerald-400 bg-emerald-900/20' :
                         'text-gray-300 hover:text-emerald-400 hover:bg-emerald-900/10'
                       }

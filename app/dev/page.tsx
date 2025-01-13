@@ -11,20 +11,31 @@ import {
   Typography as AntTypography,
   Tabs,
   Drawer,
+  Input,
 } from "antd";
 import { Content, Footer, Header } from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
 import { ObjectId } from "mongodb";
 import { useEffect, useState, useRef, useCallback } from "react";
 import "react-quill/dist/quill.snow.css";
-import { RiMenuFold2Fill, RiMenuUnfold2Fill } from "react-icons/ri";
+import {
+  RiMenuFold2Fill,
+  RiMenuUnfold2Fill,
+  RiSearchLine,
+} from "react-icons/ri";
 import { PulseLoader } from "react-spinners";
 import DevFooter from "./components/footer";
 import { TbApi } from "react-icons/tb";
 import { GiHouseKeys } from "react-icons/gi";
 import { CiMoneyBill } from "react-icons/ci";
 import { GrTransaction } from "react-icons/gr";
-import { FaFileExport, FaCopy, FaBookOpen } from "react-icons/fa6";
+import {
+  FaFileExport,
+  FaCopy,
+  FaBookOpen,
+  FaGithub,
+  FaDiscord,
+} from "react-icons/fa6";
 import { SiBnbchain } from "react-icons/si";
 import hljs from "highlight.js/lib/core";
 import javascript from "highlight.js/lib/languages/javascript";
@@ -40,6 +51,7 @@ interface Item {
   key: string;
   icon: any;
   label: string;
+  children?: Item[];
 }
 
 interface Post {
@@ -47,6 +59,7 @@ interface Post {
   title: string;
   content: string;
   description: string;
+  category?: string;
 }
 
 interface TitleItem {
@@ -62,14 +75,17 @@ function Dev() {
   const [items, setItems] = useState<Array<Item>>([]);
   const [key, setKey] = useState<string>("0");
   const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [filteredPosts, setFilteredPosts] = useState<Array<Post>>([]);
+  const [selectedVersion, setSelectedVersion] = useState<string>("v1.0");
   const quillRef = useRef<any>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [titles, setTitles] = useState<TitleItem[]>([]);
   const [activeTitle, setActiveTitle] = useState<string>("");
   const router = useRouter();
   const params = useParams();
-  const isMobile = useMediaQuery('(max-width:768px)');
-  const isTablet = useMediaQuery('(max-width:1024px)');
+  const isMobile = useMediaQuery("(max-width:768px)");
+  const isTablet = useMediaQuery("(max-width:1024px)");
 
   useEffect(() => {
     document.title = "Centichain - DEV";
@@ -198,7 +214,7 @@ function Dev() {
     const button = document.createElement("button");
     button.innerHTML = "<FaCopy /> Copy";
     button.className =
-      "copy-button absolute top-2 right-2 bg-gray-700 text-white px-2 py-1 rounded text-sm";
+      "copy-button absolute top-2 right-2 bg-[#1a1a1a] text-white px-2 py-1 rounded text-sm";
     button.onclick = (e) => {
       e.preventDefault();
       const code = block.querySelector("code");
@@ -343,7 +359,7 @@ function Dev() {
             text-gray-300 hover:text-white transition-colors duration-200
             ${
               item.key === key
-                ? "bg-gradient-to-r from-slate-800 to-slate-600 text-white font-bold shadow-md"
+                ? "bg-[#1a1a1a] text-white font-bold shadow-md"
                 : ""
             }
           `}
@@ -353,7 +369,7 @@ function Dev() {
               className={`
               ${
                 item.key === key
-                  ? "border-l-4 border-white pl-2 text-white"
+                  ? "border-l-4 border-[#80ff80] pl-2 text-white"
                   : ""
               }
             `}
@@ -367,19 +383,19 @@ function Dev() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 pt-[64px] flex flex-col pt-[60px]">
+    <div className="min-h-screen bg-[#0a0a0a] text-gray-100 flex flex-col pt-[60px]">
       <ConfigProvider
         theme={{
           algorithm: theme.darkAlgorithm,
           token: {
-            colorPrimary: "#3498db",
-            colorBgBase: "#111827",
+            colorPrimary: "#80ff80",
+            colorBgBase: "#0a0a0a",
             colorTextBase: "#f3f4f6",
           },
         }}
       >
         <Layout className="flex-grow">
-          <Header className="w-full flex items-center justify-between px-4 sm:px-6 bg-gradient-to-r from-gray-900 to-black shadow-lg border-b border-gray-800">
+          <Header className="w-full flex items-center justify-between px-4 sm:px-6 bg-[#1a1a1a] shadow-lg border-b border-[#333333]">
             <div className="flex items-center">
               <motion.button
                 whileHover={{ scale: 1.1 }}
@@ -393,14 +409,7 @@ function Dev() {
                   <RiMenuFold2Fill size={24} />
                 )}
               </motion.button>
-              <Typography
-                variant="h4"
-                className="text-gray-100 font-bold text-xl sm:text-2xl"
-              >
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
-                  Centichain DEV
-                </span>
-              </Typography>
+              
             </div>
           </Header>
           <Layout>
@@ -410,24 +419,24 @@ function Dev() {
                 onClose={() => setDrawerVisible(false)}
                 open={drawerVisible}
                 width={250}
-                className="bg-gray-900"
-                bodyStyle={{ padding: 0, backgroundColor: "#111827" }}
+                className="bg-[#0a0a0a]"
+                bodyStyle={{ padding: 0, backgroundColor: "#1a1a1a" }}
               >
                 {renderSideMenu()}
               </Drawer>
             ) : (
               <Sider
                 collapsed={collapsed}
-                className="bg-gradient-to-b from-gray-900 to-gray-800 shadow-2xl border-r border-gray-700 transition-all duration-300"
+                className="bg-[#1a1a1a] shadow-2xl border-r border-[#333333] transition-all duration-300"
                 collapsible
                 trigger={null}
               >
                 {renderSideMenu()}
               </Sider>
             )}
-            <Layout className="p-4 sm:p-6 bg-gray-900">
+            <Layout className="p-4 sm:p-6 bg-[#0a0a0a]">
               <Content
-                className="bg-gray-800 rounded-lg p-4 sm:p-6 shadow-xl overflow-hidden"
+                className="bg-[#1a1a1a] rounded-lg p-4 sm:p-6 shadow-xl overflow-hidden"
                 ref={contentRef}
               >
                 <AnimatePresence mode="wait">
@@ -440,18 +449,12 @@ function Dev() {
                       transition={{ duration: 0.5, ease: "easeInOut" }}
                       className="prose prose-invert max-w-none"
                     >
-                      <motion.h1
-                        className="text-2xl sm:text-3xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500"
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.2, duration: 0.5 }}
-                      >
-                        {posts[Number(key)].title}
-                      </motion.h1>
 
                       <div
                         dangerouslySetInnerHTML={{
-                          __html: DOMPurify.sanitize(posts[Number(key)].content),
+                          __html: DOMPurify.sanitize(
+                            posts[Number(key)].content
+                          ),
                         }}
                         className="p-2 sm:p-4 code-content text-wrap break-words prose prose-invert max-w-none prose-ul:list-disc prose-li:my-1 text-sm sm:text-base"
                       />
@@ -464,7 +467,7 @@ function Dev() {
                       transition={{ duration: 0.5 }}
                       className="flex flex-col justify-center items-center h-64 space-y-4"
                     >
-                      <PulseLoader color="#3498db" size={15} />
+                      <PulseLoader color="#80ff80" size={15} />
                       <p className="text-gray-400">Loading content...</p>
                     </motion.div>
                   )}
@@ -473,7 +476,7 @@ function Dev() {
             </Layout>
           </Layout>
         </Layout>
-        <Footer className="bg-gray-900 text-gray-300 border-t border-gray-800">
+        <Footer className="bg-[#0a0a0a] text-gray-300 border-t border-[#333333]">
           <DevFooter items={items} itemKey={key} setKey={setKey} />
         </Footer>
       </ConfigProvider>

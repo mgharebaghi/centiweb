@@ -1,67 +1,61 @@
 "use client";
 
 import { Post } from "@/app/api/types/types";
-import {
-  CircularProgress,
-  Tooltip,
-  Snackbar,
-  Container,
-} from "@mui/material";
+import { CircularProgress, Container, Snackbar, Tooltip } from "@mui/material";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import ErrorBoundary from "../../components/ErrorBoundary";
 import {
-  FaHeart,
-  FaFacebookF,
-  FaLinkedinIn,
-  FaLink,
-  FaSun,
-  FaMoon,
-  FaUser,
-  FaTelegram,
   FaBookmark,
+  FaCalendarAlt,
+  FaClock,
+  FaFacebookF,
+  FaHeart,
+  FaLink,
+  FaLinkedinIn,
+  FaMoon,
   FaRegBookmark,
+  FaSun,
+  FaTelegram,
+  FaUser,
 } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
-import {
-  motion,
-  AnimatePresence,
-  useScroll,
-  useMotionValueEvent,
-} from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import ErrorBoundary from "../../components/ErrorBoundary";
 
-function Article({ params }: { params: { id: string } }) {
+export default function Article({ params }: { params: { id: string } }) {
   const [article, setArticle] = useState<Post | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [isLiked, setIsLiked] = useState<boolean>(false);
-  const [readingProgress, setReadingProgress] = useState<number>(0);
-  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [readingProgress, setReadingProgress] = useState(0);
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [similarArticles, setSimilarArticles] = useState<Post[]>([]);
   const [savedArticles, setSavedArticles] = useState<Set<string>>(new Set());
   const router = useRouter();
-  const { scrollY } = useScroll();
 
   const theme = {
     light: {
-      bg: "bg-white",
-      text: "text-gray-900",
-      secondaryText: "text-gray-600",
-      accent: "text-blue-600",
-      border: "border-gray-200",
-      card: "bg-gray-50",
-      hover: "hover:bg-gray-100",
+      bg: "bg-gradient-to-br from-slate-50 via-slate-100 to-slate-50",
+      text: "text-slate-900", 
+      secondaryText: "text-slate-600",
+      accent: "text-green-600",
+      border: "border-slate-200",
+      card: "bg-white/90 backdrop-blur-sm",
+      hover: "hover:bg-slate-100",
+      gradient: "from-white to-slate-50"
     },
     dark: {
-      bg: "bg-gray-900",
-      text: "text-gray-100",
-      secondaryText: "text-gray-400",
-      accent: "text-blue-400",
-      border: "border-gray-700",
-      card: "bg-gray-800",
-      hover: "hover:bg-gray-700",
-    },
+      bg: "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900",
+      text: "text-slate-100",
+      secondaryText: "text-slate-400", 
+      accent: "text-green-400",
+      border: "border-slate-800",
+      card: "bg-slate-800/90 backdrop-blur-sm",
+      hover: "hover:bg-slate-700",
+      gradient: "from-slate-900 to-slate-800"
+    }
   };
 
   const currentTheme = isDarkMode ? theme.dark : theme.light;
@@ -71,7 +65,7 @@ function Article({ params }: { params: { id: string } }) {
       try {
         const response = await fetch("/api/article", {
           method: "POST",
-          body: JSON.stringify({ id: params.id }),
+          body: JSON.stringify({ id: params.id })
         });
 
         if (!response.ok) throw new Error("Failed to fetch article");
@@ -97,11 +91,10 @@ function Article({ params }: { params: { id: string } }) {
   useEffect(() => {
     const handleScroll = () => {
       const winScroll = document.documentElement.scrollTop;
-      const height =
-        document.documentElement.scrollHeight -
-        document.documentElement.clientHeight;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
       const scrolled = (winScroll / height) * 100;
       setReadingProgress(scrolled);
+      setIsHeaderVisible(winScroll < 100);
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -117,8 +110,8 @@ function Article({ params }: { params: { id: string } }) {
           method: "POST",
           body: JSON.stringify({
             id: article._id,
-            type: article.type,
-          }),
+            type: article.type
+          })
         });
 
         if (!response.ok) throw new Error("Failed to fetch similar articles");
@@ -141,32 +134,16 @@ function Article({ params }: { params: { id: string } }) {
 
     switch (platform) {
       case "twitter":
-        window.open(
-          `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-            title
-          )}&url=${encodeURIComponent(url)}`
-        );
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`);
         break;
       case "facebook":
-        window.open(
-          `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-            url
-          )}`
-        );
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`);
         break;
       case "linkedin":
-        window.open(
-          `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-            url
-          )}`
-        );
+        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`);
         break;
       case "telegram":
-        window.open(
-          `https://t.me/share/url?url=${encodeURIComponent(
-            url
-          )}&text=${encodeURIComponent(title)}`
-        );
+        window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`);
         break;
       case "copy":
         navigator.clipboard.writeText(url);
@@ -189,9 +166,7 @@ function Article({ params }: { params: { id: string } }) {
 
   if (loading) {
     return (
-      <div
-        className={`min-h-screen ${currentTheme.bg} flex items-center justify-center`}
-      >
+      <div className={`min-h-screen ${currentTheme.bg} flex items-center justify-center`}>
         <CircularProgress className={currentTheme.accent} />
       </div>
     );
@@ -199,9 +174,7 @@ function Article({ params }: { params: { id: string } }) {
 
   if (!article) {
     return (
-      <div
-        className={`min-h-screen ${currentTheme.bg} ${currentTheme.text} flex items-center justify-center`}
-      >
+      <div className={`min-h-screen ${currentTheme.bg} ${currentTheme.text} flex items-center justify-center`}>
         <p>Article not found</p>
       </div>
     );
@@ -209,46 +182,99 @@ function Article({ params }: { params: { id: string } }) {
 
   return (
     <ErrorBoundary>
-      <div
-        className={`min-h-screen ${currentTheme.bg} ${currentTheme.text} transition-colors duration-300`}
-      >
+      <div className={`min-h-screen ${currentTheme.bg} ${currentTheme.text} transition-colors duration-300`}>
         {/* Progress bar */}
-        <div className="fixed top-0 left-0 w-full h-1 bg-gray-200 dark:bg-gray-700 z-50">
-          <div
-            className="h-full bg-blue-500 transition-all duration-200"
-            style={{ width: `${readingProgress}%` }}
-          />
-        </div>
+        <motion.div
+          className="fixed top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 to-green-600 z-50"
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: readingProgress / 100 }}
+          style={{ transformOrigin: "0%" }}
+        />
+
+        {/* Floating Header */}
+        <AnimatePresence>
+          {!isHeaderVisible && (
+            <motion.div
+              initial={{ y: -100 }}
+              animate={{ y: 0 }}
+              exit={{ y: -100 }}
+              className={`fixed top-0 left-0 right-0 z-40 ${currentTheme.card} border-b ${currentTheme.border} backdrop-blur-lg bg-opacity-80`}
+            >
+              <Container maxWidth="lg" className="py-4">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-lg font-semibold truncate max-w-2xl">
+                    {article.title}
+                  </h2>
+                  <div className="flex gap-4">
+                    <button
+                      onClick={() => setIsLiked(!isLiked)}
+                      className={`p-2 rounded-full transition-all ${currentTheme.hover}`}
+                    >
+                      <FaHeart className={isLiked ? "text-red-500" : currentTheme.secondaryText} />
+                    </button>
+                    <button
+                      onClick={() => toggleSaveArticle(article._id.toString())}
+                      className={`p-2 rounded-full transition-all ${currentTheme.hover}`}
+                    >
+                      {savedArticles.has(article._id.toString()) ? (
+                        <FaBookmark className={currentTheme.accent} />
+                      ) : (
+                        <FaRegBookmark className={currentTheme.secondaryText} />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </Container>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <Container maxWidth="lg" className="py-12 pt-24">
           <article className="max-w-4xl mx-auto">
             {/* Header */}
-            <header className="mb-12">
-              <h1 className="text-4xl font-bold mb-4">{article.title}</h1>
-              <div
-                className={`flex items-center gap-4 ${currentTheme.secondaryText}`}
-              >
+            <motion.header
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-12"
+            >
+              <h1 className="text-5xl font-bold mb-6 leading-tight">
+                {article.title}
+              </h1>
+              <div className={`flex flex-wrap items-center gap-6 ${currentTheme.secondaryText} text-sm`}>
                 <div className="flex items-center gap-2">
-                  <FaUser className="text-sm" />
-                  <span>{article.author || "Anonymous"}</span>
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-green-500 to-green-600 flex items-center justify-center text-white">
+                    {article.author?.[0]?.toUpperCase() || "A"}
+                  </div>
+                  <div>
+                    <div className="font-medium text-base">
+                      {article.author || "Anonymous"}
+                    </div>
+                    <div className={currentTheme.secondaryText}>Author</div>
+                  </div>
                 </div>
-                <span>•</span>
-                <time dateTime={new Date(article.createdAt).toISOString()}>
-                  {new Date(article.createdAt).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </time>
-                <span>•</span>
-                <span>
-                  {Math.ceil(article.content.split(" ").length / 200)} min read
-                </span>
+                <div className="flex items-center gap-2">
+                  <FaCalendarAlt />
+                  <time dateTime={new Date(article.createdAt).toISOString()}>
+                    {new Date(article.createdAt).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric"
+                    })}
+                  </time>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FaClock />
+                  <span>{Math.ceil(article.content.split(" ").length / 200)} min read</span>
+                </div>
               </div>
-            </header>
+            </motion.header>
 
             {/* Featured Image */}
-            <div className="aspect-video relative rounded-lg overflow-hidden mb-12">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="aspect-[21/9] relative rounded-xl overflow-hidden mb-12 shadow-2xl"
+            >
               <Image
                 src={article.image}
                 alt={article.title}
@@ -256,147 +282,151 @@ function Article({ params }: { params: { id: string } }) {
                 className="object-cover"
                 priority
               />
-            </div>
+            </motion.div>
 
             {/* Content */}
-            <div
-              className={`prose prose-lg mx-auto ${
-                isDarkMode ? "prose-invert" : ""
-              }`}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className={`prose prose-lg mx-auto ${isDarkMode ? "prose-invert" : ""} prose-headings:font-bold prose-a:text-green-600 dark:prose-a:text-green-400`}
             >
               <div dangerouslySetInnerHTML={{ __html: article.content }} />
-            </div>
+            </motion.div>
 
             {/* Actions */}
-            <div
-              className={`mt-12 pt-6 pb-6 border-t border-b ${currentTheme.border} flex justify-between items-center`}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className={`mt-12 p-6 rounded-xl ${currentTheme.card} shadow-lg`}
             >
-              <div className="flex gap-4">
-                <Tooltip title={isLiked ? "Unlike" : "Like"}>
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div className="flex items-center gap-4">
                   <button
                     onClick={() => setIsLiked(!isLiked)}
-                    className={`p-2 rounded-full transition-transform hover:scale-110 ${currentTheme.hover}`}
+                    className={`p-3 rounded-full transition-all ${currentTheme.hover} flex items-center gap-2`}
                   >
-                    <FaHeart
-                      className={`text-xl ${
-                        isLiked ? "text-red-500" : currentTheme.secondaryText
-                      }`}
-                    />
+                    <FaHeart className={`text-xl ${isLiked ? "text-red-500" : currentTheme.secondaryText}`} />
+                    <span>Like</span>
                   </button>
-                </Tooltip>
-              </div>
+                  <button
+                    onClick={() => toggleSaveArticle(article._id.toString())}
+                    className={`p-3 rounded-full transition-all ${currentTheme.hover} flex items-center gap-2`}
+                  >
+                    {savedArticles.has(article._id.toString()) ? (
+                      <>
+                        <FaBookmark className={`text-xl ${currentTheme.accent}`} />
+                        <span>Saved</span>
+                      </>
+                    ) : (
+                      <>
+                        <FaRegBookmark className={`text-xl ${currentTheme.secondaryText}`} />
+                        <span>Save</span>
+                      </>
+                    )}
+                  </button>
+                </div>
 
-              <div className="flex gap-4">
-                <Tooltip title="Share on X">
-                  <button
-                    onClick={() => handleShare("twitter")}
-                    className={`p-2 rounded-full transition-transform hover:scale-110 ${currentTheme.hover}`}
-                  >
-                    <FaXTwitter className="text-xl" />
-                  </button>
-                </Tooltip>
-                <Tooltip title="Share on Facebook">
-                  <button
-                    onClick={() => handleShare("facebook")}
-                    className={`p-2 rounded-full transition-transform hover:scale-110 ${currentTheme.hover}`}
-                  >
-                    <FaFacebookF className="text-xl text-[#4267B2]" />
-                  </button>
-                </Tooltip>
-                <Tooltip title="Share on LinkedIn">
-                  <button
-                    onClick={() => handleShare("linkedin")}
-                    className={`p-2 rounded-full transition-transform hover:scale-110 ${currentTheme.hover}`}
-                  >
-                    <FaLinkedinIn className="text-xl text-[#0077B5]" />
-                  </button>
-                </Tooltip>
-                <Tooltip title="Share on Telegram">
-                  <button
-                    onClick={() => handleShare("telegram")}
-                    className={`p-2 rounded-full transition-transform hover:scale-110 ${currentTheme.hover}`}
-                  >
-                    <FaTelegram className="text-xl text-[#0088cc]" />
-                  </button>
-                </Tooltip>
-                <Tooltip title="Copy link">
-                  <button
-                    onClick={() => handleShare("copy")}
-                    className={`p-2 rounded-full transition-transform hover:scale-110 ${currentTheme.hover}`}
-                  >
-                    <FaLink
-                      className={`text-xl ${currentTheme.secondaryText}`}
-                    />
-                  </button>
-                </Tooltip>
+                <div className="flex gap-2">
+                  {[
+                    { icon: FaXTwitter, platform: "twitter", color: "text-slate-800 dark:text-white" },
+                    { icon: FaFacebookF, platform: "facebook", color: "text-[#4267B2]" },
+                    { icon: FaLinkedinIn, platform: "linkedin", color: "text-[#0077B5]" },
+                    { icon: FaTelegram, platform: "telegram", color: "text-[#0088cc]" },
+                    { icon: FaLink, platform: "copy", color: currentTheme.secondaryText }
+                  ].map(({ icon: Icon, platform, color }) => (
+                    <Tooltip key={platform} title={`Share on ${platform.charAt(0).toUpperCase() + platform.slice(1)}`}>
+                      <button
+                        onClick={() => handleShare(platform)}
+                        className={`p-3 rounded-full transition-all ${currentTheme.hover}`}
+                      >
+                        <Icon className={`text-xl ${color}`} />
+                      </button>
+                    </Tooltip>
+                  ))}
+                </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Suggested Articles */}
-            <div className="mt-16">
-              <h2 className="text-2xl font-bold mb-6">More Articles</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {similarArticles.map((article) => (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="mt-16"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {similarArticles.map((article, index) => (
                   <motion.div
                     key={article._id.toString()}
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    whileHover={{ scale: 1.02 }}
-                    transition={{ duration: 0.2 }}
-                    className={`${currentTheme.card} rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer`}
+                    transition={{ delay: 0.1 * index }}
+                    whileHover={{ y: -5 }}
+                    className={`${currentTheme.card} rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:cursor-pointer`}
                     onClick={() => router.push(`/articles/${article._id}`)}
                   >
-                    <div className="relative aspect-[4/3]">
+                    <div className="relative aspect-[16/9]">
                       <Image
                         src={article.image}
                         alt={article.title}
                         fill
                         className="object-cover"
                       />
-                      <button 
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                      <button
                         onClick={(e) => {
                           e.stopPropagation();
                           toggleSaveArticle(article._id.toString());
                         }}
-                        className="absolute top-2 right-2 p-1.5 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/50 transition-colors"
+                        className="absolute top-4 right-4 p-2 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/50 transition-colors"
                       >
                         {savedArticles.has(article._id.toString()) ? (
-                          <FaBookmark className="text-white text-xs" />
+                          <FaBookmark className="text-white" />
                         ) : (
-                          <FaRegBookmark className="text-white text-xs" />
+                          <FaRegBookmark className="text-white" />
                         )}
                       </button>
                     </div>
-                    
-                    <div className="p-3">
-                      <h3 className="font-semibold text-sm mb-1 line-clamp-2">
+
+                    <div className="p-6">
+                      <h3 className="font-bold text-lg mb-3 line-clamp-2 hover:text-green-500 transition-colors">
                         {article.title}
                       </h3>
-                      <div className="flex items-center gap-2 text-xs mt-2">
-                        <FaUser className="text-xs" />
+                      <div className="flex items-center gap-3 text-sm">
+                        <div className="flex items-center gap-2">
+                          <FaUser className="text-xs" />
+                          <span className={currentTheme.secondaryText}>
+                            {article.author || "Anonymous"}
+                          </span>
+                        </div>
+                        <span className={currentTheme.secondaryText}>•</span>
                         <span className={currentTheme.secondaryText}>
-                          {article.author || "Anonymous"}
+                          {article.content ? Math.ceil(article.content.split(" ").length / 200) : "5"} min read
                         </span>
                       </div>
                     </div>
                   </motion.div>
                 ))}
               </div>
-            </div>
+            </motion.div>
           </article>
         </Container>
 
         {/* Theme Toggle */}
-        <button
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
           onClick={() => setIsDarkMode(!isDarkMode)}
-          className={`fixed bottom-8 right-8 p-3 rounded-full shadow-lg ${currentTheme.card} ${currentTheme.hover}`}
+          className={`fixed bottom-8 right-8 p-4 rounded-full shadow-lg ${currentTheme.card} ${currentTheme.hover} backdrop-blur-sm bg-opacity-80`}
         >
           {isDarkMode ? (
-            <FaSun className="text-yellow-400" />
+            <FaSun className="text-xl text-yellow-400" />
           ) : (
-            <FaMoon className="text-blue-600" />
+            <FaMoon className="text-xl text-blue-600" />
           )}
-        </button>
+        </motion.button>
 
         <Snackbar
           open={snackbarOpen}
@@ -409,5 +439,3 @@ function Article({ params }: { params: { id: string } }) {
     </ErrorBoundary>
   );
 }
-
-export default Article;

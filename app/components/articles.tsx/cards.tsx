@@ -26,55 +26,65 @@ export default function Card({ id, pic, title, description }: CardProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
-      whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
-      whileTap={{ scale: 0.98 }}
-      className="cursor-pointer w-full"
-      onClick={() => {
-        router.push(`/articles/${id}`);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5 }}
+      whileHover={{ 
+        scale: 1.02,
+        transition: { duration: 0.2 }
       }}
+      className="w-full"
     >
-      <MuiCard className="bg-gray-800 rounded-xl overflow-hidden shadow-lg" style={{ height: '450px', display: 'flex', flexDirection: 'column' }}>
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          transition={{ duration: 0.2 }}
-        >
-          <CardMedia className="relative" style={{ height: '200px' }}>
-            <Image
-              alt={title}
-              src={pic}
-              layout="fill"
-              objectFit="cover"
-              className="transition-all duration-200 hover:opacity-90"
-            />
-          </CardMedia>
-        </motion.div>
-        <CardContent className="flex-grow p-4 overflow-hidden flex flex-col justify-between">
-          <div>
-            <Typography variant="h6" className="font-bold mb-2 text-gray-200" style={{ height: '3em', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {truncateText(title, 60)}
-            </Typography>
-            <Typography variant="body2" className="text-gray-400" style={{ height: '4.5em', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {truncateText(description, 120)}
-            </Typography>
-          </div>
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="mt-4"
+      <MuiCard className="bg-white dark:bg-gray-800 rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 flex flex-col" style={{ height: '450px' }}>
+        <div className="relative h-[200px]">
+          <Image
+            alt={title}
+            src={pic}
+            layout="fill"
+            objectFit="cover"
+            className="rounded-t-xl"
+            quality={90}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/50" />
+        </div>
+
+        <CardContent className="p-6 flex flex-col flex-1">
+          <Typography 
+            variant="h5" 
+            className="font-bold mb-4 text-gray-800 dark:text-gray-100 line-clamp-2 tracking-tight"
           >
-            <Button
-              variant="contained"
-              color="primary"
+            {truncateText(title, 60)}
+          </Typography>
+          
+          <Typography 
+            variant="body1" 
+            className="text-gray-600 dark:text-gray-300 line-clamp-4 mb-4"
+          >
+            {truncateText(description, 160)}
+          </Typography>
+
+          <div className="mt-auto">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={handleReadMore}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200 ease-in-out"
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center group"
             >
-              Read More →
-            </Button>
-          </motion.div>
+              <span>Read More</span>
+              <motion.span
+                initial={{ x: 0 }}
+                animate={{ x: [0, 5, 0] }}
+                transition={{ 
+                  duration: 1,
+                  repeat: Infinity,
+                  repeatDelay: 1
+                }}
+                className="ml-2"
+              >
+                →
+              </motion.span>
+            </motion.button>
+          </div>
         </CardContent>
       </MuiCard>
     </motion.div>
