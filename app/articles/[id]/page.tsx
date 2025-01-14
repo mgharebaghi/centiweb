@@ -360,6 +360,9 @@ export default function Article({ params }: { params: { id: string } }) {
                         border-collapse: collapse !important;
                         width: 100% !important;
                         margin: 1em 0 !important;
+                        display: block !important;
+                        overflow-x: auto !important;
+                        white-space: nowrap !important;
                       }
                       .preview-content th,
                       .preview-content td {
