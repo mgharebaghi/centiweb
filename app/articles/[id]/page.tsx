@@ -294,7 +294,6 @@ export default function Article({ params }: { params: { id: string } }) {
                     <div className="font-medium text-base">
                       {article.author || "Anonymous"}
                     </div>
-                    <div className={currentTheme.secondaryText}>Author</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
