@@ -13,12 +13,12 @@ export async function POST(req: NextRequest) {
     const collection = db.collection<WithId<BaseTransaction>>("reciepts");
     const count = await collection.countDocuments();
     const request = await req.json();
-    const skip = request.page * 9 - 9;
+    const skip = request.page * 5 - 5;
     const docs = await collection
       .find({})
       .sort({ date: -1 })
       .skip(skip)
-      .limit(10);
+      .limit(5);
 
     await docs.forEach((trx) => {
       transactions.push(trx);

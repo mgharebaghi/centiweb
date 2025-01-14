@@ -14,12 +14,12 @@ export async function POST(req: NextRequest) {
     const db = client.db("Centichain");
     const collection = db.collection<WithId<Block>>("Blocks");
     const request = await req.json();
-    const skip = request.page * 9 - 9;
+    const skip = request.page * 5 - 5;
     const docs = await collection
       .find({})
       .sort({"header.number": -1})
       .skip(skip)
-      .limit(10);
+      .limit(5);
     await docs.forEach((block) => {
       data.push(block);
     });

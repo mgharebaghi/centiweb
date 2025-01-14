@@ -75,6 +75,7 @@ export interface TrxScan {
   value: any;
   status: any;
   date: any;
+  block?: string | number;
 }
 
 export interface Relays {

@@ -1,7 +1,6 @@
 import { Container, Typography, Box, Button, Tooltip, Card, CardContent } from "@mui/material";
 import { SiApple, SiLinux, SiWindows } from "react-icons/si";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import { FaChevronDown, FaDownload, FaInfoCircle } from "react-icons/fa";
 
 function Validators() {
@@ -61,58 +60,45 @@ function Validators() {
   ];
 
   return (
-    <div id="validator-section" className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 flex items-center">
-      <Container maxWidth="lg" className="py-16">
+    <div id="validator-section" className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 flex items-center py-6 pt-20 md:py-12 lg:py-16">
+      <Container maxWidth="lg" className="px-4 md:px-6 lg:px-8">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="space-y-12"
+          className="space-y-6 md:space-y-8 lg:space-y-12"
         >
           {/* Header Section */}
           <motion.div variants={itemVariants} className="text-center">
-            <div className="flex justify-center mb-8">
-              <div className="relative">
-                <Image
-                  src="/images/Logo.png"
-                  alt="Centichain Logo"
-                  width={120}
-                  height={120}
-                  className="animate-pulse"
-                  priority
-                />
-                <div className="absolute -inset-2 bg-gray-800/20 rounded-full blur-xl" />
-              </div>
-            </div>
-            <Typography variant="h2" className="text-4xl md:text-5xl font-bold text-gray-100 mb-4">
+            <Typography variant="h2" className="text-2xl md:text-3xl lg:text-5xl font-bold text-gray-100 mb-3 md:mb-4">
               Become a Centichain Validator
             </Typography>
-            <Typography variant="h6" className="text-gray-400 max-w-2xl mx-auto leading-relaxed">
+            <Typography variant="h6" className="text-sm md:text-base lg:text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
               Participate in securing the future of blockchain technology. As a validator, you'll help verify transactions, maintain network integrity, and earn rewards for your contribution.
             </Typography>
           </motion.div>
 
           {/* Download Cards */}
-          <motion.div variants={itemVariants} className="grid md:grid-cols-3 gap-6">
+          <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {downloadOptions.map((option, index) => (
               <Card 
                 key={index}
                 className="bg-gray-800 border border-gray-700 hover:border-gray-600 hover:shadow-lg transition-all duration-300"
               >
-                <CardContent className="p-6 space-y-4">
-                  <div className="flex items-center space-x-4">
-                    <option.icon size={36} className="text-gray-300" />
+                <CardContent className="p-4 md:p-6 space-y-3 md:space-y-4">
+                  <div className="flex items-center space-x-3 md:space-x-4">
+                    <option.icon size={28} className="text-gray-300 md:text-[32px] lg:text-[36px]" />
                     <div>
-                      <Typography variant="h6" className="text-gray-100 font-semibold">
+                      <Typography variant="h6" className="text-base md:text-lg lg:text-xl text-gray-100 font-semibold">
                         {option.text}
                       </Typography>
-                      <Typography variant="caption" className="text-gray-400 font-medium">
+                      <Typography variant="caption" className="text-xs md:text-sm text-gray-400 font-medium">
                         {option.size}
                       </Typography>
                     </div>
                   </div>
 
-                  <Typography variant="body2" className="text-gray-400 text-sm leading-relaxed">
+                  <Typography variant="body2" className="text-xs md:text-sm text-gray-400 leading-relaxed">
                     {option.requirements}
                   </Typography>
 
@@ -121,7 +107,7 @@ function Validators() {
                     variant="contained"
                     disabled={!option.available}
                     href={option.available ? option.link : undefined}
-                    className={`${option.available ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-800'} normal-case transition-colors duration-300 font-medium`}
+                    className={`${option.available ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-800'} normal-case transition-colors duration-300 font-medium text-sm md:text-base py-2 md:py-2.5`}
                     startIcon={option.available ? <FaDownload /> : <FaInfoCircle />}
                   >
                     {option.available ? 'Download Now' : 'Coming Soon'}
@@ -132,8 +118,8 @@ function Validators() {
           </motion.div>
 
           {/* Info Section */}
-          <motion.div variants={itemVariants} className="text-center space-y-6">
-            <Typography variant="body1" className="text-gray-400">
+          <motion.div variants={itemVariants} className="text-center space-y-4 md:space-y-6">
+            <Typography variant="body1" className="text-sm md:text-base text-gray-400">
               Latest Release: <span className="text-gray-300 font-semibold">Version 0.9.0</span>
             </Typography>
             
@@ -141,7 +127,7 @@ function Validators() {
               <Button
                 onClick={scrollToRelay}
                 variant="outlined"
-                className="border-gray-700 text-gray-300 hover:bg-gray-800/50 transition-colors duration-300 font-medium"
+                className="border-gray-700 text-gray-300 hover:bg-gray-800/50 transition-colors duration-300 font-medium text-sm md:text-base py-2 md:py-2.5"
                 endIcon={<FaChevronDown />}
               >
                 Discover Relay Node Opportunities
