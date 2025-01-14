@@ -341,7 +341,40 @@ export default function Article({ params }: { params: { id: string } }) {
                 isDarkMode ? "prose-invert" : ""
               } prose-headings:font-bold prose-a:text-green-600 dark:prose-a:text-green-400`}
             >
-              <div dangerouslySetInnerHTML={{ __html: article.content }} />
+              <div
+                className="preview-content"
+                dangerouslySetInnerHTML={{
+                  __html: `
+                    <style>
+                      .preview-content ul { 
+                        list-style-type: disc !important;
+                        padding-left: 2em !important;
+                        margin: 1em 0 !important;
+                      }
+                      .preview-content ol {
+                        list-style-type: decimal !important;
+                        padding-left: 2em !important;
+                        margin: 1em 0 !important;
+                      }
+                      .preview-content table {
+                        border-collapse: collapse !important;
+                        width: 100% !important;
+                        margin: 1em 0 !important;
+                      }
+                      .preview-content th,
+                      .preview-content td {
+                        border: 1px solid #ddd !important;
+                        padding: 8px !important;
+                        text-align: left !important;
+                      }
+                      .preview-content th {
+                        background-color: #f5f5f5 !important;
+                      }
+                    </style>
+                    ${article.content}
+                  `,
+                }}
+              />
             </motion.div>
 
             {/* Actions */}

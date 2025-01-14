@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { Button, Typography, Container, Paper } from "@mui/material";
-import { Col, Divider, Input, Row, Select, Upload, message } from "antd";
-import { InboxOutlined } from '@ant-design/icons';
-import TextArea from "antd/es/input/TextArea";
+import React, { useState } from "react";
+import { Button, Typography, Container, Paper, Box, Stepper, Step, StepLabel } from "@mui/material";
+import { Col, Input, Row, Select, Upload, message } from "antd";
+import { InboxOutlined } from "@ant-design/icons";
 import { Editor } from "@tinymce/tinymce-react";
 import { PulseLoader } from "react-spinners";
-import { FaCopy } from "react-icons/fa";
+import { motion } from "framer-motion";
 
 const { Dragger } = Upload;
 
 function Production(props: any) {
+  const [activeStep, setActiveStep] = useState(0);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [select, setSelect] = useState("");
@@ -20,6 +20,9 @@ function Production(props: any) {
   const [file, setFile] = useState<File>();
   const [postImg, setPostImg] = useState("");
   const [author, setAuthor] = useState("");
+  const [previewMode, setPreviewMode] = useState(false);
+
+  const steps = ['Basic Info', 'Content', 'Media', 'Preview & Publish'];
 
   const selectOpt = [
     { value: "article", label: "Article" },
@@ -30,13 +33,21 @@ function Production(props: any) {
 
   const handleFileUpload = (info: any) => {
     const { status } = info.file;
-    if (status === 'done') {
+    if (status === "done") {
       setFile(info.file.originFileObj);
       setPostImg(`/images/${info.file.name}`);
       message.success(`${info.file.name} file uploaded successfully.`);
-    } else if (status === 'error') {
+    } else if (status === "error") {
       message.error(`${info.file.name} file upload failed.`);
     }
+  };
+
+  const handleNext = () => {
+    setActiveStep((prev) => prev + 1);
+  };
+
+  const handleBack = () => {
+    setActiveStep((prev) => prev - 1);
   };
 
   async function insert() {
@@ -67,7 +78,7 @@ function Production(props: any) {
       }
     } else {
       setLoading(false);
-      setMsgColor("error");
+      setMsgColor("error"); 
       setMsg("Please fill in all inputs correctly!");
     }
   }
@@ -100,7 +111,7 @@ function Production(props: any) {
         } else {
           props.fetchData("/api/others", props.setOtehrs);
         }
-        setMsg("Your data inserted successfully!");
+        setMsg("Your post has been published successfully!");
         setMsgColor("success");
       }
     } catch (error: any) {
@@ -109,163 +120,218 @@ function Production(props: any) {
     }
   };
 
+  const renderStepContent = (step: number) => {
+    switch (step) {
+      case 0:
+        return (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Row gutter={[16, 16]}>
+              <Col xs={24} md={16}>
+                <Input
+                  size="large"
+                  placeholder="Enter your post title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+              </Col>
+              <Col xs={24} md={8}>
+                <Select
+                  size="large"
+                  placeholder="Choose a category"
+                  className="w-full"
+                  value={select}
+                  options={selectOpt}
+                  onChange={(val) => setSelect(val)}
+                />
+              </Col>
+            </Row>
+            <Input
+              size="large"
+              placeholder="Enter author's name"
+              value={author}
+              onChange={(e) => setAuthor(e.target.value)}
+              className="mt-4"
+            />
+            <Input.TextArea
+              rows={4}
+              placeholder="Enter your description"
+              value={desc}
+              onChange={(e) => setDesc(e.target.value)}
+              className="mt-4"
+            />
+          </motion.div>
+        );
+
+      case 1:
+        return (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="mt-4"
+          >
+            <Editor
+              apiKey="2xuwpiwtg6dpym37fkznj8mvxvgl0yknv717zz9p0jpyffrx"
+              value={content}
+              init={{
+                height: 500,
+                menubar: true,
+                plugins: [
+                  "advlist", "autolink", "lists", "link", "image", "charmap", "preview",
+                  "anchor", "searchreplace", "visualblocks", "code", "fullscreen",
+                  "insertdatetime", "media", "table", "code", "help", "wordcount",
+                  "codesample"
+                ],
+                toolbar: 'undo redo | formatselect | ' +
+                  'bold italic backcolor | alignleft aligncenter ' +
+                  'alignright alignjustify | bullist numlist outdent indent | ' +
+                  'removeformat | help | code | codesample',
+                content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+              }}
+              onEditorChange={(content) => setContent(content)}
+            />
+          </motion.div>
+        );
+
+      case 2:
+        return (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="mt-4"
+          >
+            <Dragger
+              name="file"
+              multiple={false}
+              action="/api/upload"
+              onChange={handleFileUpload}
+            >
+              <p className="ant-upload-drag-icon">
+                <InboxOutlined />
+              </p>
+              <p className="ant-upload-text">
+                Click or drag file to this area to upload
+              </p>
+              <p className="ant-upload-hint">
+                Support for a single image upload. Strictly prohibit from uploading
+                company data or other sensitive files.
+              </p>
+            </Dragger>
+          </motion.div>
+        );
+
+      case 3:
+        return (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="mt-4"
+          >
+            <Paper elevation={2} className="p-6">
+              <Typography variant="h5" className="mb-4">{title}</Typography>
+              <Typography variant="subtitle1" className="mb-2">By {author}</Typography>
+              <Typography variant="body1" className="mb-4">{desc}</Typography>
+              {postImg && (
+                <img src={postImg} alt="Preview" className="w-full h-64 object-cover rounded mb-4"/>
+              )}
+              <div 
+                className="preview-content"
+                dangerouslySetInnerHTML={{ 
+                  __html: `
+                    <style>
+                      .preview-content ul { 
+                        list-style-type: disc !important;
+                        padding-left: 2em !important;
+                        margin: 1em 0 !important;
+                      }
+                      .preview-content ol {
+                        list-style-type: decimal !important;
+                        padding-left: 2em !important;
+                        margin: 1em 0 !important;
+                      }
+                      .preview-content table {
+                        border-collapse: collapse !important;
+                        width: 100% !important;
+                        margin: 1em 0 !important;
+                      }
+                      .preview-content th,
+                      .preview-content td {
+                        border: 1px solid #ddd !important;
+                        padding: 8px !important;
+                        text-align: left !important;
+                      }
+                      .preview-content th {
+                        background-color: #f5f5f5 !important;
+                      }
+                    </style>
+                    ${content}
+                  ` 
+                }}
+              />
+            </Paper>
+          </motion.div>
+        );
+    }
+  };
+
   return (
     <Container maxWidth="lg">
       <Paper elevation={3} className="p-6 mt-8">
-        <Typography variant="h4" className="mb-6 text-center font-bold text-gray-800">Create New Post</Typography>
-        <Row gutter={[16, 16]}>
-          <Col xs={24} md={16}>
-            <Input
-              size="large"
-              placeholder="Enter your text's title"
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </Col>
-          <Col xs={24} md={8}>
-            <Select
-              size="large"
-              placeholder="Choose a category"
-              className="w-full"
-              options={selectOpt}
-              onChange={(val) => setSelect(val)}
-            />
-          </Col>
-        </Row>
-        <Input
-          size="large"
-          placeholder="Enter author's name"
-          onChange={(e) => setAuthor(e.target.value)}
-          className="mt-4"
-        />
-        <TextArea
-          rows={4}
-          placeholder="Enter your description"
-          onChange={(e) => setDesc(e.target.value)}
-          className="mt-4"
-        />
-        <div className="mt-6">
-          <Editor
-            apiKey="2xuwpiwtg6dpym37fkznj8mvxvgl0yknv717zz9p0jpyffrx"
-            init={{
-              height: 500,
-              menubar: true,
-              plugins: [
-                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount',
-                'codesample', 'emoticons', 'hr', 'nonbreaking', 'pagebreak', 'paste',
-                'print', 'save', 'directionality', 'fullscreen', 'template', 'textpattern',
-                'toc', 'visualchars'
-              ],
-              toolbar: 'undo redo | formatselect | ' +
-                'bold italic backcolor | alignleft aligncenter ' +
-                'alignright alignjustify | bullist numlist outdent indent | ' +
-                'removeformat | help | code | codesample | link image | ' +
-                'emoticons hr nonbreaking pagebreak paste | ' +
-                'print save | ltr rtl | fullscreen | template | ' +
-                'toc visualchars',
-              content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
-              image_class_list: [
-                { title: 'Responsive', value: 'img-fluid' },
-              ],
-              codesample_languages: [
-                { text: 'HTML/XML', value: 'markup' },
-                { text: 'JavaScript', value: 'javascript' },
-                { text: 'CSS', value: 'css' },
-                { text: 'PHP', value: 'php' },
-                { text: 'Ruby', value: 'ruby' },
-                { text: 'Python', value: 'python' },
-                { text: 'Java', value: 'java' },
-                { text: 'C', value: 'c' },
-                { text: 'C#', value: 'csharp' },
-                { text: 'C++', value: 'cpp' }
-              ],
-              setup: function(editor) {
-                editor.on('init', function() {
-                  editor.getBody().addEventListener('click', function(e) {
-                    const target = e.target as HTMLElement;
-                    if (target.classList.contains('copy-button')) {
-                      e.preventDefault();
-                      const codeBlock = target.closest('pre');
-                      if (codeBlock) {
-                        const code = codeBlock.querySelector('code');
-                        if (code) {
-                          navigator.clipboard.writeText(code.innerText);
-                          message.success('Code copied to clipboard!');
-                        }
-                      }
-                    }
-                  });
-                });
-
-                editor.on('NodeChange', function(e) {
-                  const codeBlocks = editor.getBody().querySelectorAll('pre');
-                  codeBlocks.forEach((block) => {
-                    if (!block.querySelector('.copy-button')) {
-                      const button = editor.dom.create('button', {
-                        'class': 'copy-button absolute bottom-2 right-2 bg-gray-800 text-white px-3 py-1 rounded-full shadow-md hover:bg-gray-700 transition-colors duration-200 flex items-center space-x-1',
-                        'innerHTML': '<span class="icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg></span><span>Copy</span>'
-                      });
-                      editor.dom.setStyles(block, { position: 'relative', paddingBottom: '2.5rem' });
-                      block.appendChild(button);
-                    }
-                  });
-                });
-
-                editor.on('SetContent', function() {
-                  const codeBlocks = editor.getBody().querySelectorAll('pre');
-                  codeBlocks.forEach((block) => {
-                    if (!block.querySelector('.copy-button')) {
-                      const button = editor.dom.create('button', {
-                        'class': 'copy-button absolute bottom-2 right-2 bg-gray-800 text-white px-3 py-1 rounded-full shadow-md hover:bg-gray-700 transition-colors duration-200 flex items-center space-x-1',
-                        'innerHTML': '<span class="icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg></span><span>Copy</span>'
-                      });
-                      editor.dom.setStyles(block, { position: 'relative', paddingBottom: '2.5rem' });
-                      block.appendChild(button);
-                    }
-                  });
-                });
-              }
-            }}
-            onEditorChange={(txt) => setContent(txt)}
-          />
-        </div>
-        <Divider />
-        <Dragger
-          name="file"
-          multiple={false}
-          action="/api/upload"
-          onChange={handleFileUpload}
-          className="mt-4"
+        <Typography
+          variant="h4"
+          className="mb-6 text-center font-bold text-gray-800"
         >
-          <p className="ant-upload-drag-icon">
-            <InboxOutlined />
-          </p>
-          <p className="ant-upload-text">Click or drag file to this area to upload</p>
-          <p className="ant-upload-hint">
-            Support for a single image upload. Strictly prohibit from uploading company data or other
-            sensitive files.
-          </p>
-        </Dragger>
-        <Row justify="space-between" align="middle" className="mt-6">
-          <Col>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={insert}
-              disabled={loading}
-            >
-              {loading ? <PulseLoader size={10} color="white" /> : "Create Post"}
-            </Button>
-          </Col>
-          <Col>
+          Create New Post
+        </Typography>
+
+        <Stepper activeStep={activeStep} className="mb-8">
+          {steps.map((label) => (
+            <Step key={label}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
+          ))}
+        </Stepper>
+
+        {renderStepContent(activeStep)}
+
+        <Box className="mt-6 flex justify-between">
+          <Button
+            disabled={activeStep === 0}
+            onClick={handleBack}
+          >
+            Back
+          </Button>
+          <div>
             {msg && (
-              <Typography color={msgColor === "error" ? "error" : "success"}>
+              <Typography color={msgColor === "error" ? "error" : "success"} className="mr-4">
                 {msg}
               </Typography>
             )}
-          </Col>
-        </Row>
+            {activeStep === steps.length - 1 ? (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={insert}
+                disabled={loading}
+              >
+                {loading ? <PulseLoader size={10} color="white" /> : "Publish"}
+              </Button>
+            ) : (
+              <Button
+                variant="contained"
+                onClick={handleNext}
+              >
+                Next
+              </Button>
+            )}
+          </div>
+        </Box>
       </Paper>
     </Container>
   );
