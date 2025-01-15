@@ -151,14 +151,14 @@ export default function Contributors() {
   if (!contributors) {
     return (
       <div className="min-h-screen w-full bg-[#0A0A0A]">
-        <Container maxWidth="lg" className="py-24">
+        <Container maxWidth="lg" className="py-12 sm:py-24 px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="max-w-4xl mx-auto text-center"
           >
-            <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-gray-400 text-lg">Loading contributors...</p>
+            <div className="w-12 h-12 sm:w-16 sm:h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-gray-400 text-base sm:text-lg">Loading contributors...</p>
           </motion.div>
         </Container>
       </div>
@@ -167,33 +167,33 @@ export default function Contributors() {
 
   return (
     <div className="min-h-screen w-full bg-[#0A0A0A]">
-      <Container maxWidth="lg" className="py-24">
+      <Container maxWidth="lg" className="py-12 sm:py-24 px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="max-w-5xl mx-auto"
         >
-          <div className="text-center mb-16">
+          <div className="text-center mb-8 sm:mb-16">
             <motion.h1
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-5xl font-bold mb-4 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent"
+              className="text-3xl sm:text-5xl font-bold mb-2 sm:mb-4 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent"
             >
               Network Contributors
             </motion.h1>
-            <p className="text-gray-400 text-lg">
+            <p className="text-gray-400 text-base sm:text-lg">
               Discover the nodes powering our network
             </p>
           </div>
 
-          <div className="mb-8">
-            <div className="relative max-w-xl mx-auto">
+          <div className="mb-6 sm:mb-8">
+            <div className="relative max-w-xl mx-auto px-4">
               <input
                 type="text"
                 placeholder="Search by wallet address..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-6 py-4 bg-[#1A1A1A] rounded-xl border border-emerald-500/20 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500/50 transition-all duration-300"
+                className="w-full px-4 sm:px-6 py-3 sm:py-4 bg-[#1A1A1A] rounded-xl border border-emerald-500/20 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500/50 transition-all duration-300 text-sm sm:text-base"
               />
               <FaSearch className="absolute right-6 top-1/2 transform -translate-y-1/2 text-gray-400" />
             </div>
@@ -203,18 +203,18 @@ export default function Contributors() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-center p-12 rounded-2xl bg-[#111111] border border-emerald-500/10 shadow-2xl"
+              className="text-center p-6 sm:p-12 rounded-2xl bg-[#111111] border border-emerald-500/10 shadow-2xl mx-4"
             >
-              <div className="w-20 h-20 mx-auto mb-6 text-emerald-500 opacity-50">
+              <div className="w-12 h-12 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 text-emerald-500 opacity-50">
                 <FaServer className="w-full h-full" />
               </div>
-              <p className="text-gray-400 text-xl">
+              <p className="text-gray-400 text-lg sm:text-xl">
                 No contributors found at the moment.
               </p>
             </motion.div>
           ) : (
             <>
-              <div className="grid gap-6">
+              <div className="grid gap-4 sm:gap-6 px-4">
                 <AnimatePresence>
                   {displayContributors.map((contributor, index) => (
                     <motion.div
@@ -222,32 +222,32 @@ export default function Contributors() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
-                      className="p-8 rounded-2xl bg-[#111111] border border-emerald-500/10 shadow-2xl hover:shadow-emerald-500/5 hover:border-emerald-500/20 transition-all duration-300 backdrop-blur-xl"
+                      className="p-4 sm:p-8 rounded-2xl bg-[#111111] border border-emerald-500/10 shadow-2xl hover:shadow-emerald-500/5 hover:border-emerald-500/20 transition-all duration-300 backdrop-blur-xl"
                     >
-                      <div className="flex flex-col md:flex-row justify-between gap-6">
-                        <div className="flex items-center gap-4">
-                          <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-500 shadow-lg">
-                            <FaServer className="w-8 h-8 text-white" />
+                      <div className="flex flex-col sm:flex-row justify-between gap-4 sm:gap-6">
+                        <div className="flex items-center gap-3 sm:gap-4">
+                          <div className="p-3 sm:p-4 rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-500 shadow-lg">
+                            <FaServer className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                           </div>
                           <div>
-                            <h3 className="font-semibold text-xl text-white mb-1">
-                              {contributor.wallet.slice(0, 12)}...
-                              {contributor.wallet.slice(-8)}
+                            <h3 className="font-semibold text-lg sm:text-xl text-white mb-1">
+                              {contributor.wallet.slice(0, 6)}...
+                              {contributor.wallet.slice(-4)}
                             </h3>
-                            <p className="text-emerald-400 font-medium">
+                            <p className="text-emerald-400 font-medium text-sm sm:text-base">
                               {contributor.node_type.toUpperCase()} NODE
                             </p>
                           </div>
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-6">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 mt-4 sm:mt-0">
                           <div className="flex items-center gap-3">
-                            <FaCalendarAlt className="text-emerald-400 w-5 h-5" />
+                            <FaCalendarAlt className="text-emerald-400 w-4 h-4 sm:w-5 sm:h-5" />
                             <div>
-                              <span className="block text-sm text-gray-400">
+                              <span className="block text-xs sm:text-sm text-gray-400">
                                 First Joined
                               </span>
-                              <span className="text-white">
+                              <span className="text-white text-sm sm:text-base">
                                 {new Date(
                                   contributor.join_dates[0]
                                 ).toLocaleDateString("en-US", {
@@ -259,12 +259,12 @@ export default function Contributors() {
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
-                            <FaClock className="text-emerald-400 w-5 h-5" />
+                            <FaClock className="text-emerald-400 w-4 h-4 sm:w-5 sm:h-5" />
                             <div>
-                              <span className="block text-sm text-gray-400">
+                              <span className="block text-xs sm:text-sm text-gray-400">
                                 Total Active Days
                               </span>
-                              <span className="text-white">
+                              <span className="text-white text-sm sm:text-base">
                                 {contributor.total_active_days === 0 ? (
                                   <span className="text-gray-400">Less than 24h</span>
                                 ) : (
@@ -281,16 +281,16 @@ export default function Contributors() {
               </div>
 
               {/* Pagination Controls */}
-              <div className="mt-8 flex justify-center items-center gap-4">
+              <div className="mt-6 sm:mt-8 flex justify-center items-center gap-3 sm:gap-4 px-4">
                 <button
                   onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                   disabled={currentPage === 1}
                   className={`p-2 rounded-lg ${currentPage === 1 ? 'text-gray-500' : 'text-emerald-400 hover:bg-emerald-500/10'}`}
                 >
-                  <FaChevronLeft className="w-5 h-5" />
+                  <FaChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
                 
-                <span className="text-gray-400">
+                <span className="text-gray-400 text-sm sm:text-base">
                   Page {currentPage} of {totalPages}
                 </span>
                 
@@ -299,7 +299,7 @@ export default function Contributors() {
                   disabled={currentPage === totalPages}
                   className={`p-2 rounded-lg ${currentPage === totalPages ? 'text-gray-500' : 'text-emerald-400 hover:bg-emerald-500/10'}`}
                 >
-                  <FaChevronRight className="w-5 h-5" />
+                  <FaChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </div>
             </>
