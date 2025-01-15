@@ -166,7 +166,7 @@ export default function Contributors() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[#0A0A0A]">
+    <div className="min-h-screen w-full bg-[#0A0A0A] pt-12">
       <Container maxWidth="lg" className="py-12 sm:py-24 px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
