@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MongoClient, WithId } from "mongodb";
 import { Relays } from "../types/types";
-import { NextApiRequest } from "next";
 
 const uri = "mongodb://0.0.0.0:27017";
 const client = new MongoClient(uri);
@@ -16,7 +15,7 @@ export async function POST(req: NextRequest) {
     let cursor = await collection.find();
 
     await cursor.forEach((doc) => {
-      anothers.push({ addr: doc.addr });
+      anothers.push({ addr: doc.addr, wallet: doc.wallet });
     });
 
     if (!doc) {
@@ -48,7 +47,7 @@ export async function GET() {
     let final_data: Relays[] = [];
 
     await cursor.forEach((doc) => {
-      addresses.push({ addr: doc.addr });
+      addresses.push({ addr: doc.addr, wallet: doc.wallet });
     });
 
     if (addresses.length > 50) {

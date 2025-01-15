@@ -80,6 +80,7 @@ export interface TrxScan {
 
 export interface Relays {
   addr: string;
+  wallet: string;
 }
 
 export interface RPC {

@@ -14,6 +14,7 @@ import {
   FaDownload,
   FaCode,
   FaEnvelope,
+  FaUsers,
 } from "react-icons/fa";
 
 const menuItems = [
@@ -29,6 +30,11 @@ const menuItems = [
     icon: <FaDownload />,
   },
   { label: "DEV", path: "/dev", icon: <FaCode /> },
+  {
+    label: "Contributors",
+    path: "/contributors",
+    icon: <FaUsers />,
+  },
   {
     label: "Contact", 
     path: "/contact",
