@@ -138,7 +138,15 @@ export default function Contributors() {
       grouped[contributor.wallet][contributor.node_type].deactive_dates.push(contributor.deactive_date);
     });
     
-    return Object.values(grouped).flatMap(nodeTypes => Object.values(nodeTypes));
+    // Filter out contributors with less than 1 day active and deactivated
+    const filteredGrouped = Object.values(grouped).flatMap(nodeTypes => 
+      Object.values(nodeTypes).filter(contributor => {
+        const isDeactivated = contributor.deactive_dates.every(date => date !== null);
+        return !(contributor.total_active_days === 0 && isDeactivated);
+      })
+    );
+    
+    return filteredGrouped;
   };
 
   const allContributors = groupContributors(searchResults || contributors);
