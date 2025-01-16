@@ -138,11 +138,11 @@ export default function Contributors() {
       grouped[contributor.wallet][contributor.node_type].deactive_dates.push(contributor.deactive_date);
     });
     
-    // Filter out contributors with less than 1 day active and deactivated
+    // Filter out contributors with less than 1 day active and have a deactive date
     const filteredGrouped = Object.values(grouped).flatMap(nodeTypes => 
       Object.values(nodeTypes).filter(contributor => {
-        const isDeactivated = contributor.deactive_dates.every(date => date !== null);
-        return !(contributor.total_active_days === 0 && isDeactivated);
+        const hasDeactiveDate = contributor.deactive_dates.some(date => date !== null && date !== '');
+        return !(contributor.total_active_days === 0 && hasDeactiveDate);
       })
     );
     
