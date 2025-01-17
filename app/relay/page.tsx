@@ -1,9 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { FaServer, FaSpinner, FaDownload } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import hljs from "highlight.js/lib/core";
+import javascript from "highlight.js/lib/languages/javascript";
+import ruby from "highlight.js/lib/languages/ruby";
+import python from "highlight.js/lib/languages/python";
+import "highlight.js/styles/atom-one-dark.css";
+import { message } from "antd";
+import { FaCopy } from "react-icons/fa6";
+import DOMPurify from "isomorphic-dompurify";
 
 interface Post {
   title: string;
@@ -18,6 +26,74 @@ export default function RelayPage() {
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    hljs.registerLanguage("javascript", javascript);
+    hljs.registerLanguage("ruby", ruby);
+    hljs.registerLanguage("python", python);
+
+    (window as any).hljs = hljs;
+
+    const style = document.createElement("style");
+    style.textContent = `
+      .prose ul {
+        list-style-type: disc;
+        padding-left: 1.5em;
+        margin: 1em 0;
+      }
+      .prose li {
+        margin: 0.5em 0;
+      }
+      @media (max-width: 768px) {
+        pre {
+          max-width: 100%;
+          overflow-x: auto;
+        }
+        .code-content {
+          font-size: 14px;
+        }
+        .copy-button {
+          padding: 4px 8px;
+          font-size: 12px;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
+  const highlightCode = useCallback(() => {
+    if (contentRef.current) {
+      const codeBlocks = contentRef.current.querySelectorAll("pre code");
+      codeBlocks.forEach((block: Element) => {
+        hljs.highlightElement(block as HTMLElement);
+        addCopyButton(block.parentElement as HTMLElement);
+      });
+    }
+  }, []);
+
+  const addCopyButton = (block: HTMLElement) => {
+    if (block.querySelector(".copy-button")) return;
+
+    const button = document.createElement("button");
+    button.innerHTML = "<FaCopy /> Copy";
+    button.className =
+      "copy-button absolute top-2 right-2 bg-[#1a1a1a] text-white px-2 py-1 rounded text-sm";
+    button.onclick = (e) => {
+      e.preventDefault();
+      const code = block.querySelector("code");
+      if (code) {
+        navigator.clipboard.writeText(code.innerText);
+        message.success("Code copied to clipboard!");
+      }
+    };
+    block.style.position = "relative";
+    block.appendChild(button);
+  };
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -47,8 +123,29 @@ export default function RelayPage() {
     fetchPost();
   }, []);
 
+  useEffect(() => {
+    if (post) {
+      setTimeout(() => {
+        highlightCode();
+      }, 0);
+    }
+  }, [post, highlightCode]);
+
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver(() => {
+      highlightCode();
+    });
+
+    if (contentRef.current) {
+      resizeObserver.observe(contentRef.current);
+    }
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [highlightCode]);
+
   const handleDownloadClick = () => {
-    // Navigate to download page with relay-section fragment
     router.push('/download#relay-section');
   };
 
@@ -112,10 +209,13 @@ export default function RelayPage() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
             className="prose prose-invert prose-emerald lg:prose-xl max-w-none"
+            ref={contentRef}
           >
             <div 
-              className="text-gray-200"
-              dangerouslySetInnerHTML={{ __html: post.content }}
+              className="text-gray-200 code-content"
+              dangerouslySetInnerHTML={{ 
+                __html: DOMPurify.sanitize(post.content)
+              }}
             />
           </motion.div>
 
@@ -142,8 +242,3 @@ export default function RelayPage() {
     </div>
   );
 }
-
-
-
-
-
