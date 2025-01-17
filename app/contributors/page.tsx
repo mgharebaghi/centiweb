@@ -224,67 +224,87 @@ export default function Contributors() {
             <>
               <div className="grid gap-4 sm:gap-6 px-4">
                 <AnimatePresence>
-                  {displayContributors.map((contributor, index) => (
-                    <motion.div
-                      key={`${contributor.wallet}-${contributor.node_type}`}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      className="p-4 sm:p-8 rounded-2xl bg-[#111111] border border-emerald-500/10 shadow-2xl hover:shadow-emerald-500/5 hover:border-emerald-500/20 transition-all duration-300 backdrop-blur-xl"
-                    >
-                      <div className="flex flex-col sm:flex-row justify-between gap-4 sm:gap-6">
-                        <div className="flex items-center gap-3 sm:gap-4">
-                          <div className="p-3 sm:p-4 rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-500 shadow-lg">
-                            <FaServer className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
-                          </div>
-                          <div>
-                            <h3 className="font-semibold text-lg sm:text-xl text-white mb-1">
-                              {contributor.wallet.slice(0, 6)}...
-                              {contributor.wallet.slice(-4)}
-                            </h3>
-                            <p className="text-emerald-400 font-medium text-sm sm:text-base">
-                              {contributor.node_type.toUpperCase()} NODE
-                            </p>
-                          </div>
-                        </div>
+                  {displayContributors.map((contributor, index) => {
+                    // Find the join date to display based on conditions
+                    let displayJoinDate = contributor.join_dates[0];
+                    
+                    if (contributor.total_active_days > 1) {
+                      // Find first join date where active days is 1 or more
+                      for (let i = 0; i < contributor.join_dates.length; i++) {
+                        const activeDays = calculateActiveDays(contributor.join_dates[i], contributor.deactive_dates[i]);
+                        if (activeDays >= 1) {
+                          displayJoinDate = contributor.join_dates[i];
+                          break;
+                        }
+                      }
+                    } else {
+                      // For recently joined, find first date with empty deactive_date
+                      const activeIndex = contributor.deactive_dates.findIndex(date => date === '');
+                      if (activeIndex !== -1) {
+                        displayJoinDate = contributor.join_dates[activeIndex];
+                      }
+                    }
 
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 mt-4 sm:mt-0">
-                          <div className="flex items-center gap-3">
-                            <FaCalendarAlt className="text-emerald-400 w-4 h-4 sm:w-5 sm:h-5" />
+                    return (
+                      <motion.div
+                        key={`${contributor.wallet}-${contributor.node_type}`}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="p-4 sm:p-8 rounded-2xl bg-[#111111] border border-emerald-500/10 shadow-2xl hover:shadow-emerald-500/5 hover:border-emerald-500/20 transition-all duration-300 backdrop-blur-xl"
+                      >
+                        <div className="flex flex-col sm:flex-row justify-between gap-4 sm:gap-6">
+                          <div className="flex items-center gap-3 sm:gap-4">
+                            <div className="p-3 sm:p-4 rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-500 shadow-lg">
+                              <FaServer className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+                            </div>
                             <div>
-                              <span className="block text-xs sm:text-sm text-gray-400">
-                                First Joined
-                              </span>
-                              <span className="text-white text-sm sm:text-base">
-                                {new Date(
-                                  contributor.join_dates[0]
-                                ).toLocaleDateString("en-US", {
-                                  month: "short",
-                                  day: "numeric",
-                                  year: "numeric",
-                                })}
-                              </span>
+                              <h3 className="font-semibold text-lg sm:text-xl text-white mb-1">
+                                {contributor.wallet.slice(0, 6)}...
+                                {contributor.wallet.slice(-4)}
+                              </h3>
+                              <p className="text-emerald-400 font-medium text-sm sm:text-base">
+                                {contributor.node_type.toUpperCase()} NODE
+                              </p>
                             </div>
                           </div>
-                          <div className="flex items-center gap-3">
-                            <FaClock className="text-emerald-400 w-4 h-4 sm:w-5 sm:h-5" />
-                            <div>
-                              <span className="block text-xs sm:text-sm text-gray-400">
-                                Total Active Days
-                              </span>
-                              <span className="text-white text-sm sm:text-base">
-                                {contributor.total_active_days === 0 ? (
-                                  <span className="text-yellow-400">Recently Joined</span>
-                                ) : (
-                                  `${contributor.total_active_days} days`
-                                )}
-                              </span>
+
+                          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 mt-4 sm:mt-0">
+                            <div className="flex items-center gap-3">
+                              <FaCalendarAlt className="text-emerald-400 w-4 h-4 sm:w-5 sm:h-5" />
+                              <div>
+                                <span className="block text-xs sm:text-sm text-gray-400">
+                                  First Joined
+                                </span>
+                                <span className="text-white text-sm sm:text-base">
+                                  {new Date(displayJoinDate).toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  })}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <FaClock className="text-emerald-400 w-4 h-4 sm:w-5 sm:h-5" />
+                              <div>
+                                <span className="block text-xs sm:text-sm text-gray-400">
+                                  Total Active Days
+                                </span>
+                                <span className="text-white text-sm sm:text-base">
+                                  {contributor.total_active_days === 0 ? (
+                                    <span className="text-yellow-400">Recently Joined</span>
+                                  ) : (
+                                    `${contributor.total_active_days} days`
+                                  )}
+                                </span>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </motion.div>
-                  ))}
+                      </motion.div>
+                    );
+                  })}
                 </AnimatePresence>
               </div>
 
