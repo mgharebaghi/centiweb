@@ -41,9 +41,11 @@ export default function RelayPage() {
         list-style-type: disc;
         padding-left: 1.5em;
         margin: 1em 0;
+        color: #ffffff;
       }
       .prose li {
         margin: 0.5em 0;
+        color: #ffffff;
       }
       pre {
         position: relative;
@@ -63,6 +65,10 @@ export default function RelayPage() {
       .code-content {
         font-size: 0.95rem;
         line-height: 1.5;
+        color: #ffffff;
+      }
+      .code-content * {
+        color: #ffffff;
       }
       .code-content h1,
       .code-content h2,
@@ -78,6 +84,7 @@ export default function RelayPage() {
       .code-content p {
         margin: 1em 0;
         line-height: 1.75;
+        color: #ffffff;
       }
       .code-content code {
         background: #1a1a1a;
@@ -89,6 +96,12 @@ export default function RelayPage() {
         background: transparent;
         padding: 0;
         font-size: 0.9em;
+      }
+      .code-content span {
+        color: #ffffff;
+      }
+      .code-content div {
+        color: #ffffff;
       }
       @media (max-width: 768px) {
         pre {
@@ -260,7 +273,7 @@ export default function RelayPage() {
               dangerouslySetInnerHTML={{
                 __html: DOMPurify.sanitize(post.content)
               }}
-              className="p-6 code-content text-wrap break-words prose prose-invert max-w-none prose-headings:text-emerald-400 prose-a:text-emerald-400 hover:prose-a:text-emerald-300 prose-ul:list-disc prose-li:my-1 text-sm sm:text-base"
+              className="p-6 code-content text-wrap break-words prose prose-invert max-w-none prose-headings:text-emerald-400 prose-a:text-emerald-400 hover:prose-a:text-emerald-300 prose-ul:list-disc prose-li:my-1 text-sm sm:text-base text-white"
             />
           </motion.div>
 
