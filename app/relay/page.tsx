@@ -37,13 +37,32 @@ export default function RelayPage() {
 
     const style = document.createElement("style");
     style.textContent = `
-      .prose ul {
-        list-style-type: disc;
-        padding-left: 1.5em;
-        margin: 1em 0;
+      .prose ul { 
+        list-style-type: disc !important;
+        padding-left: 2em !important;
+        margin: 1em 0 !important;
       }
-      .prose li {
-        margin: 0.5em 0;
+      .prose ol {
+        list-style-type: decimal !important;
+        padding-left: 2em !important;
+        margin: 1em 0 !important;
+      }
+      .prose table {
+        border-collapse: collapse !important;
+        width: 100% !important;
+        margin: 1em 0 !important;
+        display: block !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+      }
+      .prose th,
+      .prose td {
+        border: 1px solid #ddd !important;
+        padding: 8px !important;
+        text-align: left !important;
+      }
+      .prose th {
+        background-color: #f5f5f5 !important;
       }
       @media (max-width: 768px) {
         pre {
@@ -214,7 +233,38 @@ export default function RelayPage() {
             <div 
               className="text-gray-200 code-content"
               dangerouslySetInnerHTML={{ 
-                __html: DOMPurify.sanitize(post.content)
+                __html: `
+                  <style>
+                    .code-content ul { 
+                      list-style-type: disc !important;
+                      padding-left: 2em !important;
+                      margin: 1em 0 !important;
+                    }
+                    .code-content ol {
+                      list-style-type: decimal !important;
+                      padding-left: 2em !important;
+                      margin: 1em 0 !important;
+                    }
+                    .code-content table {
+                      border-collapse: collapse !important;
+                      width: 100% !important;
+                      margin: 1em 0 !important;
+                      display: block !important;
+                      overflow-x: auto !important;
+                      white-space: nowrap !important;
+                    }
+                    .code-content th,
+                    .code-content td {
+                      border: 1px solid #ddd !important;
+                      padding: 8px !important;
+                      text-align: left !important;
+                    }
+                    .code-content th {
+                      background-color: #f5f5f5 !important;
+                    }
+                  </style>
+                  ${DOMPurify.sanitize(post.content)}
+                `
               }}
             />
           </motion.div>
