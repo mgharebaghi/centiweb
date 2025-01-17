@@ -37,32 +37,58 @@ export default function RelayPage() {
 
     const style = document.createElement("style");
     style.textContent = `
-      .prose ul { 
-        list-style-type: disc !important;
-        padding-left: 2em !important;
-        margin: 1em 0 !important;
+      .prose ul {
+        list-style-type: disc;
+        padding-left: 1.5em;
+        margin: 1em 0;
       }
-      .prose ol {
-        list-style-type: decimal !important;
-        padding-left: 2em !important;
-        margin: 1em 0 !important;
+      .prose li {
+        margin: 0.5em 0;
       }
-      .prose table {
-        border-collapse: collapse !important;
-        width: 100% !important;
-        margin: 1em 0 !important;
-        display: block !important;
-        overflow-x: auto !important;
-        white-space: nowrap !important;
+      pre {
+        position: relative;
+        max-width: 100%;
+        overflow-x: auto;
+        background: #1a1a1a !important;
+        border-radius: 8px !important;
+        padding: 1rem !important;
+        margin: 1rem 0 !important;
       }
-      .prose th,
-      .prose td {
-        border: 1px solid #ddd !important;
-        padding: 8px !important;
-        text-align: left !important;
+      .copy-button {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        z-index: 10;
       }
-      .prose th {
-        background-color: #f5f5f5 !important;
+      .code-content {
+        font-size: 0.95rem;
+        line-height: 1.5;
+      }
+      .code-content h1,
+      .code-content h2,
+      .code-content h3,
+      .code-content h4,
+      .code-content h5,
+      .code-content h6 {
+        color: #f3f4f6;
+        font-weight: 600;
+        margin-top: 2em;
+        margin-bottom: 1em;
+      }
+      .code-content p {
+        margin: 1em 0;
+        line-height: 1.75;
+      }
+      .code-content code {
+        background: #1a1a1a;
+        padding: 0.2em 0.4em;
+        border-radius: 4px;
+        font-size: 0.9em;
+      }
+      .code-content pre code {
+        background: transparent;
+        padding: 0;
+        font-size: 0.9em;
       }
       @media (max-width: 768px) {
         pre {
@@ -101,7 +127,7 @@ export default function RelayPage() {
     const button = document.createElement("button");
     button.innerHTML = "<FaCopy /> Copy";
     button.className =
-      "copy-button absolute top-2 right-2 bg-[#1a1a1a] text-white px-2 py-1 rounded text-sm";
+      "copy-button absolute top-2 right-2 bg-[#1a1a1a] text-white px-2 py-1 rounded text-sm hover:bg-[#2a2a2a] transition-colors";
     button.onclick = (e) => {
       e.preventDefault();
       const code = block.querySelector("code");
@@ -227,45 +253,14 @@ export default function RelayPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="prose prose-invert prose-emerald lg:prose-xl max-w-none"
+            className="prose prose-invert max-w-none bg-[#1a1a1a] rounded-lg shadow-xl overflow-hidden"
             ref={contentRef}
           >
-            <div 
-              className="text-gray-200 code-content"
-              dangerouslySetInnerHTML={{ 
-                __html: `
-                  <style>
-                    .code-content ul { 
-                      list-style-type: disc !important;
-                      padding-left: 2em !important;
-                      margin: 1em 0 !important;
-                    }
-                    .code-content ol {
-                      list-style-type: decimal !important;
-                      padding-left: 2em !important;
-                      margin: 1em 0 !important;
-                    }
-                    .code-content table {
-                      border-collapse: collapse !important;
-                      width: 100% !important;
-                      margin: 1em 0 !important;
-                      display: block !important;
-                      overflow-x: auto !important;
-                      white-space: nowrap !important;
-                    }
-                    .code-content th,
-                    .code-content td {
-                      border: 1px solid #ddd !important;
-                      padding: 8px !important;
-                      text-align: left !important;
-                    }
-                    .code-content th {
-                      background-color: #f5f5f5 !important;
-                    }
-                  </style>
-                  ${DOMPurify.sanitize(post.content)}
-                `
+            <div
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(post.content)
               }}
+              className="p-6 code-content text-wrap break-words prose prose-invert max-w-none prose-headings:text-emerald-400 prose-a:text-emerald-400 hover:prose-a:text-emerald-300 prose-ul:list-disc prose-li:my-1 text-sm sm:text-base"
             />
           </motion.div>
 
