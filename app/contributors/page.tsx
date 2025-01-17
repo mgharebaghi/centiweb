@@ -142,7 +142,7 @@ export default function Contributors() {
     const filteredGrouped = Object.values(grouped).flatMap(nodeTypes => 
       Object.values(nodeTypes).filter(contributor => {
         const hasDeactiveDate = contributor.deactive_dates.some(date => date !== null && date !== '');
-        return !(contributor.total_active_days === 0 && hasDeactiveDate);
+        return !(contributor.total_active_days + '' === '' && hasDeactiveDate);
       })
     );
     
