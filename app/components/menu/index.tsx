@@ -15,13 +15,18 @@ import {
   FaCode,
   FaEnvelope,
   FaUsers,
+  FaServer,
+  FaHome,
+  FaChevronDown,
 } from "react-icons/fa";
+import { IoClose } from "react-icons/io5";
+import Drawer from "@mui/material/Drawer";
 
 const menuItems = [
   { label: "Explorer", path: "/scan", icon: <FaQrcode /> },
   {
     label: "Whitepaper",
-    path: "/articles/671fcec5d136b9550a238077", 
+    path: "/articles/671fcec5d136b9550a238077",
     icon: <FaFileAlt />,
   },
   {
@@ -31,27 +36,44 @@ const menuItems = [
   },
   { label: "DEV", path: "/dev", icon: <FaCode /> },
   {
-    label: "Contributors",
-    path: "/contributors",
-    icon: <FaUsers />,
+    label: "Become a Node",
+    path: "/node",
+    icon: <FaServer />,
+    submenu: [
+      { label: "Relay", path: "/relay" },
+      { label: "Validator", path: "/validator" },
+      { label: "Contributors", path: "/contributors" },
+    ],
   },
   {
-    label: "Contact", 
+    label: "Contact",
     path: "/contact",
     icon: <FaEnvelope />,
   },
 ];
 
+const drawerMenuItems = [
+  { label: "Home", path: "/", icon: <FaHome /> },
+  ...menuItems
+];
+
 function Menu() {
   const [isOpen, setIsOpen] = useState(false);
   const [coins, setCoins] = useState<number | null>(null);
+  const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
   const pathname = usePathname();
   const router = useRouter();
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const isMedium = useMediaQuery("(max-width: 1024px)");
 
   useEffect(() => {
     fetchCoins();
   }, []);
+
+  // Close submenu when pathname changes
+  useEffect(() => {
+    setOpenSubmenu(null);
+  }, [pathname]);
 
   const fetchCoins = async () => {
     try {
@@ -69,30 +91,40 @@ function Menu() {
       height: 0,
       opacity: 0,
       transition: {
-        duration: 0.2
-      }
+        duration: 0.2,
+      },
     },
     open: {
       height: "auto",
       opacity: 1,
       transition: {
-        duration: 0.2
-      }
-    }
+        duration: 0.2,
+      },
+    },
   };
 
   const isPathActive = (menuPath: string) => {
-    if (menuPath === '/dev') {
-      return pathname.startsWith('/dev');
+    if (menuPath === "/dev") {
+      return pathname.startsWith("/dev");
+    }
+    if (menuPath === "/node") {
+      return pathname.startsWith("/node") || pathname === "/contributors";
     }
     return pathname === menuPath;
+  };
+
+  const handleSubmenuClick = (path: string) => {
+    if (openSubmenu === path) {
+      setOpenSubmenu(null);
+    } else {
+      setOpenSubmenu(path);
+    }
   };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-lg">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          
           {/* Logo - Left Corner */}
           <motion.div
             whileHover={{ scale: 1.05 }}
@@ -110,24 +142,68 @@ function Menu() {
           </motion.div>
 
           {/* Desktop Menu - Centered */}
-          {!isMobile && (
+          {!isMedium && (
             <div className="flex items-center justify-center flex-1 space-x-8">
               {menuItems.map((item) => (
-                <Link 
-                  key={item.path}
-                  href={item.path}
-                  className={`
-                    flex items-center space-x-2 px-3 py-2 rounded-md text-sm
-                    transition-all duration-200
-                    ${isPathActive(item.path) ? 
-                      'text-emerald-400 bg-emerald-900/20' : 
-                      'text-gray-300 hover:text-emerald-400 hover:bg-emerald-900/10'
-                    }
-                  `}
-                >
-                  <span>{item.icon}</span>
-                  <span>{item.label}</span>
-                </Link>
+                <div key={item.path} className="relative">
+                  {item.submenu ? (
+                    <div className="relative">
+                      <button
+                        onClick={() => handleSubmenuClick(item.path)}
+                        className={`
+                          flex items-center space-x-2 px-3 py-2 rounded-md text-sm
+                          transition-all duration-200
+                          ${
+                            isPathActive(item.path)
+                              ? "text-emerald-400 bg-emerald-900/20"
+                              : "text-gray-300 hover:text-emerald-400 hover:bg-emerald-900/10"
+                          }
+                        `}
+                      >
+                        <span>{item.icon}</span>
+                        <span>{item.label}</span>
+                        <FaChevronDown
+                          className={`ml-1 transition-transform ${
+                            openSubmenu === item.path ? "rotate-180" : ""
+                          }`}
+                        />
+                      </button>
+                      {openSubmenu === item.path && (
+                        <div className="absolute top-full left-0 mt-1 py-2 w-48 bg-black/90 backdrop-blur-lg rounded-md shadow-lg">
+                          {item.submenu.map((subItem) => (
+                            <Link
+                              key={subItem.path}
+                              href={subItem.path}
+                              className={`block px-4 py-2 text-sm ${
+                                pathname === subItem.path
+                                  ? "text-emerald-400 bg-emerald-900/20"
+                                  : "text-gray-300 hover:text-emerald-400 hover:bg-emerald-900/10"
+                              }`}
+                            >
+                              {subItem.label}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <Link
+                      href={item.path}
+                      className={`
+                        flex items-center space-x-2 px-3 py-2 rounded-md text-sm
+                        transition-all duration-200
+                        ${
+                          isPathActive(item.path)
+                            ? "text-emerald-400 bg-emerald-900/20"
+                            : "text-gray-300 hover:text-emerald-400 hover:bg-emerald-900/10"
+                        }
+                      `}
+                    >
+                      <span>{item.icon}</span>
+                      <span>{item.label}</span>
+                    </Link>
+                  )}
+                </div>
               ))}
             </div>
           )}
@@ -135,22 +211,21 @@ function Menu() {
           {/* Remaining CENTIs - Right Corner */}
           <div className="absolute right-4 flex items-center">
             {coins !== null ? (
-              <motion.span 
+              <motion.span
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className="text-sm font-medium text-emerald-400"
               >
-                {isMobile ? 
-                  `${Number(coins).toLocaleString()} CENTIs` :
-                  `Remaining CENTIs: ${Number(coins).toLocaleString()}`
-                }
+                {isMobile
+                  ? `${Number(coins).toLocaleString()} CENTIs`
+                  : `Remaining CENTIs: ${Number(coins).toLocaleString()}`}
               </motion.span>
             ) : (
               <PulseLoader size={4} color="#34D399" />
             )}
 
-            {/* Mobile Menu Button */}
-            {isMobile && (
+            {/* Mobile/Medium Menu Button */}
+            {isMedium && (
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsOpen(!isOpen)}
@@ -162,39 +237,93 @@ function Menu() {
           </div>
         </div>
 
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {isMobile && isOpen && (
-            <motion.div
-              initial="closed"
-              animate="open"
-              exit="closed"
-              variants={menuVariants}
-              className="md:hidden"
+        {/* Mobile/Medium Menu Drawer */}
+        <Drawer
+          anchor="right"
+          open={isMedium && isOpen}
+          onClose={() => setIsOpen(false)}
+          PaperProps={{
+            sx: {
+              backgroundColor: "rgba(0, 0, 0, 0.9)",
+              backdropFilter: "blur(10px)",
+              width: "75%",
+            },
+          }}
+        >
+          <div className="relative px-2 pt-16 pb-3 space-y-1">
+            <button
+              onClick={() => setIsOpen(false)}
+              className="absolute top-4 right-4 text-gray-300 hover:text-emerald-400"
             >
-              <div className="px-2 pt-2 pb-3 space-y-1">
-                {menuItems.map((item) => (
+              <IoClose className="w-6 h-6" />
+            </button>
+            {drawerMenuItems.map((item) => (
+              <div key={item.path}>
+                {item.submenu ? (
+                  <>
+                    <button
+                      onClick={() => handleSubmenuClick(item.path)}
+                      className={`
+                        w-full flex items-center justify-between space-x-3 px-3 py-2 rounded-md text-base
+                        transition-all duration-200
+                        ${
+                          isPathActive(item.path)
+                            ? "text-emerald-400 bg-emerald-900/20"
+                            : "text-gray-300 hover:text-emerald-400 hover:bg-emerald-900/10"
+                        }
+                      `}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <span>{item.icon}</span>
+                        <span>{item.label}</span>
+                      </div>
+                      <FaChevronDown
+                        className={`transition-transform ${
+                          openSubmenu === item.path ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+                    {openSubmenu === item.path && (
+                      <div className="pl-8 mt-1 space-y-1">
+                        {item.submenu.map((subItem) => (
+                          <Link
+                            key={subItem.path}
+                            href={subItem.path}
+                            onClick={() => setIsOpen(false)}
+                            className={`block px-3 py-2 rounded-md text-sm ${
+                              pathname === subItem.path
+                                ? "text-emerald-400 bg-emerald-900/20"
+                                : "text-gray-300 hover:text-emerald-400 hover:bg-emerald-900/10"
+                            }`}
+                          >
+                            {subItem.label}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
                   <Link
-                    key={item.path}
                     href={item.path}
                     onClick={() => setIsOpen(false)}
                     className={`
                       flex items-center space-x-3 px-3 py-2 rounded-md text-base
                       transition-all duration-200
-                      ${isPathActive(item.path) ?
-                        'text-emerald-400 bg-emerald-900/20' :
-                        'text-gray-300 hover:text-emerald-400 hover:bg-emerald-900/10'
+                      ${
+                        isPathActive(item.path)
+                          ? "text-emerald-400 bg-emerald-900/20"
+                          : "text-gray-300 hover:text-emerald-400 hover:bg-emerald-900/10"
                       }
                     `}
                   >
                     <span>{item.icon}</span>
                     <span>{item.label}</span>
                   </Link>
-                ))}
+                )}
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            ))}
+          </div>
+        </Drawer>
       </div>
     </nav>
   );
