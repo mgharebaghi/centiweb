@@ -304,21 +304,6 @@ export default function ValidatorPage() {
               </div>
             </motion.header>
 
-            {/* Featured Image */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="aspect-[21/9] relative rounded-xl overflow-hidden mb-12 shadow-2xl"
-            >
-              <Image
-                src={article.image}
-                alt={article.title}
-                fill
-                className="object-cover"
-                priority
-              />
-            </motion.div>
-
             {/* Content */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
