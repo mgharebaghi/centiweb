@@ -138,11 +138,11 @@ export default function Contributors() {
       grouped[contributor.wallet][contributor.node_type].deactive_dates.push(contributor.deactive_date);
     });
     
-    // Filter out contributors with less than 1 day active and have a deactive date
+    // Filter to show contributors with more than 0 active days OR empty deactive_date
     const filteredGrouped = Object.values(grouped).flatMap(nodeTypes => 
       Object.values(nodeTypes).filter(contributor => {
-        const hasDeactiveDate = contributor.deactive_dates.some(date => date !== null && date !== '');
-        return !(contributor.total_active_days + '' === '' && hasDeactiveDate);
+        const hasEmptyDeactiveDate = contributor.deactive_dates.some(date => date === '');
+        return contributor.total_active_days > 0 || hasEmptyDeactiveDate;
       })
     );
     
@@ -274,7 +274,7 @@ export default function Contributors() {
                               </span>
                               <span className="text-white text-sm sm:text-base">
                                 {contributor.total_active_days === 0 ? (
-                                  <span className="text-gray-400">Less than 24h</span>
+                                  <span className="text-yellow-400">Recently Joined</span>
                                 ) : (
                                   `${contributor.total_active_days} days`
                                 )}
