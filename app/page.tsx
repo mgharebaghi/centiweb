@@ -7,6 +7,7 @@ import Becomes from "./components/becomes";
 import Make from "./components/usedToMake";
 import { ThemeProvider as LightTheme } from "next-themes";
 import { useRef } from "react";
+import RoadmapComponent from "./components/roadmap";
 
 let theme = createTheme();
 theme = responsiveFontSizes(theme);
@@ -19,6 +20,7 @@ export default function Home() {
         <Articles />
         <Generated />
         <Becomes />
+        {/* <RoadmapComponent /> */}
         <Make />
       </ThemeProvider>
     </LightTheme>
