@@ -120,7 +120,7 @@ function Validators() {
           {/* Info Section */}
           <motion.div variants={itemVariants} className="text-center space-y-4 md:space-y-6">
             <Typography variant="body1" className="text-sm md:text-base text-gray-400">
-              Latest Release: <span className="text-gray-300 font-semibold">Version 0.11.1</span>
+              Latest Release: <span className="text-gray-300 font-semibold">Version 0.12.0</span>
             </Typography>
             
             <div className="flex justify-center">
