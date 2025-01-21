@@ -180,10 +180,12 @@ export default function Contributors() {
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
     // Use document.documentElement for better browser compatibility
-    document.documentElement.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }, 0);
   };
 
   const allContributors = groupContributors(searchResults || contributors);
