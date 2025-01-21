@@ -177,6 +177,11 @@ export default function Contributors() {
     setSortType(prev => prev === "date" ? "active_days" : "date");
   };
 
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const allContributors = groupContributors(searchResults || contributors);
   const totalPages = Math.ceil(allContributors.length / itemsPerPage);
   const displayContributors = allContributors.slice(
@@ -434,7 +439,7 @@ export default function Contributors() {
 
               <div className="mt-6 sm:mt-8 flex justify-center items-center gap-3 sm:gap-4 px-4">
                 <button
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
                   disabled={currentPage === 1}
                   className={`p-2 rounded-lg ${currentPage === 1 ? 'text-gray-500' : 'text-emerald-400 hover:bg-emerald-500/10'}`}
                 >
@@ -446,7 +451,7 @@ export default function Contributors() {
                 </span>
                 
                 <button
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
                   disabled={currentPage === totalPages}
                   className={`p-2 rounded-lg ${currentPage === totalPages ? 'text-gray-500' : 'text-emerald-400 hover:bg-emerald-500/10'}`}
                 >
