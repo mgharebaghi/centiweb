@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Container } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaServer, FaCalendarAlt, FaClock, FaSearch, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaServer, FaCalendarAlt, FaClock, FaSearch, FaChevronLeft, FaChevronRight, FaNetworkWired, FaShieldAlt } from "react-icons/fa";
 
 interface Contributor {
   _id: string;
@@ -26,6 +26,7 @@ export default function Contributors() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<Contributor[] | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedNodeType, setSelectedNodeType] = useState<string>("all");
   const itemsPerPage = 10;
 
   useEffect(() => {
@@ -39,7 +40,7 @@ export default function Contributors() {
       } else {
         setSearchResults(null);
       }
-      setCurrentPage(1); // Reset to first page on new search
+      setCurrentPage(1);
     }, 300);
 
     return () => clearTimeout(delaySearch);
@@ -64,7 +65,7 @@ export default function Contributors() {
       if (data.error) {
         setSearchResults(contributors);
       } else {
-        setSearchResults(data); // Data is already an array from the API
+        setSearchResults(data);
       }
     } catch (error) {
       console.error("Error searching contributor:", error);
@@ -107,7 +108,6 @@ export default function Contributors() {
     const diffTime = Math.abs(end.getTime() - start.getTime());
     const diffHours = diffTime / (1000 * 60 * 60);
     
-    // Only count a day if at least 24 hours have passed
     const completeDays = Math.floor(diffHours / 24);
     return completeDays;
   };
@@ -138,13 +138,16 @@ export default function Contributors() {
       grouped[contributor.wallet][contributor.node_type].deactive_dates.push(contributor.deactive_date);
     });
     
-    // Filter to show contributors with more than 0 active days OR empty deactive_date
-    const filteredGrouped = Object.values(grouped).flatMap(nodeTypes => 
+    let filteredGrouped = Object.values(grouped).flatMap(nodeTypes => 
       Object.values(nodeTypes).filter(contributor => {
         const hasEmptyDeactiveDate = contributor.deactive_dates.some(date => date === '');
         return contributor.total_active_days > 0 || hasEmptyDeactiveDate;
       })
     );
+
+    if (selectedNodeType !== "all") {
+      filteredGrouped = filteredGrouped.filter(c => c.node_type === selectedNodeType);
+    }
     
     return filteredGrouped;
   };
@@ -155,6 +158,28 @@ export default function Contributors() {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  const getNodeIcon = (nodeType: string) => {
+    switch(nodeType.toLowerCase()) {
+      case 'relay':
+        return <FaNetworkWired className="w-6 h-6 sm:w-8 sm:h-8 text-white" />;
+      case 'validator':
+        return <FaShieldAlt className="w-6 h-6 sm:w-8 sm:h-8 text-white" />;
+      default:
+        return <FaServer className="w-6 h-6 sm:w-8 sm:h-8 text-white" />;
+    }
+  };
+
+  const getNodeColor = (nodeType: string) => {
+    switch(nodeType.toLowerCase()) {
+      case 'relay':
+        return 'from-blue-500 to-purple-500';
+      case 'validator':
+        return 'from-emerald-500 to-cyan-500';
+      default:
+        return 'from-gray-500 to-gray-600';
+    }
+  };
 
   if (!contributors) {
     return (
@@ -189,9 +214,42 @@ export default function Contributors() {
             >
               Network Contributors
             </motion.h1>
-            <p className="text-gray-400 text-base sm:text-lg">
+            <p className="text-gray-400 text-base sm:text-lg mb-6">
               Discover the nodes powering our network
             </p>
+
+            <div className="flex justify-center gap-4 mb-8">
+              <button
+                onClick={() => setSelectedNodeType("all")}
+                className={`px-6 py-2 rounded-full transition-all duration-300 ${
+                  selectedNodeType === "all" 
+                    ? "bg-emerald-500 text-white"
+                    : "bg-[#1A1A1A] text-gray-400 hover:bg-emerald-500/10"
+                }`}
+              >
+                All Nodes
+              </button>
+              <button
+                onClick={() => setSelectedNodeType("relay")}
+                className={`px-6 py-2 rounded-full transition-all duration-300 ${
+                  selectedNodeType === "relay"
+                    ? "bg-blue-500 text-white"
+                    : "bg-[#1A1A1A] text-gray-400 hover:bg-blue-500/10"
+                }`}
+              >
+                Relay Nodes
+              </button>
+              <button
+                onClick={() => setSelectedNodeType("validator")}
+                className={`px-6 py-2 rounded-full transition-all duration-300 ${
+                  selectedNodeType === "validator"
+                    ? "bg-emerald-500 text-white"
+                    : "bg-[#1A1A1A] text-gray-400 hover:bg-emerald-500/10"
+                }`}
+              >
+                Validator Nodes
+              </button>
+            </div>
           </div>
 
           <div className="mb-6 sm:mb-8">
@@ -225,11 +283,9 @@ export default function Contributors() {
               <div className="grid gap-4 sm:gap-6 px-4">
                 <AnimatePresence>
                   {displayContributors.map((contributor, index) => {
-                    // Find the join date to display based on conditions
                     let displayJoinDate = contributor.join_dates[0];
                     
                     if (contributor.total_active_days > 1) {
-                      // Find first join date where active days is 1 or more
                       for (let i = 0; i < contributor.join_dates.length; i++) {
                         const activeDays = calculateActiveDays(contributor.join_dates[i], contributor.deactive_dates[i]);
                         if (activeDays >= 1) {
@@ -238,7 +294,6 @@ export default function Contributors() {
                         }
                       }
                     } else {
-                      // For recently joined, find first date with empty deactive_date
                       const activeIndex = contributor.deactive_dates.findIndex(date => date === '');
                       if (activeIndex !== -1) {
                         displayJoinDate = contributor.join_dates[activeIndex];
@@ -255,15 +310,19 @@ export default function Contributors() {
                       >
                         <div className="flex flex-col sm:flex-row justify-between gap-4 sm:gap-6">
                           <div className="flex items-center gap-3 sm:gap-4">
-                            <div className="p-3 sm:p-4 rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-500 shadow-lg">
-                              <FaServer className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+                            <div className={`p-3 sm:p-4 rounded-2xl bg-gradient-to-br ${getNodeColor(contributor.node_type)} shadow-lg`}>
+                              {getNodeIcon(contributor.node_type)}
                             </div>
                             <div>
                               <h3 className="font-semibold text-lg sm:text-xl text-white mb-1">
                                 {contributor.wallet.slice(0, 6)}...
                                 {contributor.wallet.slice(-4)}
                               </h3>
-                              <p className="text-emerald-400 font-medium text-sm sm:text-base">
+                              <p className={`font-medium text-sm sm:text-base ${
+                                contributor.node_type.toLowerCase() === 'relay' 
+                                  ? 'text-blue-400'
+                                  : 'text-emerald-400'
+                              }`}>
                                 {contributor.node_type.toUpperCase()} NODE
                               </p>
                             </div>
@@ -271,7 +330,11 @@ export default function Contributors() {
 
                           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 mt-4 sm:mt-0">
                             <div className="flex items-center gap-3">
-                              <FaCalendarAlt className="text-emerald-400 w-4 h-4 sm:w-5 sm:h-5" />
+                              <FaCalendarAlt className={`w-4 h-4 sm:w-5 sm:h-5 ${
+                                contributor.node_type.toLowerCase() === 'relay'
+                                  ? 'text-blue-400'
+                                  : 'text-emerald-400'
+                              }`} />
                               <div>
                                 <span className="block text-xs sm:text-sm text-gray-400">
                                   First Joined
@@ -286,7 +349,11 @@ export default function Contributors() {
                               </div>
                             </div>
                             <div className="flex items-center gap-3">
-                              <FaClock className="text-emerald-400 w-4 h-4 sm:w-5 sm:h-5" />
+                              <FaClock className={`w-4 h-4 sm:w-5 sm:h-5 ${
+                                contributor.node_type.toLowerCase() === 'relay'
+                                  ? 'text-blue-400'
+                                  : 'text-emerald-400'
+                              }`} />
                               <div>
                                 <span className="block text-xs sm:text-sm text-gray-400">
                                   Total Active Days
@@ -308,7 +375,6 @@ export default function Contributors() {
                 </AnimatePresence>
               </div>
 
-              {/* Pagination Controls */}
               <div className="mt-6 sm:mt-8 flex justify-center items-center gap-3 sm:gap-4 px-4">
                 <button
                   onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
