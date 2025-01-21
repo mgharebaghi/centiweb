@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Container } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaServer, FaCalendarAlt, FaClock, FaSearch, FaChevronLeft, FaChevronRight, FaNetworkWired, FaShieldAlt } from "react-icons/fa";
+import { FaServer, FaCalendarAlt, FaClock, FaSearch, FaChevronLeft, FaChevronRight, FaNetworkWired, FaShieldAlt, FaSortAmountDown, FaSortAmountUp } from "react-icons/fa";
 
 interface Contributor {
   _id: string;
@@ -21,21 +21,78 @@ interface GroupedContributor {
   deactive_dates: (string | null)[];
 }
 
+type SortType = "date" | "active_days";
+
 export default function Contributors() {
   const [contributors, setContributors] = useState<Contributor[] | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<Contributor[] | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedNodeType, setSelectedNodeType] = useState<string>("all");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [sortType, setSortType] = useState<SortType>("active_days");
   const itemsPerPage = 10;
 
   useEffect(() => {
+    const fetchContributors = async () => {
+      try {
+        const response = await fetch("/api/contributors", {
+          method: "GET",
+          cache: "no-store",
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (!Array.isArray(data)) {
+          console.error("Received non-array data:", data);
+          setContributors([]);
+          return;
+        }
+        
+        setContributors(data);
+      } catch (error) {
+        console.error("Error fetching contributors:", error);
+        setContributors([]);
+      }
+    };
+
     fetchContributors();
   }, []);
 
   useEffect(() => {
     const delaySearch = setTimeout(() => {
       if (searchTerm) {
+        const searchContributor = async () => {
+          try {
+            const response = await fetch("/api/contributors", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ wallet: searchTerm }),
+            });
+            
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            if (data.error) {
+              setSearchResults(contributors);
+            } else {
+              setSearchResults(data);
+            }
+          } catch (error) {
+            console.error("Error searching contributor:", error);
+            setSearchResults(contributors);
+          }
+        };
+
         searchContributor();
       } else {
         setSearchResults(null);
@@ -44,60 +101,7 @@ export default function Contributors() {
     }, 300);
 
     return () => clearTimeout(delaySearch);
-  }, [searchTerm]);
-
-  const searchContributor = async () => {
-    try {
-      const response = await fetch("/api/contributors", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ wallet: searchTerm }),
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      
-      if (data.error) {
-        setSearchResults(contributors);
-      } else {
-        setSearchResults(data);
-      }
-    } catch (error) {
-      console.error("Error searching contributor:", error);
-      setSearchResults(contributors);
-    }
-  };
-
-  const fetchContributors = async () => {
-    try {
-      const response = await fetch("/api/contributors", {
-        method: "GET",
-        cache: "no-store",
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      if (!Array.isArray(data)) {
-        console.error("Received non-array data:", data);
-        setContributors([]);
-        return;
-      }
-      
-      setContributors(data);
-    } catch (error) {
-      console.error("Error fetching contributors:", error);
-      setContributors([]);
-    }
-  };
+  }, [searchTerm, contributors]);
 
   const calculateActiveDays = (
     joinDate: string,
@@ -148,8 +152,29 @@ export default function Contributors() {
     if (selectedNodeType !== "all") {
       filteredGrouped = filteredGrouped.filter(c => c.node_type === selectedNodeType);
     }
+
+    // Sort contributors based on selected criteria
+    filteredGrouped.sort((a, b) => {
+      if (sortType === "date") {
+        const dateA = new Date(a.join_dates[0]).getTime();
+        const dateB = new Date(b.join_dates[0]).getTime();
+        return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+      } else { // active_days
+        return sortOrder === "asc" 
+          ? a.total_active_days - b.total_active_days 
+          : b.total_active_days - a.total_active_days;
+      }
+    });
     
     return filteredGrouped;
+  };
+
+  const toggleSortOrder = () => {
+    setSortOrder(prev => prev === "asc" ? "desc" : "asc");
+  };
+
+  const toggleSortType = () => {
+    setSortType(prev => prev === "date" ? "active_days" : "date");
   };
 
   const allContributors = groupContributors(searchResults || contributors);
@@ -254,14 +279,46 @@ export default function Contributors() {
 
           <div className="mb-6 sm:mb-8">
             <div className="relative max-w-xl mx-auto px-4">
-              <input
-                type="text"
-                placeholder="Search by wallet address..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 sm:px-6 py-3 sm:py-4 bg-[#1A1A1A] rounded-xl border border-emerald-500/20 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500/50 transition-all duration-300 text-sm sm:text-base"
-              />
-              <FaSearch className="absolute right-6 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="Search by wallet address..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="flex-1 px-4 sm:px-6 py-3 sm:py-4 bg-[#1A1A1A] rounded-xl border border-emerald-500/20 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500/50 transition-all duration-300 text-sm sm:text-base"
+                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={toggleSortType}
+                    className="px-3 py-3 bg-[#1A1A1A] rounded-xl border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/10 transition-all duration-300 group relative"
+                    title={`Sort by ${sortType === "date" ? "date" : "active days"}`}
+                  >
+                    {sortType === "date" ? (
+                      <FaCalendarAlt className="w-4 h-4" />
+                    ) : (
+                      <FaClock className="w-4 h-4" />
+                    )}
+                    <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black text-xs text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                      Sort by {sortType === "date" ? "Date" : "Active Days"}
+                    </span>
+                  </button>
+                  <button
+                    onClick={toggleSortOrder}
+                    className="px-3 py-3 bg-[#1A1A1A] rounded-xl border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/10 transition-all duration-300 group relative"
+                    title={`${sortOrder === "asc" ? "Ascending" : "Descending"} order`}
+                  >
+                    {sortOrder === "asc" ? (
+                      <FaSortAmountUp className="w-4 h-4" />
+                    ) : (
+                      <FaSortAmountDown className="w-4 h-4" />
+                    )}
+                    <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black text-xs text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                      {sortOrder === "asc" ? "Ascending" : "Descending"}
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <FaSearch className="absolute right-36 top-1/2 transform -translate-y-1/2 text-gray-400" />
             </div>
           </div>
 
