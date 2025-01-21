@@ -179,7 +179,11 @@ export default function Contributors() {
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
-    window.scroll({ top: 0, behavior: 'smooth' });
+    // Use document.documentElement for better browser compatibility
+    document.documentElement.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   };
 
   const allContributors = groupContributors(searchResults || contributors);
