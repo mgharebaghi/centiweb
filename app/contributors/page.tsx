@@ -217,6 +217,27 @@ export default function Contributors() {
     }
   };
 
+  const getNodeCounts = () => {
+    const counts = {
+      all: 0,
+      relay: 0,
+      validator: 0
+    };
+    
+    allContributors.forEach(contributor => {
+      counts.all++;
+      if (contributor.node_type.toLowerCase() === 'relay') {
+        counts.relay++;
+      } else if (contributor.node_type.toLowerCase() === 'validator') {
+        counts.validator++;
+      }
+    });
+
+    return counts;
+  };
+
+  const nodeCounts = getNodeCounts();
+
   if (!contributors) {
     return (
       <div className="min-h-screen w-full bg-[#0A0A0A]">
@@ -255,36 +276,45 @@ export default function Contributors() {
             </p>
 
             <div className="flex justify-center gap-4 mb-8">
-              <button
-                onClick={() => setSelectedNodeType("all")}
-                className={`px-6 py-2 rounded-full transition-all duration-300 ${
-                  selectedNodeType === "all" 
-                    ? "bg-emerald-500 text-white"
-                    : "bg-[#1A1A1A] text-gray-400 hover:bg-emerald-500/10"
-                }`}
-              >
-                All Nodes
-              </button>
-              <button
-                onClick={() => setSelectedNodeType("relay")}
-                className={`px-6 py-2 rounded-full transition-all duration-300 ${
-                  selectedNodeType === "relay"
-                    ? "bg-blue-500 text-white"
-                    : "bg-[#1A1A1A] text-gray-400 hover:bg-blue-500/10"
-                }`}
-              >
-                Relay Nodes
-              </button>
-              <button
-                onClick={() => setSelectedNodeType("validator")}
-                className={`px-6 py-2 rounded-full transition-all duration-300 ${
-                  selectedNodeType === "validator"
-                    ? "bg-emerald-500 text-white"
-                    : "bg-[#1A1A1A] text-gray-400 hover:bg-emerald-500/10"
-                }`}
-              >
-                Validator Nodes
-              </button>
+              <div className="flex flex-col items-center">
+                <button
+                  onClick={() => setSelectedNodeType("all")}
+                  className={`px-6 py-2 rounded-full transition-all duration-300 ${
+                    selectedNodeType === "all" 
+                      ? "bg-emerald-500 text-white"
+                      : "bg-[#1A1A1A] text-gray-400 hover:bg-emerald-500/10"
+                  }`}
+                >
+                  All Nodes
+                </button>
+                <span className="text-gray-400 text-sm mt-2">{nodeCounts.all} nodes</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <button
+                  onClick={() => setSelectedNodeType("relay")}
+                  className={`px-6 py-2 rounded-full transition-all duration-300 ${
+                    selectedNodeType === "relay"
+                      ? "bg-blue-500 text-white"
+                      : "bg-[#1A1A1A] text-gray-400 hover:bg-blue-500/10"
+                  }`}
+                >
+                  Relay Nodes
+                </button>
+                <span className="text-gray-400 text-sm mt-2">{nodeCounts.relay} nodes</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <button
+                  onClick={() => setSelectedNodeType("validator")}
+                  className={`px-6 py-2 rounded-full transition-all duration-300 ${
+                    selectedNodeType === "validator"
+                      ? "bg-emerald-500 text-white"
+                      : "bg-[#1A1A1A] text-gray-400 hover:bg-emerald-500/10"
+                  }`}
+                >
+                  Validator Nodes
+                </button>
+                <span className="text-gray-400 text-sm mt-2">{nodeCounts.validator} nodes</span>
+              </div>
             </div>
           </div>
 
