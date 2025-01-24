@@ -170,7 +170,7 @@ function Relay() {
                     variant="caption"
                     className="text-gray-400 block text-center mt-3 md:mt-4 text-xs md:text-sm"
                   >
-                    Current Version: 1.0.1 | Ubuntu Compatible
+                    Current Version: 1.0.2 | Ubuntu Compatible
                   </Typography>
                 </CardContent>
               </Card>
