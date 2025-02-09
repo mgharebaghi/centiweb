@@ -63,9 +63,15 @@ export default function Contributors() {
     } else if (currentTab === "deactive") {
       filtered = filtered.filter(contributor => contributor.deactive_date);
     } else if (currentTab === "relay") {
-      filtered = filtered.filter(contributor => contributor.node_type.toLowerCase() === "relay");
+      filtered = filtered.filter(contributor => 
+        contributor.node_type.toLowerCase() === "relay" && 
+        !contributor.deactive_date
+      );
     } else if (currentTab === "validator") {
-      filtered = filtered.filter(contributor => contributor.node_type.toLowerCase() === "validator");
+      filtered = filtered.filter(contributor => 
+        contributor.node_type.toLowerCase() === "validator" && 
+        !contributor.deactive_date
+      );
     }
     
     setSearchResults(filtered);
@@ -136,8 +142,8 @@ export default function Contributors() {
     { value: 'all', label: `All (${contributors.length})` },
     { value: 'active', label: `Active (${contributors.filter(c => !c.deactive_date).length})` },
     { value: 'deactive', label: `Deactive (${contributors.filter(c => c.deactive_date).length})` },
-    { value: 'relay', label: `Relays (${contributors.filter(c => c.node_type.toLowerCase() === 'relay').length})` },
-    { value: 'validator', label: `Validators (${contributors.filter(c => c.node_type.toLowerCase() === 'validator').length})` }
+    { value: 'relay', label: `Relays (${contributors.filter(c => c.node_type.toLowerCase() === 'relay' && !c.deactive_date).length})` },
+    { value: 'validator', label: `Validators (${contributors.filter(c => c.node_type.toLowerCase() === 'validator' && !c.deactive_date).length})` }
   ] as const;
 
   return (

@@ -413,6 +413,14 @@ export default function TransactionExplorer() {
                   TabIndicatorProps={{
                     style: { backgroundColor: "#059669" },
                   }}
+                  sx={{
+                    "& .MuiTab-root": {
+                      color: "#9CA3AF",
+                      "&.Mui-selected": {
+                        color: "#ffffff"
+                      }
+                    }
+                  }}
                 >
                   <Tab
                     label="Overview"
