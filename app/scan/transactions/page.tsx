@@ -174,7 +174,7 @@ export default function TransactionExplorer() {
         >
           <Paper
             elevation={3}
-            className="bg-gradient-to-r from-zinc-900 to-zinc-800 p-4 rounded-xl border border-zinc-700 shadow-2xl"
+            className="bg-gradient-to-r from-zinc-900 to-zinc-800 p-4 rounded-xl border border-zinc-700 shadow-2xl mb-5"
           >
             <div className="space-y-4">
               {/* Title Section */}
@@ -327,12 +327,23 @@ export default function TransactionExplorer() {
                               <Typography className="text-white font-mono">
                                 {transaction.hash}
                               </Typography>
-                              <Typography
-                                variant="body2"
-                                className="text-gray-400"
-                              >
-                                {moment(transaction.date).fromNow()}
-                              </Typography>
+                              <div className="flex items-center gap-2">
+                                <Typography
+                                  variant="body2"
+                                  className="text-gray-400"
+                                >
+                                  {moment(transaction.date).fromNow()}
+                                </Typography>
+                                <Chip
+                                  label={transaction.block ? "Confirmed" : "Pending"}
+                                  size="small"
+                                  className={`${
+                                    transaction.block 
+                                      ? "bg-emerald-400/10 text-emerald-400" 
+                                      : "bg-yellow-400/10 text-yellow-400"
+                                  }`}
+                                />
+                              </div>
                             </div>
                           </div>
                           <Chip
@@ -473,7 +484,11 @@ export default function TransactionExplorer() {
                             Block Number
                           </Typography>
                           <Typography className="font-mono text-white bg-zinc-800/50 p-3 rounded-lg">
-                            {selectedTransaction.block || "Pending"}
+                            {selectedTransaction.block ? (
+                              selectedTransaction.block
+                            ) : (
+                              <span className="text-yellow-400 font-semibold">Pending</span>
+                            )}
                           </Typography>
                         </div>
                         <div>
