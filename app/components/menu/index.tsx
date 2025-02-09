@@ -23,7 +23,16 @@ import { IoClose } from "react-icons/io5";
 import Drawer from "@mui/material/Drawer";
 
 const menuItems = [
-  { label: "Explorer", path: "/scan", icon: <FaQrcode /> },
+  { 
+    label: "Explorer", 
+    path: "/scan", 
+    icon: <FaQrcode />,
+    submenu: [
+      { label: "Blocks", path: "/scan/blocks" },
+      { label: "Transactions", path: "/scan/transactions" }
+    ]
+
+  },
   {
     label: "Whitepaper",
     path: "/articles/671fcec5d136b9550a238077",
@@ -109,6 +118,9 @@ function Menu() {
     }
     if (menuPath === "/node") {
       return pathname.startsWith("/node") || pathname === "/contributors";
+    }
+    if (menuPath === "/scan") {
+      return pathname === "/scan" || pathname === "/transactions";
     }
     return pathname === menuPath;
   };
