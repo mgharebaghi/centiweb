@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Container } from "@mui/material";
+import { Container, Dialog, Box, Typography } from "@mui/material";
 import { motion } from "framer-motion";
 import { FaCalendarAlt, FaClock, FaSearch, FaChevronLeft, FaChevronRight, FaNetworkWired, FaShieldAlt, FaSortAmountDown, FaSortAmountUp, FaFingerprint, FaLink, FaCopy } from "react-icons/fa";
+import { IoClose } from "react-icons/io5";
 
 interface Contributor {
   _id: string;
@@ -27,6 +28,9 @@ export default function Contributors() {
   const [sortType, setSortType] = useState<SortType>("active_days");
   const [currentTab, setCurrentTab] = useState<TabValue>("active");
   const [copiedWallet, setCopiedWallet] = useState<string | null>(null);
+  const [selectedContributor, setSelectedContributor] = useState<Contributor | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [showCopyAlert, setShowCopyAlert] = useState(false);
   const itemsPerPage = 9;
 
   useEffect(() => {
@@ -78,23 +82,34 @@ export default function Contributors() {
     setCurrentPage(1);
   }, [searchTerm, contributors, currentTab]);
 
-  const calculateActiveTime = (joinDate: string, deactiveDate: string | null): { days: number, minutes: number } => {
+  const calculateActiveTime = (joinDate: string, deactiveDate: string | null): { days: number, hours: number, minutes: number } => {
     const start = new Date(joinDate);
     const end = deactiveDate ? new Date(deactiveDate) : new Date();
     const diffTime = Math.abs(end.getTime() - start.getTime());
     const days = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    const minutes = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60));
-    return { days, minutes };
+    const hours = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diffTime % (1000 * 60 * 60)) / (1000 * 60));
+    return { days, hours, minutes };
   };
 
-  const copyToClipboard = async (wallet: string) => {
+  const copyToClipboard = async (wallet: string, e: React.MouseEvent) => {
+    e.stopPropagation();
     try {
       await navigator.clipboard.writeText(wallet);
       setCopiedWallet(wallet);
-      setTimeout(() => setCopiedWallet(null), 2000);
+      setShowCopyAlert(true);
+      setTimeout(() => {
+        setCopiedWallet(null);
+        setShowCopyAlert(false);
+      }, 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
     }
+  };
+
+  const handleContributorClick = (contributor: Contributor) => {
+    setSelectedContributor(contributor);
+    setDialogOpen(true);
   };
 
   const sortContributors = (contributors: Contributor[] | null): Contributor[] => {
@@ -108,8 +123,8 @@ export default function Contributors() {
       } else {
         const timeA = calculateActiveTime(a.join_date, a.deactive_date);
         const timeB = calculateActiveTime(b.join_date, b.deactive_date);
-        const totalMinutesA = timeA.days * 24 * 60 + timeA.minutes;
-        const totalMinutesB = timeB.days * 24 * 60 + timeB.minutes;
+        const totalMinutesA = timeA.days * 24 * 60 + timeA.hours * 60 + timeA.minutes;
+        const totalMinutesB = timeB.days * 24 * 60 + timeB.hours * 60 + timeB.minutes;
         return sortOrder === "asc" ? totalMinutesA - totalMinutesB : totalMinutesB - totalMinutesA;
       }
     });
@@ -140,17 +155,16 @@ export default function Contributors() {
 
   const tabs = [
     { value: 'all', label: `All (${contributors.length})` },
-    { value: 'active', label: `Active (${contributors.filter(c => !c.deactive_date).length})` },
-    { value: 'deactive', label: `Deactive (${contributors.filter(c => c.deactive_date).length})` },
+    { value: 'active', label: `Actives (${contributors.filter(c => !c.deactive_date).length})` },
     { value: 'relay', label: `Relays (${contributors.filter(c => c.node_type.toLowerCase() === 'relay' && !c.deactive_date).length})` },
-    { value: 'validator', label: `Validators (${contributors.filter(c => c.node_type.toLowerCase() === 'validator' && !c.deactive_date).length})` }
+    { value: 'validator', label: `Validators (${contributors.filter(c => c.node_type.toLowerCase() === 'validator' && !c.deactive_date).length})` },
+    { value: 'deactive', label: `Deactives (${contributors.filter(c => c.deactive_date).length})` }
   ] as const;
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] pt-20">
       <Container maxWidth="lg">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-
           <h1 className="text-2xl font-bold text-white">Network Contributors</h1>
           <div className="flex gap-2">
             <button onClick={toggleSortType} className="px-3 py-2 bg-[#1A1A1A] rounded text-sm text-gray-300 hover:bg-[#222]">
@@ -186,13 +200,21 @@ export default function Contributors() {
           className="w-full px-4 py-2 mb-4 bg-[#1A1A1A] rounded border border-gray-700 text-white"
         />
 
+        {showCopyAlert && (
+          <div className="fixed bottom-4 right-4 bg-emerald-500 text-white px-4 py-2 rounded shadow-lg">
+            Copied to clipboard!
+          </div>
+        )}
+
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {displayContributors.map((contributor) => (
             <motion.div
               key={contributor._id}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="p-4 bg-[#1A1A1A] rounded border border-gray-700"
+              className="p-4 bg-[#1A1A1A] rounded border border-gray-700 cursor-pointer hover:border-emerald-500/50 transition-colors"
+              onClick={() => handleContributorClick(contributor)}
             >
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
@@ -202,8 +224,8 @@ export default function Contributors() {
                   }
                   <div>
                     <div 
-                      className="flex items-center gap-2 cursor-pointer"
-                      onClick={() => copyToClipboard(contributor.wallet)}
+                      className="flex items-center gap-2"
+                      onClick={(e) => copyToClipboard(contributor.wallet, e)}
                     >
                       <span className="text-white">
                         {contributor.wallet.slice(0, 6)}...{contributor.wallet.slice(-4)}
@@ -247,10 +269,14 @@ export default function Contributors() {
                   <div className="flex items-center gap-2">
                     <FaClock className="text-gray-400" />
                     {(() => {
-                      const { days, minutes } = calculateActiveTime(contributor.join_date, contributor.deactive_date);
-                      return days < 1 
-                        ? <span className="text-orange-400">{minutes}m</span>
-                        : <span className="text-orange-400">{days}d {minutes}m</span>;
+                      const { days, hours, minutes } = calculateActiveTime(contributor.join_date, contributor.deactive_date);
+                      if (days > 0) {
+                        return <span className="text-orange-400">{days}d {hours}h</span>;
+                      } else if (hours > 0 || minutes >= 60) {
+                        return <span className="text-orange-400">{hours}h {minutes}m</span>;
+                      } else {
+                        return <span className="text-orange-400">{minutes}m</span>;
+                      }
                     })()}
                   </div>
                 </div>
@@ -278,6 +304,113 @@ export default function Contributors() {
             <FaChevronRight />
           </button>
         </div>
+
+        <Dialog 
+          open={dialogOpen} 
+          onClose={() => setDialogOpen(false)}
+          maxWidth="md"
+          fullWidth
+          PaperProps={{
+            style: {
+              backgroundColor: '#1A1A1A',
+              backgroundImage: 'linear-gradient(to right, #1A1A1A, #262626)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+            }
+          }}
+        >
+          {selectedContributor && (
+            <Box p={3}>
+              <div className="flex justify-between items-center mb-4">
+                <Typography variant="h5" className="text-white font-bold">
+                  Contributor Details
+                </Typography>
+                <button 
+                  onClick={() => setDialogOpen(false)}
+                  className="text-gray-400 hover:text-white"
+                >
+                  <IoClose size={24} />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-black/20 p-4 rounded-lg">
+                  <Typography className="text-gray-400 mb-1">Wallet Address</Typography>
+                  <div className="flex items-center gap-2">
+                    <Typography className="text-white font-mono break-all">
+                      {selectedContributor.wallet}
+                    </Typography>
+                    <button
+                      onClick={(e) => copyToClipboard(selectedContributor.wallet, e)}
+                      className="text-gray-400 hover:text-white"
+                    >
+                      <FaCopy />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-black/20 p-4 rounded-lg">
+                    <Typography className="text-gray-400 mb-1">Node Type</Typography>
+                    <Typography className="text-white">
+                      {selectedContributor.node_type}
+                    </Typography>
+                  </div>
+                  <div className="bg-black/20 p-4 rounded-lg">
+                    <Typography className="text-gray-400 mb-1">Status</Typography>
+                    <Typography className={selectedContributor.deactive_date ? "text-red-400" : "text-emerald-400"}>
+                      {selectedContributor.deactive_date ? "DEACTIVE" : "ACTIVE"}
+                    </Typography>
+                  </div>
+                </div>
+
+                {selectedContributor.peerid && (
+                  <div className="bg-black/20 p-4 rounded-lg">
+                    <Typography className="text-gray-400 mb-1">Peer ID</Typography>
+                    <Typography className="text-white font-mono break-all">
+                      {selectedContributor.peerid}
+                    </Typography>
+                  </div>
+                )}
+
+                {selectedContributor.relay_id && (
+                  <div className="bg-black/20 p-4 rounded-lg">
+                    <Typography className="text-gray-400 mb-1">Relay ID</Typography>
+                    <Typography className="text-white font-mono break-all">
+                      {selectedContributor.relay_id}
+                    </Typography>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-black/20 p-4 rounded-lg">
+                    <Typography className="text-gray-400 mb-1">Join Date</Typography>
+                    <Typography className="text-white">
+                      {new Date(selectedContributor.join_date).toLocaleString()}
+                    </Typography>
+                  </div>
+                  <div className="bg-black/20 p-4 rounded-lg">
+                    <Typography className="text-gray-400 mb-1">Active Time</Typography>
+                    <Typography className="text-orange-400">
+                      {(() => {
+                        const { days, hours, minutes } = calculateActiveTime(
+                          selectedContributor.join_date,
+                          selectedContributor.deactive_date
+                        );
+                        if (days > 0) {
+                          return `${days} days, ${hours} hours, ${minutes} minutes`;
+                        } else if (hours > 0 || minutes >= 60) {
+                          return `${hours} hours, ${minutes} minutes`;
+                        } else {
+                          return `${minutes} minutes`;
+                        }
+                      })()}
+                    </Typography>
+                  </div>
+                </div>
+              </div>
+            </Box>
+          )}
+        </Dialog>
       </Container>
     </div>
   );
