@@ -271,7 +271,7 @@ export default function Contributors() {
                     {(() => {
                       const { days, hours, minutes } = calculateActiveTime(
                         contributor.join_date, 
-                        contributor.deactive_date ? contributor.deactive_date : contributor.deactive_date ? contributor.deactive_date : new Date().toISOString()
+                        contributor.deactive_date
                       );
                       if (days > 0) {
                         return <span className="text-orange-400">{days}d {hours}h</span>;
@@ -397,7 +397,7 @@ export default function Contributors() {
                       {(() => {
                         const { days, hours, minutes } = calculateActiveTime(
                           selectedContributor.join_date,
-                          selectedContributor.deactive_date ? selectedContributor.deactive_date : selectedContributor.deactive_date ? selectedContributor.deactive_date : new Date().toISOString()
+                          selectedContributor.deactive_date
                         );
                         if (days > 0) {
                           return `${days} days, ${hours} hours, ${minutes} minutes`;
