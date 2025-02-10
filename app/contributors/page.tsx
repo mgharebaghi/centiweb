@@ -269,7 +269,10 @@ export default function Contributors() {
                   <div className="flex items-center gap-2">
                     <FaClock className="text-gray-400" />
                     {(() => {
-                      const { days, hours, minutes } = calculateActiveTime(contributor.join_date, contributor.deactive_date);
+                      const { days, hours, minutes } = calculateActiveTime(
+                        contributor.join_date, 
+                        contributor.deactive_date ? contributor.deactive_date : contributor.deactive_date ? contributor.deactive_date : new Date().toISOString()
+                      );
                       if (days > 0) {
                         return <span className="text-orange-400">{days}d {hours}h</span>;
                       } else if (hours > 0 || minutes >= 60) {
@@ -394,7 +397,7 @@ export default function Contributors() {
                       {(() => {
                         const { days, hours, minutes } = calculateActiveTime(
                           selectedContributor.join_date,
-                          selectedContributor.deactive_date
+                          selectedContributor.deactive_date ? selectedContributor.deactive_date : selectedContributor.deactive_date ? selectedContributor.deactive_date : new Date().toISOString()
                         );
                         if (days > 0) {
                           return `${days} days, ${hours} hours, ${minutes} minutes`;

@@ -21,6 +21,8 @@ import {
   Tabs,
   Tab,
   Paper,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { IoClose } from "react-icons/io5";
 import { FiClock, FiHash, FiList, FiSearch } from "react-icons/fi";
@@ -51,10 +53,13 @@ function TabPanel(props: TabPanelProps) {
 }
 
 export default function TransactionExplorer() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+
   const [transactions, setTransactions] = useState<TrxScan[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedTransaction, setSelectedTransaction] =
-    useState<TrxScan | null>(null);
+  const [selectedTransaction, setSelectedTransaction] = useState<TrxScan | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [page, setPage] = useState(1);
@@ -63,7 +68,7 @@ export default function TransactionExplorer() {
   const [searchError, setSearchError] = useState("");
   const [lastTrxCount, setLastTrxCount] = useState(0);
   const [tabValue, setTabValue] = useState(0);
-  const itemsPerPage = 5;
+  const itemsPerPage = isMobile ? 3 : isTablet ? 4 : 5;
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -165,7 +170,7 @@ export default function TransactionExplorer() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-zinc-950 pt-[80px]">
+    <div className="min-h-screen w-full bg-zinc-950 pt-[80px] px-4 sm:px-6">
       <Container maxWidth="md">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -174,13 +179,13 @@ export default function TransactionExplorer() {
         >
           <Paper
             elevation={3}
-            className="bg-gradient-to-r from-zinc-900 to-zinc-800 p-4 rounded-xl border border-zinc-700 shadow-2xl mb-5"
+            className="bg-gradient-to-r from-zinc-900 to-zinc-800 p-4 sm:p-6 rounded-xl border border-zinc-700 shadow-2xl mb-5"
           >
             <div className="space-y-4">
               {/* Title Section */}
               <div className="text-center">
                 <Typography
-                  variant="h4"
+                  variant={isMobile ? "h5" : "h4"}
                   className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-green-300 to-emerald-400 tracking-tight"
                 >
                   Live Transaction Explorer
@@ -192,7 +197,7 @@ export default function TransactionExplorer() {
 
               {/* Stats Section */}
               <div className="flex flex-wrap justify-center items-center gap-3">
-                <div className="flex items-center gap-3 bg-zinc-800/50 px-3 py-1.5 rounded-xl backdrop-blur-sm border border-zinc-700/50">
+                <div className="flex flex-col sm:flex-row items-center gap-3 bg-zinc-800/50 px-3 py-1.5 rounded-xl backdrop-blur-sm border border-zinc-700/50 w-full sm:w-auto">
                   <div className="flex items-center gap-2">
                     <div className="p-1 bg-emerald-400/10 rounded-lg">
                       <RiNodeTree className="text-emerald-400 text-base" />
@@ -205,10 +210,10 @@ export default function TransactionExplorer() {
                     </div>
                   </div>
                   
-                  <div className="h-6 w-px bg-zinc-700/50" />
+                  <div className="hidden sm:block h-6 w-px bg-zinc-700/50" />
                   
                   <div
-                    className="flex items-center gap-2 cursor-pointer group"
+                    className="flex items-center gap-2 cursor-pointer group mt-2 sm:mt-0"
                     onClick={toggleAutoRefresh}
                   >
                     <div className={`p-1 rounded-lg transition-colors ${
@@ -234,7 +239,7 @@ export default function TransactionExplorer() {
               <div className="max-w-xl mx-auto relative">
                 <TextField
                   fullWidth
-                  placeholder="Search by transaction hash..."
+                  placeholder={isMobile ? "Search hash..." : "Search by transaction hash..."}
                   value={searchValue}
                   onChange={(e) => {
                     setSearchValue(e.target.value);
@@ -319,18 +324,21 @@ export default function TransactionExplorer() {
                       onClick={() => handleTransactionClick(transaction)}
                       className="bg-gradient-to-r from-zinc-900 to-zinc-800 hover:from-zinc-800 hover:to-zinc-700 transition-colors cursor-pointer border border-zinc-700"
                     >
-                      <CardContent>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <FiHash className="text-emerald-400 text-lg" />
-                            <div>
-                              <Typography className="text-white font-mono">
-                                {transaction.hash}
+                      <CardContent className="p-3 sm:p-4">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                          <div className="flex items-center gap-3 w-full sm:w-auto">
+                            <FiHash className="text-emerald-400 text-lg hidden sm:block" />
+                            <div className="w-full sm:w-auto">
+                              <Typography className="text-white font-mono text-xs sm:text-sm break-all">
+                                {isMobile ? 
+                                  `${transaction.hash.slice(0, 20)}...${transaction.hash.slice(-4)}` :
+                                  transaction.hash
+                                }
                               </Typography>
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-2 mt-1">
                                 <Typography
                                   variant="body2"
-                                  className="text-gray-400"
+                                  className="text-gray-400 text-xs"
                                 >
                                   {moment(transaction.date).fromNow()}
                                 </Typography>
@@ -341,14 +349,15 @@ export default function TransactionExplorer() {
                                     transaction.block 
                                       ? "bg-emerald-400/10 text-emerald-400" 
                                       : "bg-yellow-400/10 text-yellow-400"
-                                  }`}
+                                  } text-xs`}
                                 />
                               </div>
                             </div>
                           </div>
                           <Chip
                             label={`${transaction.value} CENTI`}
-                            className="bg-zinc-800 text-emerald-400"
+                            className="bg-zinc-800 text-emerald-400 text-xs"
+                            size="small"
                           />
                         </div>
                       </CardContent>
@@ -360,13 +369,14 @@ export default function TransactionExplorer() {
           )}
 
           {!loading && transactions.length > 0 && (
-            <div className="flex justify-center mt-6">
+            <div className="flex justify-center mt-6 mb-8">
               <Pagination
                 count={totalPages}
                 page={page}
                 onChange={handlePageChange}
                 variant="outlined"
                 shape="rounded"
+                size={isMobile ? "small" : "medium"}
                 className="bg-zinc-900 p-2 rounded-lg"
                 sx={{
                   "& .MuiPaginationItem-root": {
@@ -388,13 +398,13 @@ export default function TransactionExplorer() {
             maxWidth="md"
             fullWidth
             PaperProps={{
-              className: "bg-zinc-900",
+              className: "bg-zinc-900 m-4",
             }}
           >
             {selectedTransaction && (
-              <Box className="p-6">
+              <Box className="p-4 sm:p-6">
                 <div className="flex justify-between items-center mb-6">
-                  <Typography variant="h6" className="text-emerald-400">
+                  <Typography variant="h6" className="text-emerald-400 text-base sm:text-lg">
                     Transaction Details
                   </Typography>
                   <IconButton
@@ -410,6 +420,7 @@ export default function TransactionExplorer() {
                   onChange={handleTabChange}
                   className="border-b border-zinc-700"
                   textColor="inherit"
+                  variant={isMobile ? "fullWidth" : "standard"}
                   TabIndicatorProps={{
                     style: { backgroundColor: "#059669" },
                   }}
@@ -418,7 +429,9 @@ export default function TransactionExplorer() {
                       color: "#9CA3AF",
                       "&.Mui-selected": {
                         color: "#ffffff"
-                      }
+                      },
+                      minHeight: isMobile ? "48px" : "64px",
+                      fontSize: isMobile ? "0.75rem" : "0.875rem"
                     }
                   }}
                 >
@@ -436,42 +449,42 @@ export default function TransactionExplorer() {
 
                 <TabPanel value={tabValue} index={0}>
                   <div className="space-y-4">
-                    <div className="bg-gradient-to-r from-zinc-900 to-zinc-800 p-6 rounded-xl border border-zinc-700">
-                      <Typography className="text-emerald-400 text-lg font-semibold mb-4">
+                    <div className="bg-gradient-to-r from-zinc-900 to-zinc-800 p-4 sm:p-6 rounded-xl border border-zinc-700">
+                      <Typography className="text-emerald-400 text-base sm:text-lg font-semibold mb-4">
                         Transaction Information
                       </Typography>
                       <div className="space-y-4">
                         <div>
-                          <Typography className="text-gray-400 mb-2">
+                          <Typography className="text-gray-400 mb-2 text-sm">
                             Hash
                           </Typography>
-                          <Typography className="font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg">
+                          <Typography className="font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg text-xs sm:text-sm">
                             {selectedTransaction.hash}
                           </Typography>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-4">
                           <div>
-                            <Typography className="text-gray-400 mb-2">
+                            <Typography className="text-gray-400 mb-2 text-sm">
                               From
                             </Typography>
-                            <Typography className="font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg">
+                            <Typography className="font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg text-xs sm:text-sm">
                               {selectedTransaction.from}
                             </Typography>
                           </div>
                           <div>
-                            <Typography className="text-gray-400 mb-2">
+                            <Typography className="text-gray-400 mb-2 text-sm">
                               To
                             </Typography>
-                            <Typography className="font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg">
+                            <Typography className="font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg text-xs sm:text-sm">
                               {selectedTransaction.to}
                             </Typography>
                           </div>
                         </div>
                         <div>
-                          <Typography className="text-gray-400 mb-2">
+                          <Typography className="text-gray-400 mb-2 text-sm">
                             Value
                           </Typography>
-                          <Typography className="font-mono text-white bg-zinc-800/50 p-3 rounded-lg">
+                          <Typography className="font-mono text-white bg-zinc-800/50 p-3 rounded-lg text-xs sm:text-sm">
                             {selectedTransaction.value} CENTI
                           </Typography>
                         </div>
@@ -482,16 +495,16 @@ export default function TransactionExplorer() {
 
                 <TabPanel value={tabValue} index={1}>
                   <div className="space-y-4">
-                    <div className="bg-gradient-to-r from-zinc-900 to-zinc-800 p-6 rounded-xl border border-zinc-700">
-                      <Typography className="text-emerald-400 text-lg font-semibold mb-4">
+                    <div className="bg-gradient-to-r from-zinc-900 to-zinc-800 p-4 sm:p-6 rounded-xl border border-zinc-700">
+                      <Typography className="text-emerald-400 text-base sm:text-lg font-semibold mb-4">
                         Additional Details
                       </Typography>
                       <div className="space-y-4">
                         <div>
-                          <Typography className="text-gray-400 mb-2">
+                          <Typography className="text-gray-400 mb-2 text-sm">
                             Block Number
                           </Typography>
-                          <Typography className="font-mono text-white bg-zinc-800/50 p-3 rounded-lg">
+                          <Typography className="font-mono text-white bg-zinc-800/50 p-3 rounded-lg text-xs sm:text-sm">
                             {selectedTransaction.block ? (
                               selectedTransaction.block
                             ) : (
@@ -500,10 +513,10 @@ export default function TransactionExplorer() {
                           </Typography>
                         </div>
                         <div>
-                          <Typography className="text-gray-400 mb-2">
+                          <Typography className="text-gray-400 mb-2 text-sm">
                             Timestamp
                           </Typography>
-                          <Typography className="font-mono text-white bg-zinc-800/50 p-3 rounded-lg">
+                          <Typography className="font-mono text-white bg-zinc-800/50 p-3 rounded-lg text-xs sm:text-sm">
                             {moment(selectedTransaction.date).format(
                               "MMMM Do YYYY, h:mm:ss a"
                             )}

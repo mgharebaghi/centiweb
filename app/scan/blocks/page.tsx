@@ -21,6 +21,8 @@ import {
   Tabs,
   Tab,
   Paper,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { IoClose } from "react-icons/io5";
 import { FiClock, FiHash, FiBox, FiList, FiSearch } from "react-icons/fi";
@@ -51,6 +53,11 @@ function TabPanel(props: TabPanelProps) {
 }
 
 export default function BlockExplorer() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+  const isLaptop = useMediaQuery(theme.breakpoints.down('lg'));
+
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
@@ -62,7 +69,7 @@ export default function BlockExplorer() {
   const [searchError, setSearchError] = useState("");
   const [lastBlockNumber, setLastBlockNumber] = useState(0);
   const [tabValue, setTabValue] = useState(0);
-  const itemsPerPage = 5;
+  const itemsPerPage = isMobile ? 3 : isTablet ? 4 : 5;
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -144,7 +151,7 @@ export default function BlockExplorer() {
         clearInterval(interval);
       }
     };
-  }, [autoRefresh, page, searchValue]);
+  }, [autoRefresh, page, searchValue, itemsPerPage]);
 
   const handleBlockClick = (block: Block) => {
     setSelectedBlock(block);
@@ -165,7 +172,7 @@ export default function BlockExplorer() {
 
   return (
     <div className="min-h-screen w-full bg-zinc-950 pt-14">
-      <Container maxWidth="md">
+      <Container maxWidth={isLaptop ? "sm" : "md"}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -180,7 +187,7 @@ export default function BlockExplorer() {
               {/* Title Section */}
               <div className="text-center">
                 <Typography
-                  variant="h4"
+                  variant={isMobile ? "h5" : "h4"}
                   className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-green-300 to-emerald-400 tracking-tight"
                 >
                   Live Block Explorer
@@ -192,20 +199,20 @@ export default function BlockExplorer() {
 
               {/* Stats Section */}
               <div className="flex flex-wrap justify-center items-center gap-3">
-                <div className="flex items-center gap-3 bg-zinc-800/50 px-3 py-1.5 rounded-xl backdrop-blur-sm border border-zinc-700/50">
+                <div className={`flex items-center gap-3 bg-zinc-800/50 ${isMobile ? 'px-2 py-1' : 'px-3 py-1.5'} rounded-xl backdrop-blur-sm border border-zinc-700/50 ${isMobile ? 'flex-col' : 'flex-row'}`}>
                   <div className="flex items-center gap-2">
                     <div className="p-1 bg-emerald-400/10 rounded-lg">
-                      <RiNodeTree className="text-emerald-400 text-base" />
+                      <RiNodeTree className={`text-emerald-400 ${isMobile ? 'text-sm' : 'text-base'}`} />
                     </div>
                     <div>
-                      <Typography className="text-xs text-zinc-400">Block Height</Typography>
-                      <Typography className="text-base font-semibold text-white">
+                      <Typography className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-zinc-400`}>Block Height</Typography>
+                      <Typography className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold text-white`}>
                         {lastBlockNumber?.toLocaleString()}
                       </Typography>
                     </div>
                   </div>
                   
-                  <div className="h-6 w-px bg-zinc-700/50" />
+                  {!isMobile && <div className="h-6 w-px bg-zinc-700/50" />}
                   
                   <div
                     className="flex items-center gap-2 cursor-pointer group"
@@ -214,13 +221,13 @@ export default function BlockExplorer() {
                     <div className={`p-1 rounded-lg transition-colors ${
                       autoRefresh ? 'bg-emerald-400/10' : 'bg-zinc-700/30'
                     }`}>
-                      <FiClock className={`text-base transition-colors ${
+                      <FiClock className={`${isMobile ? 'text-sm' : 'text-base'} transition-colors ${
                         autoRefresh ? 'text-emerald-400' : 'text-zinc-400'
                       }`} />
                     </div>
                     <div>
-                      <Typography className="text-xs text-zinc-400">Auto Refresh</Typography>
-                      <Typography className={`text-xs font-medium transition-colors ${
+                      <Typography className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-zinc-400`}>Auto Refresh</Typography>
+                      <Typography className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium transition-colors ${
                         autoRefresh ? 'text-emerald-400' : 'text-white'
                       }`}>
                         {autoRefresh ? 'Active' : 'Inactive'}
@@ -234,7 +241,7 @@ export default function BlockExplorer() {
               <div className="max-w-xl mx-auto relative">
                 <TextField
                   fullWidth
-                  placeholder="Search by block number or hash..."
+                  placeholder={isMobile ? "Search blocks..." : "Search by block number or hash..."}
                   value={searchValue}
                   onChange={(e) => {
                     setSearchValue(e.target.value);
@@ -242,6 +249,7 @@ export default function BlockExplorer() {
                   }}
                   onKeyPress={(e) => e.key === "Enter" && handleSearch()}
                   className="bg-zinc-800/30 rounded-xl shadow-lg transition-all duration-200 hover:shadow-emerald-900/20"
+                  size={isMobile ? "small" : "medium"}
                   InputProps={{
                     startAdornment: (
                       <IconButton
@@ -281,8 +289,8 @@ export default function BlockExplorer() {
                     },
                     "& .MuiInputBase-input": {
                       color: "white",
-                      padding: "8px 10px",
-                      fontSize: "0.875rem",
+                      padding: isMobile ? "6px 8px" : "8px 10px",
+                      fontSize: isMobile ? "0.75rem" : "0.875rem",
                       "&::placeholder": {
                         color: "rgb(156 163 175)",
                         opacity: 0.7,
@@ -303,7 +311,7 @@ export default function BlockExplorer() {
           {/* Blocks List */}
           {loading ? (
             <div className="flex justify-center items-center py-12">
-              <CircularProgress size={40} sx={{ color: "#10B981" }} />
+              <CircularProgress size={isMobile ? 30 : 40} sx={{ color: "#10B981" }} />
             </div>
           ) : (
             <div className="space-y-4">
@@ -320,30 +328,32 @@ export default function BlockExplorer() {
                       onClick={() => handleBlockClick(block)}
                       className="bg-gradient-to-r from-zinc-900 to-zinc-800 hover:from-zinc-800 hover:to-zinc-700 transition-all duration-300 cursor-pointer border-l-4 border-l-emerald-500 rounded-xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
                     >
-                      <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 py-4">
+                      <CardContent className={`grid ${isMobile ? 'grid-cols-1 gap-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'} py-4`}>
                         <div className="flex items-center gap-3">
                           <FiBox className="text-emerald-400 text-xl" />
                           <div>
-                            <Typography className="text-emerald-400 text-lg font-semibold">
+                            <Typography className={`text-emerald-400 ${isMobile ? 'text-base' : 'text-lg'} font-semibold`}>
                               #{block.header.number.toLocaleString()}
                             </Typography>
-                            <Typography className="text-gray-400">
+                            <Typography className={`text-gray-400 ${isMobile ? 'text-xs' : ''}`}>
                               {moment(block.header.date).fromNow()}
                             </Typography>
                           </div>
                         </div>
 
-                        <div className="sm:col-span-2 hidden sm:block">
-                          <Tooltip title="Block Hash" placement="top" arrow>
-                            <Typography className="text-white font-mono text-sm truncate bg-zinc-800/50 p-2 rounded-lg">
-                              {block.header.hash}
-                            </Typography>
-                          </Tooltip>
-                        </div>
+                        {!isMobile && (
+                          <div className="sm:col-span-2 hidden sm:block">
+                            <Tooltip title="Block Hash" placement="top" arrow>
+                              <Typography className="text-white font-mono text-sm truncate bg-zinc-800/50 p-2 rounded-lg">
+                                {block.header.hash}
+                              </Typography>
+                            </Tooltip>
+                          </div>
+                        )}
 
-                        <div className="flex items-center justify-end gap-3">
+                        <div className={`flex items-center ${isMobile ? '' : 'justify-end'} gap-3`}>
                           <Chip
-                            size="medium"
+                            size={isMobile ? "small" : "medium"}
                             icon={<FiList className="text-white" />}
                             label={`${block.body.transactions.length} Transactions`}
                             className="bg-emerald-500/20 text-white hover:bg-emerald-500/30 transition-colors"
@@ -365,7 +375,7 @@ export default function BlockExplorer() {
                 count={totalPages}
                 page={page}
                 onChange={handlePageChange}
-                size="large"
+                size={isMobile ? "small" : "large"}
                 variant="outlined"
                 shape="rounded"
                 className="bg-zinc-900/50 p-3 rounded-xl"
@@ -373,7 +383,7 @@ export default function BlockExplorer() {
                   "& .MuiPaginationItem-root": {
                     color: "white",
                     borderColor: "#4B5563",
-                    fontSize: "1rem",
+                    fontSize: isMobile ? "0.875rem" : "1rem",
                   },
                   "& .Mui-selected": {
                     backgroundColor: "#10B981 !important",
@@ -394,15 +404,16 @@ export default function BlockExplorer() {
             onClose={() => setDialogOpen(false)}
             maxWidth="lg"
             fullWidth
+            fullScreen={isMobile}
             PaperProps={{
               className:
                 "bg-gradient-to-b from-gray-900 to-black text-white rounded-xl",
             }}
           >
             {selectedBlock && (
-              <Box className="p-6">
+              <Box className={`p-${isMobile ? '4' : '6'}`}>
                 <div className="flex justify-between items-center mb-6">
-                  <Typography className="text-xl font-bold text-emerald-400">
+                  <Typography className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-emerald-400`}>
                     Block #{selectedBlock.header.number.toLocaleString()}
                   </Typography>
                   <IconButton
@@ -418,6 +429,7 @@ export default function BlockExplorer() {
                   onChange={handleTabChange}
                   className="border-b border-zinc-800 mb-6"
                   textColor="inherit"
+                  variant={isMobile ? "fullWidth" : "standard"}
                   TabIndicatorProps={{
                     style: {
                       backgroundColor: "#10B981",
@@ -426,10 +438,10 @@ export default function BlockExplorer() {
                   }}
                   sx={{
                     "& .MuiTab-root": {
-                      fontSize: "1rem",
+                      fontSize: isMobile ? "0.875rem" : "1rem",
                       fontWeight: "bold",
                       textTransform: "none",
-                      minWidth: "120px",
+                      minWidth: isMobile ? "auto" : "120px",
                     },
                     "& .Mui-selected": {
                       color: "#10B981",
@@ -444,7 +456,7 @@ export default function BlockExplorer() {
                 <TabPanel value={tabValue} index={0}>
                   <div className="grid grid-cols-1 gap-6">
                     <div className="bg-gradient-to-r from-zinc-900 to-zinc-800 p-6 rounded-xl border border-zinc-700">
-                      <Typography className="text-emerald-400 text-lg font-semibold mb-4">
+                      <Typography className={`text-emerald-400 ${isMobile ? 'text-base' : 'text-lg'} font-semibold mb-4`}>
                         Block Information
                       </Typography>
                       <div className="space-y-4">
@@ -452,7 +464,7 @@ export default function BlockExplorer() {
                           <Typography className="text-gray-400 mb-2">
                             Block Hash
                           </Typography>
-                          <Typography className="font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg">
+                          <Typography className={`font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg ${isMobile ? 'text-sm' : ''}`}>
                             {selectedBlock.header.hash}
                           </Typography>
                         </div>
@@ -460,7 +472,7 @@ export default function BlockExplorer() {
                           <Typography className="text-gray-400 mb-2">
                             Previous Hash
                           </Typography>
-                          <Typography className="font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg">
+                          <Typography className={`font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg ${isMobile ? 'text-sm' : ''}`}>
                             {selectedBlock.header.previous}
                           </Typography>
                         </div>
@@ -468,7 +480,7 @@ export default function BlockExplorer() {
                           <Typography className="text-gray-400 mb-2">
                             Merkle Root
                           </Typography>
-                          <Typography className="font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg">
+                          <Typography className={`font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg ${isMobile ? 'text-sm' : ''}`}>
                             {selectedBlock.header.merkel}
                           </Typography>
                         </div>
@@ -476,7 +488,7 @@ export default function BlockExplorer() {
                           <Typography className="text-gray-400 mb-2">
                             Timestamp
                           </Typography>
-                          <Typography className="font-mono text-white bg-zinc-800/50 p-3 rounded-lg">
+                          <Typography className={`font-mono text-white bg-zinc-800/50 p-3 rounded-lg ${isMobile ? 'text-sm' : ''}`}>
                             {moment(selectedBlock.header.date).format(
                               "MMMM Do YYYY, h:mm:ss a"
                             )}
@@ -485,15 +497,15 @@ export default function BlockExplorer() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className={`grid grid-cols-1 ${isMobile ? 'gap-4' : 'md:grid-cols-2 gap-6'}`}>
                       <div className="bg-gradient-to-r from-zinc-900 to-zinc-800 p-6 rounded-xl border border-zinc-700">
                         <div className="flex items-center gap-3 mb-4">
                           <FaUserShield className="text-emerald-400 text-xl" />
-                          <Typography className="text-emerald-400 text-lg font-semibold">
+                          <Typography className={`text-emerald-400 ${isMobile ? 'text-base' : 'text-lg'} font-semibold`}>
                             Validator
                           </Typography>
                         </div>
-                        <Typography className="font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg">
+                        <Typography className={`font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg ${isMobile ? 'text-sm' : ''}`}>
                           {selectedBlock.header.validator}
                         </Typography>
                       </div>
@@ -501,11 +513,11 @@ export default function BlockExplorer() {
                       <div className="bg-gradient-to-r from-zinc-900 to-zinc-800 p-6 rounded-xl border border-zinc-700">
                         <div className="flex items-center gap-3 mb-4">
                           <FaServer className="text-emerald-400 text-xl" />
-                          <Typography className="text-emerald-400 text-lg font-semibold">
+                          <Typography className={`text-emerald-400 ${isMobile ? 'text-base' : 'text-lg'} font-semibold`}>
                             Relay
                           </Typography>
                         </div>
-                        <Typography className="font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg">
+                        <Typography className={`font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg ${isMobile ? 'text-sm' : ''}`}>
                           {selectedBlock.header.relay}
                         </Typography>
                       </div>
@@ -517,7 +529,7 @@ export default function BlockExplorer() {
                   <div className="space-y-6">
                     {/* Reward Transaction */}
                     <div className="bg-gradient-to-r from-zinc-900 to-zinc-800 p-6 rounded-xl border border-zinc-700">
-                      <Typography className="text-emerald-400 text-lg font-semibold mb-4">
+                      <Typography className={`text-emerald-400 ${isMobile ? 'text-base' : 'text-lg'} font-semibold mb-4`}>
                         Reward Transaction
                       </Typography>
                       <div className="space-y-4">
@@ -525,16 +537,16 @@ export default function BlockExplorer() {
                           <Typography className="text-gray-400 mb-2">
                             Hash
                           </Typography>
-                          <Typography className="font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg">
+                          <Typography className={`font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg ${isMobile ? 'text-sm' : ''}`}>
                             {selectedBlock.body.coinbase.data.reward.hash}
                           </Typography>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className={`grid grid-cols-1 ${isMobile ? 'gap-4' : 'md:grid-cols-2 gap-4'}`}>
                           <div>
                             <Typography className="text-gray-400 mb-2">
                               From
                             </Typography>
-                            <Typography className="font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg">
+                            <Typography className={`font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg ${isMobile ? 'text-sm' : ''}`}>
                               {
                                 selectedBlock.body.coinbase.data.reward.data
                                   .from
@@ -545,7 +557,7 @@ export default function BlockExplorer() {
                             <Typography className="text-gray-400 mb-2">
                               To
                             </Typography>
-                            <Typography className="font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg">
+                            <Typography className={`font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg ${isMobile ? 'text-sm' : ''}`}>
                               {selectedBlock.body.coinbase.data.reward.data.to}
                             </Typography>
                           </div>
@@ -554,7 +566,7 @@ export default function BlockExplorer() {
                           <Typography className="text-gray-400 mb-2">
                             Value
                           </Typography>
-                          <Typography className="font-mono text-white bg-zinc-800/50 p-3 rounded-lg">
+                          <Typography className={`font-mono text-white bg-zinc-800/50 p-3 rounded-lg ${isMobile ? 'text-sm' : ''}`}>
                             {selectedBlock.body.coinbase.data.reward.data.value}{" "}
                             CENTI
                           </Typography>
@@ -564,7 +576,7 @@ export default function BlockExplorer() {
 
                     {/* Relay Fee Transaction */}
                     <div className="bg-gradient-to-r from-zinc-900 to-zinc-800 p-6 rounded-xl border border-zinc-700">
-                      <Typography className="text-emerald-400 text-lg font-semibold mb-4">
+                      <Typography className={`text-emerald-400 ${isMobile ? 'text-base' : 'text-lg'} font-semibold mb-4`}>
                         Relay Fee Transaction
                       </Typography>
                       <div className="space-y-4">
@@ -572,16 +584,16 @@ export default function BlockExplorer() {
                           <Typography className="text-gray-400 mb-2">
                             Hash
                           </Typography>
-                          <Typography className="font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg">
+                          <Typography className={`font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg ${isMobile ? 'text-sm' : ''}`}>
                             {selectedBlock.body.coinbase.data.relay_fee.hash}
                           </Typography>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className={`grid grid-cols-1 ${isMobile ? 'gap-4' : 'md:grid-cols-2 gap-4'}`}>
                           <div>
                             <Typography className="text-gray-400 mb-2">
                               From
                             </Typography>
-                            <Typography className="font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg">
+                            <Typography className={`font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg ${isMobile ? 'text-sm' : ''}`}>
                               {
                                 selectedBlock.body.coinbase.data.relay_fee.data
                                   .from
@@ -592,7 +604,7 @@ export default function BlockExplorer() {
                             <Typography className="text-gray-400 mb-2">
                               To
                             </Typography>
-                            <Typography className="font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg">
+                            <Typography className={`font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg ${isMobile ? 'text-sm' : ''}`}>
                               {
                                 selectedBlock.body.coinbase.data.relay_fee.data
                                   .to
@@ -604,7 +616,7 @@ export default function BlockExplorer() {
                           <Typography className="text-gray-400 mb-2">
                             Value
                           </Typography>
-                          <Typography className="font-mono text-white bg-zinc-800/50 p-3 rounded-lg">
+                          <Typography className={`font-mono text-white bg-zinc-800/50 p-3 rounded-lg ${isMobile ? 'text-sm' : ''}`}>
                             {
                               selectedBlock.body.coinbase.data.relay_fee.data
                                 .value
@@ -617,7 +629,7 @@ export default function BlockExplorer() {
 
                     {/* Validator Fee Transaction */}
                     <div className="bg-gradient-to-r from-zinc-900 to-zinc-800 p-6 rounded-xl border border-zinc-700">
-                      <Typography className="text-emerald-400 text-lg font-semibold mb-4">
+                      <Typography className={`text-emerald-400 ${isMobile ? 'text-base' : 'text-lg'} font-semibold mb-4`}>
                         Validator Fee Transaction
                       </Typography>
                       <div className="space-y-4">
@@ -625,19 +637,19 @@ export default function BlockExplorer() {
                           <Typography className="text-gray-400 mb-2">
                             Hash
                           </Typography>
-                          <Typography className="font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg">
+                          <Typography className={`font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg ${isMobile ? 'text-sm' : ''}`}>
                             {
                               selectedBlock.body.coinbase.data.validator_fee
                                 .hash
                             }
                           </Typography>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className={`grid grid-cols-1 ${isMobile ? 'gap-4' : 'md:grid-cols-2 gap-4'}`}>
                           <div>
                             <Typography className="text-gray-400 mb-2">
                               From
                             </Typography>
-                            <Typography className="font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg">
+                            <Typography className={`font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg ${isMobile ? 'text-sm' : ''}`}>
                               {
                                 selectedBlock.body.coinbase.data.validator_fee
                                   .data.from
@@ -648,7 +660,7 @@ export default function BlockExplorer() {
                             <Typography className="text-gray-400 mb-2">
                               To
                             </Typography>
-                            <Typography className="font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg">
+                            <Typography className={`font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg ${isMobile ? 'text-sm' : ''}`}>
                               {
                                 selectedBlock.body.coinbase.data.validator_fee
                                   .data.to
@@ -660,7 +672,7 @@ export default function BlockExplorer() {
                           <Typography className="text-gray-400 mb-2">
                             Value
                           </Typography>
-                          <Typography className="font-mono text-white bg-zinc-800/50 p-3 rounded-lg">
+                          <Typography className={`font-mono text-white bg-zinc-800/50 p-3 rounded-lg ${isMobile ? 'text-sm' : ''}`}>
                             {
                               selectedBlock.body.coinbase.data.validator_fee
                                 .data.value
