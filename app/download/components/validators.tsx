@@ -36,7 +36,7 @@ function Validators() {
     {
       icon: SiWindows,
       text: "Windows",
-      link: "https://centichain.org/downloads/updates/windows/x64/v0.17.3/Centichain_0.17.3_x64_en-US.msi",
+      link: "https://centichain.org/downloads/updates/windows/x64/v0.17.4/Centichain_0.17.4_x64_en-US.msi",
       available: true,
       requirements: "Windows 10 or later, 64-bit processor required",
       size: "15 MB"
@@ -120,7 +120,7 @@ function Validators() {
           {/* Info Section */}
           <motion.div variants={itemVariants} className="text-center space-y-4 md:space-y-6">
             <Typography variant="body1" className="text-sm md:text-base text-gray-400">
-              Latest Release: <span className="text-gray-300 font-semibold">Version 0.17.3</span>
+              Latest Release: <span className="text-gray-300 font-semibold">Version 0.17.4</span>
             </Typography>
             
             <div className="flex justify-center">
