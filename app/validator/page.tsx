@@ -23,6 +23,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { Metadata } from "next";
 
 interface Post {
   _id: string;

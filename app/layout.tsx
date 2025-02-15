@@ -5,12 +5,12 @@ import Menu from "./components/menu";
 import Footer from "./components/footer";
 
 export const metadata: Metadata = {
-  title: "Centichain: No Mining,No Staking,No Problem",
+  title: {
+    default: "Centichain: No Mining,No Staking,No Problem",
+    template: "%s | Centichain",
+  },
   description: "A blockchain network that is easy",
 };
-
-const title = "Centichain: No Mining,No Staking,No Problem";
-const description = "A blockchain network that is easy";
 
 export default function RootLayout({
   children,
@@ -45,18 +45,36 @@ export default function RootLayout({
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="theme-color" content="#ffffff" />
         {/* Open Graph meta tags for Facebook, LinkedIn, etc. */}
-        <meta property="og:title" content={title} />
-        <meta property="og:description" content={description} />
-        <meta property="og:image" content="https://centichain.org/images/Logo.png" />
+        <meta
+          property="og:title"
+          content="Centichain: No Mining,No Staking,No Problem"
+        />
+        <meta
+          property="og:description"
+          content="A blockchain network that is easy"
+        />
+        <meta
+          property="og:image"
+          content="https://centichain.org/images/Logo.png"
+        />
         <meta property="og:url" content="https://centichain.org" />
         <meta property="og:type" content="website" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
 
         {/* Twitter meta tags */}
-        <meta name="twitter:title" content={title} />
-        <meta name="twitter:description" content={description} />
-        <meta name="twitter:image" content="https://centichain.org/images/Logo.png" />
+        <meta
+          name="twitter:title"
+          content="Centichain: No Mining,No Staking,No Problem"
+        />
+        <meta
+          name="twitter:description"
+          content="A blockchain network that is easy"
+        />
+        <meta
+          name="twitter:image"
+          content="https://centichain.org/images/Logo.png"
+        />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@centichain" />
       </head>
