@@ -17,7 +17,7 @@ interface Contributor {
 }
 
 type SortType = "date" | "active_days";
-type TabValue = "all" | "relay" | "validator" | "active" | "deactive";
+type TabValue = "all" | "relay" | "validator";
 
 export default function Contributors() {
   const [contributors, setContributors] = useState<Contributor[] | null>(null);
@@ -26,7 +26,7 @@ export default function Contributors() {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [sortType, setSortType] = useState<SortType>("active_days");
-  const [currentTab, setCurrentTab] = useState<TabValue>("active");
+  const [currentTab, setCurrentTab] = useState<TabValue>("all");
   const [copiedWallet, setCopiedWallet] = useState<string | null>(null);
   const [selectedContributor, setSelectedContributor] = useState<Contributor | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -39,7 +39,9 @@ export default function Contributors() {
         const response = await fetch("/api/contributors");
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
-        setContributors(Array.isArray(data) ? data : []);
+        // Only keep active contributors
+        const activeContributors = Array.isArray(data) ? data.filter(c => !c.deactive_date) : [];
+        setContributors(activeContributors);
       } catch (error) {
         console.error("Error fetching contributors:", error);
         setContributors([]);
@@ -62,45 +64,13 @@ export default function Contributors() {
       );
     }
 
-    if (currentTab === "active") {
-      // Group by wallet
-      const walletGroups = filtered.reduce((acc, curr) => {
-        if (!acc[curr.wallet]) {
-          acc[curr.wallet] = [];
-        }
-        acc[curr.wallet].push(curr);
-        return acc;
-      }, {} as Record<string, Contributor[]>);
-
-      // Filter wallets that have at least one active node (deactive_date is null or empty string)
-      filtered = filtered.filter(contributor => {
-        const walletDocs = walletGroups[contributor.wallet];
-        return walletDocs.some(doc => !doc.deactive_date || doc.deactive_date === '');
-      });
-    } else if (currentTab === "deactive") {
-      // Group by wallet
-      const walletGroups = filtered.reduce((acc, curr) => {
-        if (!acc[curr.wallet]) {
-          acc[curr.wallet] = [];
-        }
-        acc[curr.wallet].push(curr);
-        return acc;
-      }, {} as Record<string, Contributor[]>);
-
-      // Filter wallets where all nodes are deactive (have deactive_date and not empty string)
-      filtered = filtered.filter(contributor => {
-        const walletDocs = walletGroups[contributor.wallet];
-        return walletDocs.every(doc => doc.deactive_date && doc.deactive_date !== '');
-      });
-    } else if (currentTab === "relay") {
+    if (currentTab === "relay") {
       filtered = filtered.filter(contributor => 
-        contributor.node_type.toLowerCase() === "relay" && 
-        !contributor.deactive_date
+        contributor.node_type.toLowerCase() === "relay"
       );
     } else if (currentTab === "validator") {
       filtered = filtered.filter(contributor => 
-        contributor.node_type.toLowerCase() === "validator" && 
-        !contributor.deactive_date
+        contributor.node_type.toLowerCase() === "validator"
       );
     }
     
@@ -108,9 +78,9 @@ export default function Contributors() {
     setCurrentPage(1);
   }, [searchTerm, contributors, currentTab]);
 
-  const calculateActiveTime = (joinDate: string, deactiveDate: string | null): { days: number, hours: number, minutes: number } => {
+  const calculateActiveTime = (joinDate: string): { days: number, hours: number, minutes: number } => {
     const start = new Date(joinDate);
-    const end = deactiveDate ? new Date(deactiveDate) : new Date();
+    const end = new Date();
     const diffTime = Math.abs(end.getTime() - start.getTime());
     const days = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -147,8 +117,8 @@ export default function Contributors() {
         const dateB = new Date(b.join_date).getTime();
         return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
       } else {
-        const timeA = calculateActiveTime(a.join_date, a.deactive_date);
-        const timeB = calculateActiveTime(b.join_date, b.deactive_date);
+        const timeA = calculateActiveTime(a.join_date);
+        const timeB = calculateActiveTime(b.join_date);
         const totalMinutesA = timeA.days * 24 * 60 + timeA.hours * 60 + timeA.minutes;
         const totalMinutesB = timeB.days * 24 * 60 + timeB.hours * 60 + timeB.minutes;
         return sortOrder === "asc" ? totalMinutesA - totalMinutesB : totalMinutesB - totalMinutesA;
@@ -179,29 +149,10 @@ export default function Contributors() {
     );
   }
 
-  // Group by wallet for accurate counts
-  const walletGroups = contributors.reduce((acc, curr) => {
-    if (!acc[curr.wallet]) {
-      acc[curr.wallet] = [];
-    }
-    acc[curr.wallet].push(curr);
-    return acc;
-  }, {} as Record<string, Contributor[]>);
-
-  const activeWallets = Object.values(walletGroups).filter(docs => 
-    docs.some(doc => !doc.deactive_date || doc.deactive_date === '')
-  ).length;
-
-  const deactiveWallets = Object.values(walletGroups).filter(docs => 
-    docs.every(doc => doc.deactive_date && doc.deactive_date !== '')
-  ).length;
-
   const tabs = [
     { value: 'all', label: `All (${contributors.length})` },
-    { value: 'active', label: `Actives (${activeWallets})` },
-    { value: 'relay', label: `Relays (${contributors.filter(c => c.node_type.toLowerCase() === 'relay' && !c.deactive_date).length})` },
-    { value: 'validator', label: `Validators (${contributors.filter(c => c.node_type.toLowerCase() === 'validator' && !c.deactive_date).length})` },
-    { value: 'deactive', label: `Deactives (${deactiveWallets})` }
+    { value: 'relay', label: `Relays (${contributors.filter(c => c.node_type.toLowerCase() === 'relay').length})` },
+    { value: 'validator', label: `Validators (${contributors.filter(c => c.node_type.toLowerCase() === 'validator').length})` }
   ] as const;
 
   return (
@@ -249,7 +200,6 @@ export default function Contributors() {
           </div>
         )}
 
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {displayContributors.map((contributor) => (
             <motion.div
@@ -279,11 +229,7 @@ export default function Contributors() {
                   </div>
                 </div>
                 <div>
-                  {contributor.deactive_date ? (
-                    <span className="text-red-400">DEACTIVE</span>
-                  ) : (
-                    <span className="text-emerald-400">ACTIVE</span>
-                  )}
+                  <span className="text-emerald-400">ACTIVE</span>
                 </div>
               </div>
 
@@ -312,10 +258,7 @@ export default function Contributors() {
                   <div className="flex items-center gap-2">
                     <FaClock className="text-gray-400" />
                     {(() => {
-                      const { days, hours, minutes } = calculateActiveTime(
-                        contributor.join_date, 
-                        contributor.deactive_date
-                      );
+                      const { days, hours, minutes } = calculateActiveTime(contributor.join_date);
                       if (days > 0) {
                         return <span className="text-orange-400">{days}d {hours}h</span>;
                       } else if (hours > 0 || minutes >= 60) {
@@ -403,8 +346,8 @@ export default function Contributors() {
                   </div>
                   <div className="bg-black/20 p-4 rounded-lg">
                     <Typography className="text-gray-400 mb-1">Status</Typography>
-                    <Typography className={selectedContributor.deactive_date ? "text-red-400" : "text-emerald-400"}>
-                      {selectedContributor.deactive_date ? "DEACTIVE" : "ACTIVE"}
+                    <Typography className="text-emerald-400">
+                      ACTIVE
                     </Typography>
                   </div>
                 </div>
@@ -439,8 +382,7 @@ export default function Contributors() {
                     <Typography className="text-orange-400">
                       {(() => {
                         const { days, hours, minutes } = calculateActiveTime(
-                          selectedContributor.join_date,
-                          selectedContributor.deactive_date
+                          selectedContributor.join_date
                         );
                         if (days > 0) {
                           return `${days} days, ${hours} hours, ${minutes} minutes`;
