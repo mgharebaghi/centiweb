@@ -63,9 +63,35 @@ export default function Contributors() {
     }
 
     if (currentTab === "active") {
-      filtered = filtered.filter(contributor => !contributor.deactive_date);
+      // Group by wallet
+      const walletGroups = filtered.reduce((acc, curr) => {
+        if (!acc[curr.wallet]) {
+          acc[curr.wallet] = [];
+        }
+        acc[curr.wallet].push(curr);
+        return acc;
+      }, {} as Record<string, Contributor[]>);
+
+      // Filter wallets that have at least one active node (deactive_date is null or empty string)
+      filtered = filtered.filter(contributor => {
+        const walletDocs = walletGroups[contributor.wallet];
+        return walletDocs.some(doc => !doc.deactive_date || doc.deactive_date === '');
+      });
     } else if (currentTab === "deactive") {
-      filtered = filtered.filter(contributor => contributor.deactive_date);
+      // Group by wallet
+      const walletGroups = filtered.reduce((acc, curr) => {
+        if (!acc[curr.wallet]) {
+          acc[curr.wallet] = [];
+        }
+        acc[curr.wallet].push(curr);
+        return acc;
+      }, {} as Record<string, Contributor[]>);
+
+      // Filter wallets where all nodes are deactive (have deactive_date and not empty string)
+      filtered = filtered.filter(contributor => {
+        const walletDocs = walletGroups[contributor.wallet];
+        return walletDocs.every(doc => doc.deactive_date && doc.deactive_date !== '');
+      });
     } else if (currentTab === "relay") {
       filtered = filtered.filter(contributor => 
         contributor.node_type.toLowerCase() === "relay" && 
@@ -153,12 +179,29 @@ export default function Contributors() {
     );
   }
 
+  // Group by wallet for accurate counts
+  const walletGroups = contributors.reduce((acc, curr) => {
+    if (!acc[curr.wallet]) {
+      acc[curr.wallet] = [];
+    }
+    acc[curr.wallet].push(curr);
+    return acc;
+  }, {} as Record<string, Contributor[]>);
+
+  const activeWallets = Object.values(walletGroups).filter(docs => 
+    docs.some(doc => !doc.deactive_date || doc.deactive_date === '')
+  ).length;
+
+  const deactiveWallets = Object.values(walletGroups).filter(docs => 
+    docs.every(doc => doc.deactive_date && doc.deactive_date !== '')
+  ).length;
+
   const tabs = [
     { value: 'all', label: `All (${contributors.length})` },
-    { value: 'active', label: `Actives (${contributors.filter(c => !c.deactive_date).length})` },
+    { value: 'active', label: `Actives (${activeWallets})` },
     { value: 'relay', label: `Relays (${contributors.filter(c => c.node_type.toLowerCase() === 'relay' && !c.deactive_date).length})` },
     { value: 'validator', label: `Validators (${contributors.filter(c => c.node_type.toLowerCase() === 'validator' && !c.deactive_date).length})` },
-    { value: 'deactive', label: `Deactives (${contributors.filter(c => c.deactive_date).length})` }
+    { value: 'deactive', label: `Deactives (${deactiveWallets})` }
   ] as const;
 
   return (
