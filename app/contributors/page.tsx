@@ -48,6 +48,14 @@ export default function Contributors() {
     }
   };
 
+  const formatPeerId = (peerId: string, nodeType: string) => {
+    if (nodeType.toLowerCase() === "relay") {
+      const parts = peerId.split("/p2p/");
+      return parts.length > 1 ? parts[1] : peerId;
+    }
+    return peerId;
+  };
+
   useEffect(() => {
     const fetchContributors = async () => {
       try {
@@ -194,7 +202,7 @@ export default function Contributors() {
               <div className="mt-2">
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-gray-300 truncate">
-                    Peer ID: {contributor.peerid}
+                    Peer ID: {formatPeerId(contributor.peerid, contributor.node_type)}
                   </p>
                   <button 
                     onClick={() => copyToClipboard(contributor.peerid)}
