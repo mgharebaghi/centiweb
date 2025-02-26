@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Container } from "@mui/material";
-import { FaNetworkWired, FaShieldAlt, FaSearch, FaSortAmountDown, FaSortAmountUp } from "react-icons/fa";
+import { FaNetworkWired, FaShieldAlt, FaSearch, FaSortAmountDown, FaSortAmountUp, FaCopy } from "react-icons/fa";
 
 interface Contributor {
   peerid: string;
@@ -20,6 +20,27 @@ export default function Contributors() {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const itemsPerPage = 9;
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+  };
+
+  const getTimeAgo = (date: string) => {
+    const now = new Date();
+    const joinDate = new Date(date);
+    const diffInMs = now.getTime() - joinDate.getTime();
+    const diffInMins = Math.floor(diffInMs / (1000 * 60));
+    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+
+    if (diffInDays > 0) {
+      return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+    } else if (diffInHours > 0) {
+      return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+    } else {
+      return `${diffInMins} minute${diffInMins > 1 ? 's' : ''} ago`;
+    }
+  };
 
   useEffect(() => {
     const fetchContributors = async () => {
@@ -143,22 +164,37 @@ export default function Contributors() {
                 ) : (
                   <FaShieldAlt className="text-emerald-400" />
                 )}
-                <div className="min-w-0">
-                  <span className="text-white block truncate">
-                    {contributor.wallet.slice(0, 6)}...
-                    {contributor.wallet.slice(-4)}
-                  </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-white block truncate">
+                      {contributor.wallet.slice(0, 6)}...{contributor.wallet.slice(-4)}
+                    </span>
+                    <button 
+                      onClick={() => copyToClipboard(contributor.wallet)}
+                      className="text-gray-400 hover:text-white"
+                    >
+                      <FaCopy />
+                    </button>
+                  </div>
                   <p className="text-sm text-gray-400 truncate">
                     {contributor.node_type}
                   </p>
                 </div>
               </div>
               <div className="mt-2">
-                <p className="text-sm text-gray-300 truncate">
-                  Peer ID: {contributor.peerid}
-                </p>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-gray-300 truncate">
+                    Peer ID: {contributor.peerid}
+                  </p>
+                  <button 
+                    onClick={() => copyToClipboard(contributor.peerid)}
+                    className="text-gray-400 hover:text-white"
+                  >
+                    <FaCopy />
+                  </button>
+                </div>
                 <p className="text-sm text-gray-300">
-                  Joined: {new Date(contributor.join_date).toLocaleDateString()}
+                  Joined: {getTimeAgo(contributor.join_date)}
                 </p>
               </div>
             </div>
