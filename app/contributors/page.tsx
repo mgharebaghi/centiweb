@@ -16,24 +16,8 @@ export default function Contributors() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
-  const [itemsPerPage, setItemsPerPage] = useState(getInitialItemsPerPage());
   const [activeTab, setActiveTab] = useState<'all' | 'relay' | 'validator'>('all');
-
-  function getInitialItemsPerPage() {
-    if (typeof window !== 'undefined') {
-      if (window.innerWidth >= 1280) return 16;
-      if (window.innerWidth >= 1024) return 12;
-      if (window.innerWidth >= 768) return 8;
-      return 6;
-    }
-    return 16;
-  }
-
-  useEffect(() => {
-    const handleResize = () => setItemsPerPage(getInitialItemsPerPage());
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  const itemsPerPage = 12;
 
   useEffect(() => {
     const fetchContributors = async () => {
