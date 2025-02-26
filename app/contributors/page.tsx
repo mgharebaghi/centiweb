@@ -55,7 +55,7 @@ export default function Contributors() {
   if (!contributors) {
     return (
       <div className="min-h-screen bg-[#111827] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -92,8 +92,8 @@ export default function Contributors() {
     <div className="min-h-screen bg-[#111827] pt-20 px-4 sm:px-6 lg:px-8">
       <Container maxWidth="xl">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
-            Network Contributors
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-400 to-green-500 bg-clip-text text-transparent">
+            Active Network Participants
           </h1>
           <div className="flex items-center gap-4 w-full md:w-auto">
             <div className="relative flex-1 md:flex-none">
@@ -103,14 +103,14 @@ export default function Contributors() {
                 placeholder="Search by PeerID or Wallet"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full md:w-64 pl-10 pr-4 py-3 bg-[#1F2937] text-white rounded-lg border border-gray-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all"
+                className="w-full md:w-64 pl-10 pr-4 py-3 bg-[#1F2937] text-white rounded-lg border border-gray-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
               />
             </div>
             <button
               onClick={() => setSortDirection(prev => prev === 'desc' ? 'asc' : 'desc')}
               className="p-3 bg-[#1F2937] rounded-lg border border-gray-600 hover:bg-[#374151] transition-all"
             >
-              {sortDirection === 'desc' ? <FaSortAmountDown className="text-purple-400" /> : <FaSortAmountUp className="text-purple-400" />}
+              {sortDirection === 'desc' ? <FaSortAmountDown className="text-emerald-400" /> : <FaSortAmountUp className="text-emerald-400" />}
             </button>
           </div>
         </div>
@@ -119,7 +119,7 @@ export default function Contributors() {
           {paginatedContributors.map((contributor) => (
             <div
               key={contributor.peerid}
-              className="p-6 bg-[#1F2937] rounded-xl border border-gray-600 hover:border-purple-500 transition-all duration-300 transform hover:-translate-y-1"
+              className="p-6 bg-[#1F2937] rounded-xl border border-gray-600 hover:border-emerald-500 transition-all duration-300 transform hover:-translate-y-1"
             >
               <div className="flex items-center gap-3">
                 {contributor.node_type.toLowerCase() === "relay" ? (
@@ -127,8 +127,8 @@ export default function Contributors() {
                     <FaNetworkWired className="text-blue-400 text-xl" />
                   </div>
                 ) : (
-                  <div className="p-2 bg-purple-500/10 rounded-lg">
-                    <FaShieldAlt className="text-purple-400 text-xl" />
+                  <div className="p-2 bg-emerald-500/10 rounded-lg">
+                    <FaShieldAlt className="text-emerald-400 text-xl" />
                   </div>
                 )}
                 <div className="min-w-0 flex-1">
@@ -138,7 +138,7 @@ export default function Contributors() {
                     </span>
                     <button 
                       onClick={() => navigator.clipboard.writeText(contributor.wallet)}
-                      className="text-gray-400 hover:text-purple-400 transition-colors"
+                      className="text-gray-400 hover:text-emerald-400 transition-colors"
                     >
                       <FaCopy />
                     </button>
@@ -156,14 +156,14 @@ export default function Contributors() {
                     {contributor.peerid}
                     <button 
                       onClick={() => navigator.clipboard.writeText(contributor.peerid)}
-                      className="ml-2 text-gray-400 hover:text-purple-400 transition-colors"
+                      className="ml-2 text-gray-400 hover:text-emerald-400 transition-colors"
                     >
                       <FaCopy />
                     </button>
                   </div>
                 </div>
                 <p className="text-sm text-gray-400 mt-3">
-                  Joined: <span className="text-purple-400">{getTimeAgo(contributor.join_date)}</span>
+                  Joined: <span className="text-emerald-400">{getTimeAgo(contributor.join_date)}</span>
                 </p>
               </div>
             </div>
