@@ -10,6 +10,8 @@ import {
   FaSortAmountUp,
   FaCopy,
 } from "react-icons/fa";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface Contributor {
   peerid: string;
@@ -54,9 +56,23 @@ export default function Contributors() {
   const handleCopy = async (text: string, type: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      alert(`${type} copied to clipboard!`);
+      toast.success(`${type} copied to clipboard!`, {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     } catch (err) {
-      alert('Failed to copy text');
+      toast.error('Failed to copy text', {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     }
   };
 
@@ -274,6 +290,7 @@ export default function Contributors() {
           </div>
         )}
       </Container>
+      <ToastContainer />
     </div>
   );
 }
