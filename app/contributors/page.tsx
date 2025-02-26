@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Container } from "@mui/material";
-import { FaNetworkWired, FaShieldAlt } from "react-icons/fa";
+import { FaNetworkWired, FaShieldAlt, FaSearch, FaSortAmountDown, FaSortAmountUp } from "react-icons/fa";
 
 interface Contributor {
   peerid: string;
@@ -16,6 +16,10 @@ type TabValue = "all" | "relay" | "validator";
 export default function Contributors() {
   const [contributors, setContributors] = useState<Contributor[] | null>(null);
   const [currentTab, setCurrentTab] = useState<TabValue>("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const itemsPerPage = 9;
 
   useEffect(() => {
     const fetchContributors = async () => {
@@ -51,6 +55,8 @@ export default function Contributors() {
   ] as const;
 
   let displayContributors = [...contributors];
+
+  // Filter by tab
   if (currentTab === "relay") {
     displayContributors = displayContributors.filter(
       (contributor) => contributor.node_type.toLowerCase() === "relay"
@@ -61,6 +67,27 @@ export default function Contributors() {
     );
   }
 
+  // Filter by search
+  if (searchTerm) {
+    displayContributors = displayContributors.filter(
+      (contributor) =>
+        contributor.peerid.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        contributor.wallet.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }
+
+  // Sort by date
+  displayContributors.sort((a, b) => {
+    const dateA = new Date(a.join_date).getTime();
+    const dateB = new Date(b.join_date).getTime();
+    return sortDirection === 'desc' ? dateB - dateA : dateA - dateB;
+  });
+
+  // Pagination
+  const totalPages = Math.ceil(displayContributors.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedContributors = displayContributors.slice(startIndex, startIndex + itemsPerPage);
+
   return (
     <div className="min-h-screen bg-[#0A0A0A] pt-20">
       <Container maxWidth="lg">
@@ -68,6 +95,24 @@ export default function Contributors() {
           <h1 className="text-2xl font-bold text-white">
             Network Contributors
           </h1>
+          <div className="flex items-center gap-4 w-full md:w-auto">
+            <div className="relative flex-1 md:flex-none">
+              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by PeerID or Wallet"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full md:w-64 pl-10 pr-4 py-2 bg-[#1A1A1A] text-white rounded border border-gray-700 focus:outline-none focus:border-emerald-500"
+              />
+            </div>
+            <button
+              onClick={() => setSortDirection(prev => prev === 'desc' ? 'asc' : 'desc')}
+              className="p-2 bg-[#1A1A1A] rounded border border-gray-700 hover:bg-[#222]"
+            >
+              {sortDirection === 'desc' ? <FaSortAmountDown className="text-gray-300" /> : <FaSortAmountUp className="text-gray-300" />}
+            </button>
+          </div>
         </div>
 
         <div className="flex gap-2 overflow-x-auto mb-4 pb-2">
@@ -87,7 +132,7 @@ export default function Contributors() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {displayContributors.map((contributor) => (
+          {paginatedContributors.map((contributor) => (
             <div
               key={contributor.peerid}
               className="p-4 bg-[#1A1A1A] rounded border border-gray-700"
@@ -119,6 +164,28 @@ export default function Contributors() {
             </div>
           ))}
         </div>
+
+        {totalPages > 1 && (
+          <div className="flex justify-center gap-2 mt-6">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 bg-[#1A1A1A] text-gray-300 rounded border border-gray-700 disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <span className="px-4 py-2 text-white">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 bg-[#1A1A1A] text-gray-300 rounded border border-gray-700 disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        )}
       </Container>
     </div>
   );
