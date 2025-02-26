@@ -2,7 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { Container } from "@mui/material";
-import { FaNetworkWired, FaShieldAlt, FaSearch, FaSortAmountDown, FaSortAmountUp, FaCopy } from "react-icons/fa";
+import {
+  FaNetworkWired,
+  FaShieldAlt,
+  FaSearch,
+  FaSortAmountDown,
+  FaSortAmountUp,
+  FaCopy,
+} from "react-icons/fa";
 
 interface Contributor {
   peerid: string;
@@ -15,18 +22,25 @@ export default function Contributors() {
   const [contributors, setContributors] = useState<Contributor[] | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
-  const [activeTab, setActiveTab] = useState<'all' | 'relay' | 'validator'>('all');
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [activeTab, setActiveTab] = useState<"all" | "relay" | "validator">(
+    "all"
+  );
   const itemsPerPage = 12;
 
   useEffect(() => {
     const fetchContributors = async () => {
       try {
         const response = await fetch("/api/contributors");
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok)
+          throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         const activeContributors = Array.isArray(data)
-          ? data.sort((a, b) => new Date(b.join_date).getTime() - new Date(a.join_date).getTime())
+          ? data.sort(
+              (a, b) =>
+                new Date(b.join_date).getTime() -
+                new Date(a.join_date).getTime()
+            )
           : [];
         setContributors(activeContributors);
       } catch (error) {
@@ -48,9 +62,9 @@ export default function Contributors() {
   let displayContributors = [...contributors];
 
   // Filter by tab
-  if (activeTab !== 'all') {
+  if (activeTab !== "all") {
     displayContributors = displayContributors.filter(
-      contributor => contributor.node_type.toLowerCase() === activeTab
+      (contributor) => contributor.node_type.toLowerCase() === activeTab
     );
   }
 
@@ -66,12 +80,15 @@ export default function Contributors() {
   displayContributors.sort((a, b) => {
     const dateA = new Date(a.join_date).getTime();
     const dateB = new Date(b.join_date).getTime();
-    return sortDirection === 'desc' ? dateB - dateA : dateA - dateB;
+    return sortDirection === "desc" ? dateB - dateA : dateA - dateB;
   });
 
   const totalPages = Math.ceil(displayContributors.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedContributors = displayContributors.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedContributors = displayContributors.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
 
   const getTimeAgo = (date: string) => {
     const now = new Date();
@@ -81,11 +98,15 @@ export default function Contributors() {
     return `${diffInDays} days ago`;
   };
 
-  const relayCount = contributors.filter(c => c.node_type.toLowerCase() === 'relay').length;
-  const validatorCount = contributors.filter(c => c.node_type.toLowerCase() === 'validator').length;
+  const relayCount = contributors.filter(
+    (c) => c.node_type.toLowerCase() === "relay"
+  ).length;
+  const validatorCount = contributors.filter(
+    (c) => c.node_type.toLowerCase() === "validator"
+  ).length;
 
   return (
-    <div className="min-h-screen bg-[#111827] pt-16 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#111827] pt-24 px-4 sm:px-6 lg:px-8">
       <Container maxWidth="xl">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
           <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-green-500 bg-clip-text text-transparent">
@@ -103,41 +124,47 @@ export default function Contributors() {
               />
             </div>
             <button
-              onClick={() => setSortDirection(prev => prev === 'desc' ? 'asc' : 'desc')}
+              onClick={() =>
+                setSortDirection((prev) => (prev === "desc" ? "asc" : "desc"))
+              }
               className="p-2 bg-[#1F2937] rounded-lg border border-gray-600 hover:bg-[#374151] transition-all"
             >
-              {sortDirection === 'desc' ? <FaSortAmountDown className="text-emerald-400" /> : <FaSortAmountUp className="text-emerald-400" />}
+              {sortDirection === "desc" ? (
+                <FaSortAmountDown className="text-emerald-400" />
+              ) : (
+                <FaSortAmountUp className="text-emerald-400" />
+              )}
             </button>
           </div>
         </div>
 
         <div className="flex gap-4 mb-6">
           <button
-            onClick={() => setActiveTab('all')}
+            onClick={() => setActiveTab("all")}
             className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
-              activeTab === 'all' 
-                ? 'bg-emerald-500 text-white' 
-                : 'bg-[#1F2937] text-gray-300 hover:bg-[#374151]'
+              activeTab === "all"
+                ? "bg-emerald-500 text-white"
+                : "bg-[#1F2937] text-gray-300 hover:bg-[#374151]"
             }`}
           >
             All ({contributors.length})
           </button>
           <button
-            onClick={() => setActiveTab('relay')}
+            onClick={() => setActiveTab("relay")}
             className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
-              activeTab === 'relay' 
-                ? 'bg-blue-500 text-white' 
-                : 'bg-[#1F2937] text-gray-300 hover:bg-[#374151]'
+              activeTab === "relay"
+                ? "bg-blue-500 text-white"
+                : "bg-[#1F2937] text-gray-300 hover:bg-[#374151]"
             }`}
           >
             <FaNetworkWired /> Relays ({relayCount})
           </button>
           <button
-            onClick={() => setActiveTab('validator')}
+            onClick={() => setActiveTab("validator")}
             className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
-              activeTab === 'validator' 
-                ? 'bg-emerald-500 text-white' 
-                : 'bg-[#1F2937] text-gray-300 hover:bg-[#374151]'
+              activeTab === "validator"
+                ? "bg-emerald-500 text-white"
+                : "bg-[#1F2937] text-gray-300 hover:bg-[#374151]"
             }`}
           >
             <FaShieldAlt /> Validators ({validatorCount})
@@ -163,10 +190,13 @@ export default function Contributors() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between">
                     <span className="text-base font-medium text-white block truncate">
-                      {contributor.wallet.slice(0, 6)}...{contributor.wallet.slice(-4)}
+                      {contributor.wallet.slice(0, 6)}...
+                      {contributor.wallet.slice(-4)}
                     </span>
-                    <button 
-                      onClick={() => navigator.clipboard.writeText(contributor.wallet)}
+                    <button
+                      onClick={() =>
+                        navigator.clipboard.writeText(contributor.wallet)
+                      }
                       className="text-gray-400 hover:text-emerald-400 transition-colors"
                     >
                       <FaCopy />
@@ -177,14 +207,16 @@ export default function Contributors() {
                   </p>
                 </div>
               </div>
-              
+
               <div className="mt-3 pt-3 border-t border-gray-600">
                 <div className="text-xs text-gray-300">
                   <span className="text-gray-400">Peer ID:</span>
                   <div className="mt-1 break-all font-mono bg-[#374151] p-2 rounded-lg text-xs">
                     {contributor.peerid}
-                    <button 
-                      onClick={() => navigator.clipboard.writeText(contributor.peerid)}
+                    <button
+                      onClick={() =>
+                        navigator.clipboard.writeText(contributor.peerid)
+                      }
                       className="ml-2 text-gray-400 hover:text-emerald-400 transition-colors"
                     >
                       <FaCopy />
@@ -192,7 +224,10 @@ export default function Contributors() {
                   </div>
                 </div>
                 <p className="text-xs text-gray-400 mt-2">
-                  Joined: <span className="text-emerald-400">{getTimeAgo(contributor.join_date)}</span>
+                  Joined:{" "}
+                  <span className="text-emerald-400">
+                    {getTimeAgo(contributor.join_date)}
+                  </span>
                 </p>
               </div>
             </div>
@@ -202,7 +237,7 @@ export default function Contributors() {
         {totalPages > 1 && (
           <div className="flex justify-center gap-4 mt-6">
             <button
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
               className="px-4 py-1.5 bg-[#1F2937] text-white rounded-lg border border-gray-600 hover:bg-[#374151] disabled:opacity-50 disabled:hover:bg-[#1F2937] transition-all text-sm"
             >
@@ -212,7 +247,9 @@ export default function Contributors() {
               {currentPage} of {totalPages}
             </span>
             <button
-              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+              }
               disabled={currentPage === totalPages}
               className="px-4 py-1.5 bg-[#1F2937] text-white rounded-lg border border-gray-600 hover:bg-[#374151] disabled:opacity-50 disabled:hover:bg-[#1F2937] transition-all text-sm"
             >
