@@ -19,7 +19,7 @@ export default function Contributors() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
-  const itemsPerPage = 9;
+  const itemsPerPage = 12; // Increased from 9 to show more items
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -57,6 +57,7 @@ export default function Contributors() {
         const data = await response.json();
         const activeContributors = Array.isArray(data)
           ? data.filter((c) => !c.deactive_date)
+            .sort((a, b) => new Date(b.join_date).getTime() - new Date(a.join_date).getTime()) // Sort by join date descending
           : [];
         setContributors(activeContributors);
       } catch (error) {
@@ -203,7 +204,7 @@ export default function Contributors() {
                   </button>
                 </div>
                 <p className="text-sm text-gray-300">
-                  Joined: <span className="text-orange-500">{new Date(contributor.join_date).toLocaleDateString()} ({getTimeAgo(contributor.join_date)})</span>
+                  Joined: <span className="text-emerald-400">{getTimeAgo(contributor.join_date)}</span>
                 </p>
               </div>
             </div>
