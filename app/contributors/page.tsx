@@ -18,8 +18,26 @@ export default function Contributors() {
   const [currentTab, setCurrentTab] = useState<TabValue>("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc'); // Default to desc
-  const itemsPerPage = 12; // Increased from 9 to show more items
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [itemsPerPage, setItemsPerPage] = useState(getInitialItemsPerPage());
+
+  function getInitialItemsPerPage() {
+    if (typeof window !== 'undefined') {
+      if (window.innerWidth >= 1280) return 12; // xl screens
+      if (window.innerWidth >= 1024) return 9; // lg screens  
+      if (window.innerWidth >= 768) return 6; // md screens
+      return 4; // sm screens
+    }
+    return 12; // default for SSR
+  }
+
+  useEffect(() => {
+    function handleResize() {
+      setItemsPerPage(getInitialItemsPerPage());
+    }
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -65,7 +83,7 @@ export default function Contributors() {
         const data = await response.json();
         const activeContributors = Array.isArray(data)
           ? data.filter((c) => !c.deactive_date)
-            .sort((a, b) => new Date(b.join_date).getTime() - new Date(a.join_date).getTime()) // Sort by join date descending
+            .sort((a, b) => new Date(b.join_date).getTime() - new Date(a.join_date).getTime())
           : [];
         setContributors(activeContributors);
       } catch (error) {
@@ -86,7 +104,6 @@ export default function Contributors() {
 
   let displayContributors = [...contributors];
 
-  // Filter by tab
   let relayCount = contributors.filter(c => c.node_type.toLowerCase() === "relay").length;
   let validatorCount = contributors.filter(c => c.node_type.toLowerCase() === "validator").length;
 
@@ -106,7 +123,6 @@ export default function Contributors() {
     );
   }
 
-  // Filter by search
   if (searchTerm) {
     displayContributors = displayContributors.filter(
       (contributor) =>
@@ -115,21 +131,19 @@ export default function Contributors() {
     );
   }
 
-  // Sort by date
   displayContributors.sort((a, b) => {
     const dateA = new Date(a.join_date).getTime();
     const dateB = new Date(b.join_date).getTime();
     return sortDirection === 'desc' ? dateB - dateA : dateA - dateB;
   });
 
-  // Pagination
   const totalPages = Math.ceil(displayContributors.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedContributors = displayContributors.slice(startIndex, startIndex + itemsPerPage);
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] pt-20">
-      <Container maxWidth="lg">
+    <div className="min-h-screen bg-[#0A0A0A] pt-20 px-4 sm:px-6 lg:px-8">
+      <Container maxWidth="xl">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
           <h1 className="text-2xl font-bold text-white">
             Network Contributors
@@ -170,7 +184,7 @@ export default function Contributors() {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {paginatedContributors.map((contributor) => (
             <div
               key={contributor.peerid}
@@ -178,9 +192,9 @@ export default function Contributors() {
             >
               <div className="flex items-center gap-2">
                 {contributor.node_type.toLowerCase() === "relay" ? (
-                  <FaNetworkWired className="text-blue-400" />
+                  <FaNetworkWired className="text-blue-400 flex-shrink-0" />
                 ) : (
-                  <FaShieldAlt className="text-emerald-400" />
+                  <FaShieldAlt className="text-emerald-400 flex-shrink-0" />
                 )}
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between">
@@ -189,38 +203,39 @@ export default function Contributors() {
                     </span>
                     <button 
                       onClick={() => copyToClipboard(contributor.wallet)}
-                      className="text-gray-400 hover:text-white"
+                      className="text-gray-400 hover:text-white flex-shrink-0"
                     >
                       <FaCopy />
                     </button>
                   </div>
-                  <p className="text-sm text-gray-400 truncate">
+                  <p className="text-sm text-gray-400">
                     {contributor.node_type}
                   </p>
                 </div>
               </div>
               <div className="mt-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-gray-300 truncate">
-                    Peer ID: {formatPeerId(contributor.peerid, contributor.node_type)}
+                <div className="flex flex-col gap-2">
+                  <div className="break-all text-sm text-gray-300">
+                    <span className="font-medium">Peer ID:</span><br/>
+                    {contributor.peerid}
+                    <button 
+                      onClick={() => copyToClipboard(contributor.peerid)}
+                      className="ml-2 text-gray-400 hover:text-white inline-flex"
+                    >
+                      <FaCopy />
+                    </button>
+                  </div>
+                  <p className="text-sm text-gray-300">
+                    Joined: <span className="text-emerald-400">{getTimeAgo(contributor.join_date)}</span>
                   </p>
-                  <button 
-                    onClick={() => copyToClipboard(contributor.peerid)}
-                    className="text-gray-400 hover:text-white"
-                  >
-                    <FaCopy />
-                  </button>
                 </div>
-                <p className="text-sm text-gray-300">
-                  Joined: <span className="text-emerald-400">{getTimeAgo(contributor.join_date)}</span>
-                </p>
               </div>
             </div>
           ))}
         </div>
 
         {totalPages > 1 && (
-          <div className="flex justify-center gap-2 mt-6">
+          <div className="flex flex-wrap justify-center gap-2 mt-6">
             <button
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
