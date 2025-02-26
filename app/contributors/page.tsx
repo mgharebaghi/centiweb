@@ -221,7 +221,9 @@ export default function Contributors() {
                 <div className="text-xs text-gray-300">
                   <span className="text-gray-400">Peer ID:</span>
                   <div className="mt-1 break-all font-mono bg-[#374151] p-1.5 sm:p-2 rounded-lg text-xs">
-                    {contributor.peerid}
+                    {contributor.node_type.toLowerCase() === "relay" 
+                      ? contributor.peerid.split('/p2p/')[1] || contributor.peerid
+                      : contributor.peerid}
                     <button
                       onClick={() =>
                         navigator.clipboard.writeText(contributor.peerid)
