@@ -98,18 +98,18 @@ export default function Contributors() {
                 ) : (
                   <FaShieldAlt className="text-emerald-400" />
                 )}
-                <div>
-                  <span className="text-white">
+                <div className="min-w-0">
+                  <span className="text-white block truncate">
                     {contributor.wallet.slice(0, 6)}...
                     {contributor.wallet.slice(-4)}
                   </span>
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-gray-400 truncate">
                     {contributor.node_type}
                   </p>
                 </div>
               </div>
               <div className="mt-2">
-                <p className="text-sm text-gray-300">
+                <p className="text-sm text-gray-300 truncate">
                   Peer ID: {contributor.peerid}
                 </p>
                 <p className="text-sm text-gray-300">
