@@ -11,79 +11,37 @@ interface Contributor {
   join_date: string;
 }
 
-type TabValue = "all" | "relay" | "validator";
-
 export default function Contributors() {
   const [contributors, setContributors] = useState<Contributor[] | null>(null);
-  const [currentTab, setCurrentTab] = useState<TabValue>("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [itemsPerPage, setItemsPerPage] = useState(getInitialItemsPerPage());
 
   function getInitialItemsPerPage() {
     if (typeof window !== 'undefined') {
-      if (window.innerWidth >= 1280) return 12; // xl screens
-      if (window.innerWidth >= 1024) return 9; // lg screens  
-      if (window.innerWidth >= 768) return 6; // md screens
-      return 4; // sm screens
+      if (window.innerWidth >= 1280) return 12;
+      if (window.innerWidth >= 1024) return 9;
+      if (window.innerWidth >= 768) return 6;
+      return 4;
     }
-    return 12; // default for SSR
+    return 12;
   }
 
   useEffect(() => {
-    function handleResize() {
-      setItemsPerPage(getInitialItemsPerPage());
-    }
+    const handleResize = () => setItemsPerPage(getInitialItemsPerPage());
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-  };
-
-  const getTimeAgo = (date: string) => {
-    const now = new Date();
-    const joinDate = new Date(date);
-    const diffInMs = now.getTime() - joinDate.getTime();
-    const diffInMins = Math.floor(diffInMs / (1000 * 60));
-    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
-    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
-    const diffInMonths = Math.floor(diffInDays / 30);
-    const diffInYears = Math.floor(diffInDays / 365);
-
-    if (diffInYears > 0) {
-      return `${diffInYears} year${diffInYears > 1 ? 's' : ''} ago`;
-    } else if (diffInMonths > 0) {
-      return `${diffInMonths} month${diffInMonths > 1 ? 's' : ''} ago`;
-    } else if (diffInDays > 0) {
-      return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
-    } else if (diffInHours > 0) {
-      return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
-    } else {
-      return `${diffInMins} minute${diffInMins > 1 ? 's' : ''} ago`;
-    }
-  };
-
-  const formatPeerId = (peerId: string, nodeType: string) => {
-    if (nodeType.toLowerCase() === "relay") {
-      const parts = peerId.split("/p2p/");
-      return parts.length > 1 ? parts[1] : peerId;
-    }
-    return peerId;
-  };
 
   useEffect(() => {
     const fetchContributors = async () => {
       try {
         const response = await fetch("/api/contributors");
-        if (!response.ok)
-          throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         const activeContributors = Array.isArray(data)
-          ? data.filter((c) => !c.deactive_date)
-            .sort((a, b) => new Date(b.join_date).getTime() - new Date(a.join_date).getTime())
+          ? data.sort((a, b) => new Date(b.join_date).getTime() - new Date(a.join_date).getTime())
           : [];
         setContributors(activeContributors);
       } catch (error) {
@@ -96,32 +54,13 @@ export default function Contributors() {
 
   if (!contributors) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#111827] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   let displayContributors = [...contributors];
-
-  let relayCount = contributors.filter(c => c.node_type.toLowerCase() === "relay").length;
-  let validatorCount = contributors.filter(c => c.node_type.toLowerCase() === "validator").length;
-
-  const tabs = [
-    { value: "all", label: `All (${contributors.length})` },
-    { value: "relay", label: `Relays (${relayCount})` },
-    { value: "validator", label: `Validators (${validatorCount})` }
-  ] as const;
-
-  if (currentTab === "relay") {
-    displayContributors = displayContributors.filter(
-      (contributor) => contributor.node_type.toLowerCase() === "relay"
-    );
-  } else if (currentTab === "validator") {
-    displayContributors = displayContributors.filter(
-      (contributor) => contributor.node_type.toLowerCase() === "validator"
-    );
-  }
 
   if (searchTerm) {
     displayContributors = displayContributors.filter(
@@ -141,11 +80,19 @@ export default function Contributors() {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedContributors = displayContributors.slice(startIndex, startIndex + itemsPerPage);
 
+  const getTimeAgo = (date: string) => {
+    const now = new Date();
+    const joinDate = new Date(date);
+    const diffInMs = now.getTime() - joinDate.getTime();
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+    return `${diffInDays} days ago`;
+  };
+
   return (
-    <div className="min-h-screen bg-[#0A0A0A] pt-20 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#111827] pt-20 px-4 sm:px-6 lg:px-8">
       <Container maxWidth="xl">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-          <h1 className="text-2xl font-bold text-white">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
             Network Contributors
           </h1>
           <div className="flex items-center gap-4 w-full md:w-auto">
@@ -156,100 +103,89 @@ export default function Contributors() {
                 placeholder="Search by PeerID or Wallet"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full md:w-64 pl-10 pr-4 py-2 bg-[#1A1A1A] text-white rounded border border-gray-700 focus:outline-none focus:border-emerald-500"
+                className="w-full md:w-64 pl-10 pr-4 py-3 bg-[#1F2937] text-white rounded-lg border border-gray-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all"
               />
             </div>
             <button
               onClick={() => setSortDirection(prev => prev === 'desc' ? 'asc' : 'desc')}
-              className="p-2 bg-[#1A1A1A] rounded border border-gray-700 hover:bg-[#222]"
+              className="p-3 bg-[#1F2937] rounded-lg border border-gray-600 hover:bg-[#374151] transition-all"
             >
-              {sortDirection === 'desc' ? <FaSortAmountDown className="text-gray-300" /> : <FaSortAmountUp className="text-gray-300" />}
+              {sortDirection === 'desc' ? <FaSortAmountDown className="text-purple-400" /> : <FaSortAmountUp className="text-purple-400" />}
             </button>
           </div>
         </div>
 
-        <div className="flex gap-2 overflow-x-auto mb-4 pb-2">
-          {tabs.map((tab) => (
-            <button
-              key={tab.value}
-              onClick={() => setCurrentTab(tab.value as TabValue)}
-              className={`px-4 py-2 rounded whitespace-nowrap ${
-                currentTab === tab.value
-                  ? "bg-emerald-500 text-white"
-                  : "bg-[#1A1A1A] text-gray-300 hover:bg-[#222]"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {paginatedContributors.map((contributor) => (
             <div
               key={contributor.peerid}
-              className="p-4 bg-[#1A1A1A] rounded border border-gray-700"
+              className="p-6 bg-[#1F2937] rounded-xl border border-gray-600 hover:border-purple-500 transition-all duration-300 transform hover:-translate-y-1"
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 {contributor.node_type.toLowerCase() === "relay" ? (
-                  <FaNetworkWired className="text-blue-400 flex-shrink-0" />
+                  <div className="p-2 bg-blue-500/10 rounded-lg">
+                    <FaNetworkWired className="text-blue-400 text-xl" />
+                  </div>
                 ) : (
-                  <FaShieldAlt className="text-emerald-400 flex-shrink-0" />
+                  <div className="p-2 bg-purple-500/10 rounded-lg">
+                    <FaShieldAlt className="text-purple-400 text-xl" />
+                  </div>
                 )}
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between">
-                    <span className="text-white block truncate">
+                    <span className="text-lg font-medium text-white block truncate">
                       {contributor.wallet.slice(0, 6)}...{contributor.wallet.slice(-4)}
                     </span>
                     <button 
-                      onClick={() => copyToClipboard(contributor.wallet)}
-                      className="text-gray-400 hover:text-white flex-shrink-0"
+                      onClick={() => navigator.clipboard.writeText(contributor.wallet)}
+                      className="text-gray-400 hover:text-purple-400 transition-colors"
                     >
                       <FaCopy />
                     </button>
                   </div>
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-gray-400 mt-1">
                     {contributor.node_type}
                   </p>
                 </div>
               </div>
-              <div className="mt-2">
-                <div className="flex flex-col gap-2">
-                  <div className="break-all text-sm text-gray-300">
-                    <span className="font-medium">Peer ID:</span><br/>
+              
+              <div className="mt-4 pt-4 border-t border-gray-600">
+                <div className="text-sm text-gray-300">
+                  <span className="text-gray-400">Peer ID:</span>
+                  <div className="mt-1 break-all font-mono bg-[#374151] p-2 rounded-lg">
                     {contributor.peerid}
                     <button 
-                      onClick={() => copyToClipboard(contributor.peerid)}
-                      className="ml-2 text-gray-400 hover:text-white inline-flex"
+                      onClick={() => navigator.clipboard.writeText(contributor.peerid)}
+                      className="ml-2 text-gray-400 hover:text-purple-400 transition-colors"
                     >
                       <FaCopy />
                     </button>
                   </div>
-                  <p className="text-sm text-gray-300">
-                    Joined: <span className="text-emerald-400">{getTimeAgo(contributor.join_date)}</span>
-                  </p>
                 </div>
+                <p className="text-sm text-gray-400 mt-3">
+                  Joined: <span className="text-purple-400">{getTimeAgo(contributor.join_date)}</span>
+                </p>
               </div>
             </div>
           ))}
         </div>
 
         {totalPages > 1 && (
-          <div className="flex flex-wrap justify-center gap-2 mt-6">
+          <div className="flex justify-center gap-4 mt-8">
             <button
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
-              className="px-4 py-2 bg-[#1A1A1A] text-gray-300 rounded border border-gray-700 disabled:opacity-50"
+              className="px-6 py-2 bg-[#1F2937] text-white rounded-lg border border-gray-600 hover:bg-[#374151] disabled:opacity-50 disabled:hover:bg-[#1F2937] transition-all"
             >
               Previous
             </button>
-            <span className="px-4 py-2 text-white">
-              Page {currentPage} of {totalPages}
+            <span className="px-4 py-2 text-white bg-[#374151] rounded-lg">
+              {currentPage} of {totalPages}
             </span>
             <button
               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
-              className="px-4 py-2 bg-[#1A1A1A] text-gray-300 rounded border border-gray-700 disabled:opacity-50"
+              className="px-6 py-2 bg-[#1F2937] text-white rounded-lg border border-gray-600 hover:bg-[#374151] disabled:opacity-50 disabled:hover:bg-[#1F2937] transition-all"
             >
               Next
             </button>
