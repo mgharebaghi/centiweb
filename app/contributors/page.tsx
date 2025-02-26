@@ -22,7 +22,7 @@ export default function Contributors() {
   const [contributors, setContributors] = useState<Contributor[] | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [activeTab, setActiveTab] = useState<"all" | "relay" | "validator">(
     "all"
   );
