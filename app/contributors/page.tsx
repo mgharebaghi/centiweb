@@ -51,6 +51,15 @@ export default function Contributors() {
     fetchContributors();
   }, []);
 
+  const handleCopy = async (text: string, type: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      alert(`${type} copied to clipboard!`);
+    } catch (err) {
+      alert('Failed to copy text');
+    }
+  };
+
   if (!contributors) {
     return (
       <div className="min-h-screen bg-[#111827] flex items-center justify-center">
@@ -203,9 +212,7 @@ export default function Contributors() {
                       {contributor.wallet.slice(-4)}
                     </span>
                     <button
-                      onClick={() =>
-                        navigator.clipboard.writeText(contributor.wallet)
-                      }
+                      onClick={() => handleCopy(contributor.wallet, 'Wallet address')}
                       className="text-gray-400 hover:text-emerald-400 transition-colors"
                     >
                       <FaCopy className="text-sm sm:text-base" />
@@ -225,9 +232,7 @@ export default function Contributors() {
                       ? contributor.peerid.split('/p2p/')[1] || contributor.peerid
                       : contributor.peerid}
                     <button
-                      onClick={() =>
-                        navigator.clipboard.writeText(contributor.peerid)
-                      }
+                      onClick={() => handleCopy(contributor.peerid, 'Peer ID')}
                       className="ml-1.5 sm:ml-2 text-gray-400 hover:text-emerald-400 transition-colors"
                     >
                       <FaCopy className="text-xs sm:text-sm" />
