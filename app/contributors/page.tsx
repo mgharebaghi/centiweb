@@ -18,7 +18,7 @@ export default function Contributors() {
   const [currentTab, setCurrentTab] = useState<TabValue>("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc'); // Default to desc
   const itemsPerPage = 12; // Increased from 9 to show more items
 
   const copyToClipboard = (text: string) => {
