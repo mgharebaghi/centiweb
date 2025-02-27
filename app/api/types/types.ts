@@ -81,6 +81,7 @@ export interface TrxScan {
 export interface Relays {
   addr: string;
   wallet: string;
+  join_date: string;
 }
 
 export interface RPC {

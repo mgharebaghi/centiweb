@@ -18,10 +18,31 @@ async function connectDB() {
 export async function GET() {
   try {
     await connectDB();
-    const db = client.db("centiweb");
-    const collection = db.collection("contributors");
+    
+    // Get relays from centiweb DB and map to Contributor interface
+    const centiwebDb = client.db("centiweb");
+    const relaysCollection = centiwebDb.collection("relays");
+    const relays = await relaysCollection.find({}).toArray();
+    const mappedRelays = relays.map(relay => ({
+      peerid: relay.addr,
+      wallet: relay.wallet,
+      node_type: "relay",
+      join_date: relay.join_date
+    }));
 
-    const contributors = await collection.find({}).toArray();
+    // Get validators from Centichain DB and map to Contributor interface
+    const centichainDb = client.db("Centichain");
+    const validatorsCollection = centichainDb.collection("validators");
+    const validators = await validatorsCollection.find({}).toArray();
+    const mappedValidators = validators.map(validator => ({
+      peerid: validator.peerid,
+      wallet: validator.wallet,
+      node_type: "validator", 
+      join_date: validator.join_date
+    }));
+
+    // Combine both collections
+    const contributors = [...mappedRelays, ...mappedValidators];
 
     // Don't close the connection here
     return NextResponse.json(contributors);

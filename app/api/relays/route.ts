@@ -15,7 +15,11 @@ export async function POST(req: NextRequest) {
     let cursor = await collection.find();
 
     await cursor.forEach((doc) => {
-      anothers.push({ addr: doc.addr, wallet: doc.wallet });
+      anothers.push({
+        addr: doc.addr,
+        wallet: doc.wallet,
+        join_date: new Date().toISOString(),
+      });
     });
 
     if (!doc) {
@@ -47,7 +51,7 @@ export async function GET() {
     let final_data: Relays[] = [];
 
     await cursor.forEach((doc) => {
-      addresses.push({ addr: doc.addr, wallet: doc.wallet });
+      addresses.push({ addr: doc.addr, wallet: doc.wallet, join_date: doc.join_date });
     });
 
     if (addresses.length > 50) {
