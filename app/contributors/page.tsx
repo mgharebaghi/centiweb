@@ -39,9 +39,15 @@ export default function Contributors() {
         const data = await response.json();
         const activeContributors = Array.isArray(data)
           ? data.sort(
-              (a, b) =>
-                new Date(b.join_date).getTime() -
-                new Date(a.join_date).getTime()
+              (a, b) => {
+                // Ensure both dates are valid before comparison
+                const dateA = new Date(a.join_date).getTime();
+                const dateB = new Date(b.join_date).getTime();
+                // If either date is invalid (NaN), treat it as most recent
+                if (isNaN(dateA)) return -1;
+                if (isNaN(dateB)) return 1;
+                return dateB - dateA;
+              }
             )
           : [];
         setContributors(activeContributors);
@@ -105,6 +111,9 @@ export default function Contributors() {
   displayContributors.sort((a, b) => {
     const dateA = new Date(a.join_date).getTime();
     const dateB = new Date(b.join_date).getTime();
+    // Handle invalid dates
+    if (isNaN(dateA)) return sortDirection === "desc" ? -1 : 1;
+    if (isNaN(dateB)) return sortDirection === "desc" ? 1 : -1;
     return sortDirection === "desc" ? dateB - dateA : dateA - dateB;
   });
 
@@ -118,6 +127,12 @@ export default function Contributors() {
   const getTimeAgo = (date: string) => {
     const now = new Date();
     const joinDate = new Date(date);
+    
+    // Handle invalid date
+    if (isNaN(joinDate.getTime())) {
+      return "Just now"; // Fallback for invalid dates
+    }
+    
     const diffInMs = now.getTime() - joinDate.getTime();
     const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
     const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
