@@ -8,39 +8,332 @@ import {
   Button,
   Box,
   useMediaQuery,
+  Grid,
+  Divider,
+  Chip,
+  Stack,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import TypeAnimation from "./TypeAnimation";
 import Link from "next/link";
+import Image from "next/image";
 
 const Banner = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
+  const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg"));
   const [isClient, setIsClient] = useState(false);
 
-  // Use useEffect to ensure component only renders once on the client side
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  // Return null on first render to prevent hydration mismatch
-  if (!isClient) {
-    return null;
-  }
+  if (!isClient) return null;
 
   return (
     <Box
       sx={{
         position: "relative",
         overflow: "hidden",
-        background: "linear-gradient(135deg, #0a1f1c 0%, #0f2818 100%)",
-        pt: { xs: 12, md: 20 },
-        pb: { xs: 10, md: 16 },
-        borderBottom: "1px solid rgba(16, 185, 129, 0.2)",
-        fontFamily: "'Poppins', 'Inter', sans-serif",
+        background: "linear-gradient(135deg, #0a1f00 0%, #0a1f00 100%)",
+        minHeight: "100vh",
+        height: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        borderBottom: "1px solid rgba(16, 185, 129, 0.1)",
+        fontFamily: "'Inter', sans-serif",
+        pt: { xs: 4, sm: 5, md: 6 },
+        pb: { xs: 4, sm: 5, md: 6 },
       }}
     >
-      {/* Animated particles background */}
+      {/* Blockchain grid network with minimal light pulses */}
+      <Box
+        component={motion.div}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 2 }}
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          overflow: "hidden",
+          zIndex: 1,
+        }}
+      >
+        {/* Grid overlay for the checkerboard effect */}
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            opacity: 0.1,
+            backgroundImage: `
+              linear-gradient(rgba(16, 185, 129, 0.5) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(16, 185, 129, 0.5) 1px, transparent 1px)
+            `,
+            backgroundSize: {
+              xs: "10% 10%",
+              sm: "6.67% 6.67%",
+              md: "5% 5%",
+            },
+          }}
+        />
+
+        {/* Grid structure without glowing points */}
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "repeat(10, 1fr)",
+              sm: "repeat(15, 1fr)",
+              md: "repeat(20, 1fr)",
+            },
+            gridTemplateRows: {
+              xs: "repeat(10, 1fr)",
+              sm: "repeat(15, 1fr)",
+              md: "repeat(20, 1fr)",
+            },
+          }}
+        >
+          {/* Generate grid lines */}
+          {Array.from({ length: isMobile ? 100 : isTablet ? 225 : 400 }).map(
+            (_, index) => {
+              const row = Math.floor(
+                index / (isMobile ? 10 : isTablet ? 15 : 20)
+              );
+              const col = index % (isMobile ? 10 : isTablet ? 15 : 20);
+
+              return (
+                <Box
+                  key={`grid-cell-${index}`}
+                  sx={{
+                    position: "relative",
+                    gridRow: row + 1,
+                    gridColumn: col + 1,
+                  }}
+                >
+                  {/* Horizontal connection */}
+                  {col < (isMobile ? 9 : isTablet ? 14 : 19) && (
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        height: "1px",
+                        right: 0,
+                        width: "100%",
+                        background: "rgba(16, 185, 129, 0.1)",
+                      }}
+                    />
+                  )}
+
+                  {/* Vertical connection */}
+                  {row < (isMobile ? 9 : isTablet ? 14 : 19) && (
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        width: "1px",
+                        bottom: 0,
+                        height: "100%",
+                        background: "rgba(16, 185, 129, 0.1)",
+                      }}
+                    />
+                  )}
+                </Box>
+              );
+            }
+          )}
+        </Box>
+
+        {/* Mixed pulses: full lines and center-crossing pulses */}
+        {Array.from({ length: 20 + Math.floor(Math.random() * 10) }).map(
+          (_, index) => {
+            // Grid dimensions
+            const gridCols = isMobile ? 10 : isTablet ? 15 : 20;
+            const gridRows = isMobile ? 10 : isTablet ? 15 : 20;
+
+            // Grid center point
+            const centerX = gridCols / 2;
+            const centerY = gridRows / 2;
+
+            // Determine pulse type:
+            // 0-1: full horizontal/vertical lines
+            // 2: center cross horizontal
+            // 3: center cross vertical
+            const pulseType = index % 4;
+
+            if (pulseType < 2) {
+              // Full line pulse (horizontal or vertical)
+              const isHorizontal = pulseType === 0;
+
+              // We want some lines to go through center area
+              let linePosition;
+              if (index % 6 < 3) {
+                // 50% chance for center-passing lines
+                // Lines that pass through or near center
+                const offset = Math.floor(Math.random() * 5) - 2; // -2, -1, 0, 1, 2
+                linePosition =
+                  Math.floor(isHorizontal ? centerY : centerX) + offset;
+              } else {
+                // Random position
+                linePosition = Math.floor(
+                  Math.random() * (isHorizontal ? gridRows : gridCols)
+                );
+              }
+
+              // Direction (left-right, right-left, top-bottom, bottom-top)
+              const isReversed = Math.random() > 0.5;
+
+              return (
+                <motion.div
+                  key={`pulse-fullline-${index}`}
+                  style={{
+                    position: "absolute",
+                    left: isHorizontal
+                      ? 0
+                      : `${(linePosition / gridCols) * 100}%`,
+                    top: isHorizontal
+                      ? `${(linePosition / gridRows) * 100}%`
+                      : 0,
+                    width: isHorizontal ? "100%" : "1px",
+                    height: isHorizontal ? "1px" : "100%",
+                    overflow: "hidden",
+                  }}
+                >
+                  <motion.div
+                    initial={{
+                      x: isHorizontal ? (isReversed ? "100%" : "0%") : 0,
+                      y: !isHorizontal ? (isReversed ? "100%" : "0%") : 0,
+                      opacity: 0,
+                    }}
+                    animate={{
+                      x: isHorizontal ? (isReversed ? "0%" : "100%") : 0,
+                      y: !isHorizontal ? (isReversed ? "0%" : "100%") : 0,
+                      opacity: [0, 0.3, 0.8, 0.3, 0],
+                    }}
+                    transition={{
+                      duration: 5 + Math.random() * 3,
+                      ease: "linear",
+                      repeat: Infinity,
+                      delay: index * 0.5,
+                      times: [0, 0.2, 0.5, 0.8, 1],
+                    }}
+                    style={{
+                      position: "absolute",
+                      width: isHorizontal ? "10%" : "1px",
+                      height: !isHorizontal ? "10%" : "1px",
+                      background: isHorizontal
+                        ? `linear-gradient(${
+                            isReversed ? -90 : 90
+                          }deg, rgba(16, 185, 129, 0) 0%, rgba(16, 185, 129, 0.9) 50%, rgba(16, 185, 129, 0) 100%)`
+                        : `linear-gradient(${
+                            isReversed ? 180 : 0
+                          }deg, rgba(16, 185, 129, 0) 0%, rgba(16, 185, 129, 0.9) 50%, rgba(16, 185, 129, 0) 100%)`,
+                      boxShadow: "0 0 6px rgba(16, 185, 129, 0.6)",
+                    }}
+                  />
+                </motion.div>
+              );
+            } else {
+              // Center cross pulse - start or end in center
+              const isHorizontal = pulseType === 2;
+              const startAtCenter = Math.random() > 0.5;
+
+              // Calculate start and end points
+              const startX = isHorizontal
+                ? startAtCenter
+                  ? centerX
+                  : Math.random() > 0.5
+                  ? 0
+                  : gridCols
+                : centerX;
+              const startY = isHorizontal
+                ? centerY
+                : startAtCenter
+                ? centerY
+                : Math.random() > 0.5
+                ? 0
+                : gridRows;
+              const endX = isHorizontal
+                ? startAtCenter
+                  ? Math.random() > 0.5
+                    ? 0
+                    : gridCols
+                  : centerX
+                : centerX;
+              const endY = isHorizontal
+                ? centerY
+                : startAtCenter
+                ? Math.random() > 0.5
+                  ? 0
+                  : gridRows
+                : centerY;
+
+              // Convert to percentages
+              const startXPercent = (startX / gridCols) * 100;
+              const startYPercent = (startY / gridRows) * 100;
+              const endXPercent = (endX / gridCols) * 100;
+              const endYPercent = (endY / gridRows) * 100;
+
+              // Calculate length and angle
+              const deltaX = endX - startX;
+              const deltaY = endY - startY;
+              const length = Math.sqrt(
+                Math.pow(endXPercent - startXPercent, 2) +
+                  Math.pow(endYPercent - startYPercent, 2)
+              );
+              const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
+
+              return (
+                <motion.div
+                  key={`pulse-center-${index}`}
+                  style={{
+                    position: "absolute",
+                    left: `${startXPercent}%`,
+                    top: `${startYPercent}%`,
+                    width: `${length}%`,
+                    height: "1px",
+                    transformOrigin: "0 0",
+                    transform: `rotate(${angle}deg)`,
+                    overflow: "hidden",
+                  }}
+                >
+                  <motion.div
+                    initial={{ x: "0%", opacity: 0 }}
+                    animate={{ x: "100%", opacity: [0, 0.3, 0.8, 0.3, 0] }}
+                    transition={{
+                      duration: 3 + Math.random() * 2,
+                      ease: "linear",
+                      repeat: Infinity,
+                      delay: index * 0.5,
+                      times: [0, 0.2, 0.5, 0.8, 1],
+                    }}
+                    style={{
+                      position: "absolute",
+                      width: "15%",
+                      height: "1px",
+                      background:
+                        "linear-gradient(90deg, rgba(16, 185, 129, 0) 0%, rgba(16, 185, 129, 0.9) 50%, rgba(16, 185, 129, 0) 100%)",
+                      boxShadow: "0 0 6px rgba(16, 185, 129, 0.6)",
+                    }}
+                  />
+                </motion.div>
+              );
+            }
+          }
+        )}
+      </Box>
+
+      {/* Updated gradient overlay */}
       <Box
         sx={{
           position: "absolute",
@@ -48,93 +341,125 @@ const Banner = () => {
           left: 0,
           right: 0,
           bottom: 0,
-          zIndex: 0,
-          opacity: 0.07,
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2310b981' fill-opacity='0.4' fill-rule='evenodd'%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3Ccircle cx='30' cy='10' r='2'/%3E%3Ccircle cx='50' cy='10' r='2'/%3E%3Ccircle cx='20' cy='20' r='2'/%3E%3Ccircle cx='40' cy='20' r='2'/%3E%3Ccircle cx='10' cy='30' r='2'/%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3Ccircle cx='50' cy='30' r='2'/%3E%3Ccircle cx='20' cy='40' r='2'/%3E%3Ccircle cx='40' cy='40' r='2'/%3E%3Ccircle cx='10' cy='50' r='2'/%3E%3Ccircle cx='30' cy='50' r='2'/%3E%3Ccircle cx='50' cy='50' r='2'/%3E%3C/g%3E%3C/svg%3E")`,
+          background: `radial-gradient(circle at 50% 50%, 
+            rgba(10, 31, 0, 0.4) 0%, 
+            rgba(10, 31, 0, 0.6) 50%, 
+            rgba(10, 31, 0, 0.8) 100%)`,
+          mixBlendMode: "multiply",
+          zIndex: 1,
         }}
       />
 
-      {/* Glowing accent */}
-      <Box
+      <Container
+        maxWidth="xl"
         sx={{
-          position: "absolute",
-          top: "30%",
-          left: "20%",
-          width: "50%",
-          height: "50%",
-          borderRadius: "50%",
-          filter: "blur(150px)",
-          background:
-            "radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0) 70%)",
-          zIndex: 0,
+          position: "relative",
+          zIndex: 2,
+          px: { xs: 2, sm: 3, md: 4 },
+          py: { xs: 2, sm: 3, md: 4 },
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
         }}
-      />
-
-      <Container maxWidth="lg" sx={{ position: "relative", zIndex: 2 }}>
-        <Box
+      >
+        <Grid
+          container
+          spacing={{ xs: 4, sm: 6, md: 8 }}
+          alignItems="center"
+          justifyContent="center"
           sx={{
-            display: "flex",
-            flexDirection: { xs: "column", md: "row" },
-            alignItems: "center",
-            gap: 8,
+            minHeight: { xs: "calc(100vh - 64px)", sm: "calc(100vh - 80px)" },
+            width: "100%",
           }}
         >
-          <Box
+          <Grid
+            item
+            xs={12}
+            sm={10}
+            md={6}
+            lg={6}
             sx={{
-              flex: 1,
-              textAlign: { xs: "center", md: "left" },
-              position: "relative",
-              zIndex: 1,
+              order: { xs: 2, sm: 2, md: 1 },
+              textAlign: { xs: "center", sm: "center", md: "left" },
             }}
           >
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <Typography
-                component="h1"
-                sx={{
-                  fontSize: { xs: "2.5rem", md: "3.5rem", lg: "4.5rem" },
-                  fontWeight: 800,
-                  color: "#ffffff",
-                  mb: 3,
-                  lineHeight: 1.1,
-                  letterSpacing: "-0.02em",
-                  fontFamily: "'Poppins', sans-serif",
-                }}
+            <Box>
+              {/* Floating badge */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
               >
-                <Box
+                <Chip
+                  label="Revolutionary Blockchain Technology"
                   sx={{
-                    display: "block",
-                    height: { xs: "2.5rem", md: "3.5rem", lg: "4.5rem" },
-                    mb: 1,
+                    background: "rgba(16, 185, 129, 0.15)",
+                    color: "#10b981",
+                    borderRadius: "50px",
+                    fontWeight: 600,
+                    mb: 3,
+                    px: { xs: 1, md: 2 },
+                    py: { xs: 0.5, md: 0.75 },
+                    border: "1px solid rgba(16, 185, 129, 0.3)",
+                    backdropFilter: "blur(10px)",
+                    fontSize: { xs: "0.75rem", md: "0.875rem" },
+                  }}
+                />
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+              >
+                <Typography
+                  variant="h1"
+                  sx={{
+                    fontSize: {
+                      xs: "2rem",
+                      sm: "2.75rem",
+                      md: "3.5rem",
+                      lg: "4rem",
+                    },
+                    fontWeight: 500,
+                    color: "rgba(255, 255, 255, 0.95)",
+                    mb: { xs: 1, md: 1.5 },
+                    lineHeight: 1,
+                    letterSpacing: "-0.01em",
+                    fontFamily:
+                      "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
                   }}
                 >
                   Centichain
-                </Box>
+                </Typography>
                 <Box
                   component="span"
                   sx={{
-                    fontSize: { xs: "1.75rem", md: "2.5rem", lg: "3rem" },
                     display: "block",
-                    background:
-                      "linear-gradient(90deg, #10b981 0%, #059669 100%)",
-                    backgroundClip: "text",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    fontWeight: 700,
-                    fontFamily: "'Poppins', sans-serif",
+                    fontSize: {
+                      xs: "1.1rem",
+                      sm: "1.25rem",
+                      md: "1.5rem",
+                      lg: "1.75rem",
+                    },
+                    fontWeight: 400,
+                    color: "rgba(255, 255, 255, 0.85)",
+                    letterSpacing: "0.01em",
+                    fontFamily:
+                      "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+                    mb: { xs: 3, md: 4 },
+                    mt: { xs: 1, md: 1.5 },
                   }}
                 >
-                  <TypeAnimation 
+                  <TypeAnimation
                     text={[
                       "Redefining Cryptocurrency",
-                      "Securing Digital Wealth",
-                      "The Future of Value Storage",
-                      "Unmatched Asset Security"
+                      "Building the Future of Finance",
+                      "Decentralized. Secure. Scalable.",
+                      "Join the Financial Revolution",
+                      "Empowering Global Transactions",
                     ]}
-                    speed={70}
+                    speed={50}
                     delay={0}
                     loop={true}
                     repeat={true}
@@ -142,344 +467,350 @@ const Banner = () => {
                     switchDelay={5000}
                   />
                 </Box>
-              </Typography>
-            </motion.div>
+              </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <Typography
-                variant="h2"
-                sx={{
-                  fontSize: { xs: "1rem", md: "1.125rem" },
-                  color: "rgba(255,255,255,0.8)",
-                  maxWidth: "500px",
-                  mb: 5,
-                  mx: { xs: "auto", md: 0 },
-                  fontWeight: 400,
-                  lineHeight: 1.7,
-                  fontFamily: "'Inter', sans-serif",
-                }}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
               >
-                A next generation blockchain designed exclusively as a store of
-                value. Redefining cryptocurrency with unmatched security,
-                immutability, and reliability for preserving digital wealth.
-              </Typography>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-            >
-              <Box
-                sx={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: 3,
-                  justifyContent: { xs: "center", md: "flex-start" },
-                }}
-              >
-                <Button
-                  variant="contained"
-                  size="large"
-                  component={Link}
-                  href="/download"
+                <Typography
                   sx={{
-                    background:
-                      "linear-gradient(90deg, #10b981 0%, #059669 100%)",
-                    px: 4,
-                    py: 1.5,
-                    borderRadius: "8px",
-                    fontWeight: 600,
-                    textTransform: "none",
-                    fontSize: "1rem",
-                    boxShadow: "0 4px 14px rgba(16, 185, 129, 0.4)",
-                    fontFamily: "'Inter', sans-serif",
-                    "&:hover": {
-                      boxShadow: "0 6px 20px rgba(16, 185, 129, 0.6)",
+                    fontSize: {
+                      xs: "1rem",
+                      sm: "1.1rem",
+                      md: "1.2rem",
+                      lg: "1.25rem",
                     },
+                    color: "rgba(255,255,255,0.8)",
+                    maxWidth: { xs: "100%", md: "540px" },
+                    mb: { xs: 4, md: 5 },
+                    lineHeight: 1.6,
+                    mx: { xs: "auto", md: 0 },
+                    pr: { md: 6, lg: 8 },
                   }}
                 >
-                  Start as a Node
-                </Button>
-                <Button
-                  variant="outlined"
-                  size="large"
-                  component="a"
-                  href="https://centichain.org/articles/671fcec5d136b9550a238077"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  A next generation blockchain designed exclusively as a store
+                  of value. Redefining cryptocurrency with unmatched security
+                  and reliability.
+                </Typography>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+              >
+                <Stack
+                  direction={{ xs: "column", sm: "row" }}
+                  spacing={2}
                   sx={{
-                    borderColor: "rgba(16, 185, 129, 0.6)",
-                    color: "#10b981",
-                    px: 4,
-                    py: 1.5,
-                    borderRadius: "8px",
-                    fontWeight: 600,
-                    textTransform: "none",
-                    fontSize: "1rem",
-                    fontFamily: "'Inter', sans-serif",
-                    "&:hover": {
-                      borderColor: "#10b981",
-                      background: "rgba(16, 185, 129, 0.05)",
-                    },
+                    flexWrap: "wrap",
+                    justifyContent: { xs: "center", md: "flex-start" },
+                    mb: { xs: 5, md: 0 },
                   }}
                 >
-                  Learn More
-                </Button>
-              </Box>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-            >
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 5,
-                  mt: 6,
-                  justifyContent: { xs: "center", md: "flex-start" },
-                }}
-              >
-                {[
-                  {
-                    value: "100%",
-                    label: "Asset Security",
-                  },
-                  {
-                    value: "21M",
-                    label: "Maximum Supply",
-                  },
-                  {
-                    value: "Fully",
-                    label: "Decentralized",
-                  },
-                ].map((stat, i) => (
-                  <Box key={i} sx={{ textAlign: "center" }}>
-                    <Typography
-                      component="span"
-                      sx={{
-                        fontSize: "1.5rem",
-                        fontWeight: 700,
-                        color: "#10b981",
-                        display: "block",
-                        fontFamily: "'Poppins', sans-serif",
-                      }}
-                    >
-                      {stat.value}
-                    </Typography>
-                    <Typography
-                      component="span"
-                      sx={{
-                        fontSize: "0.875rem",
-                        color: "rgba(255,255,255,0.6)",
-                        fontFamily: "'Inter', sans-serif",
-                      }}
-                    >
-                      {stat.label}
-                    </Typography>
-                  </Box>
-                ))}
-              </Box>
-            </motion.div>
-          </Box>
-
-          {!isMobile && isClient && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6 }}
-              style={{ flex: 1 }}
-            >
-              <Box
-                sx={{
-                  position: "relative",
-                  height: "500px",
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                {/* Vault/treasure visualization */}
-                <svg
-                  width="400"
-                  height="400"
-                  viewBox="0 0 400 400"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  style={{
-                    position: "absolute",
-                    opacity: 0.15,
-                  }}
-                >
-                  <path
-                    d="M200 50L300 100L200 150L100 100L200 50Z"
-                    fill="url(#vault_gradient)"
-                    stroke="url(#vault_gradient)"
-                    strokeWidth="2"
-                  />
-                  <path
-                    d="M100 100V250L200 300V150"
-                    stroke="url(#vault_gradient)"
-                    strokeWidth="2"
-                    fill="none"
-                  />
-                  <path
-                    d="M300 100V250L200 300"
-                    stroke="url(#vault_gradient)"
-                    strokeWidth="2"
-                    fill="none"
-                  />
-                  <path
-                    d="M150 75L250 125M150 125L250 175"
-                    stroke="url(#vault_gradient)"
-                    strokeWidth="1"
-                    strokeDasharray="4 4"
-                  />
-                  <defs>
-                    <linearGradient
-                      id="vault_gradient"
-                      x1="100"
-                      y1="50"
-                      x2="300"
-                      y2="300"
-                      gradientUnits="userSpaceOnUse"
-                    >
-                      <stop stopColor="#10b981" />
-                      <stop offset="1" stopColor="#059669" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-
-                {/* Animated value tokens */}
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0 }}
-                    animate={{
-                      opacity: [0.4, 0.8, 0.4],
-                      y: i % 2 === 0 ? [-5, 5, -5] : [5, -5, 5],
-                      x: i % 3 === 0 ? [-5, 5, -5] : [5, -5, 5],
-                    }}
-                    transition={{
-                      duration: 3 + i * 0.5,
-                      repeat: Infinity,
-                      delay: i * 0.4,
-                    }}
-                    style={{
-                      position: "absolute",
-                      top: `${150 + Math.sin(i * 0.8) * 80}px`,
-                      left: `${150 + Math.cos(i * 0.8) * 80}px`,
-                      width: "16px",
-                      height: "16px",
-                      borderRadius: "50%",
-                      background: `rgba(16, 185, 129, ${0.4 + i * 0.08})`,
-                      boxShadow: `0 0 ${8 + i * 2}px ${
-                        4 + i
-                      }px rgba(16, 185, 129, 0.3)`,
-                    }}
-                  />
-                ))}
-
-                {/* Central value storage element */}
-                <motion.div
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{
-                    scale: [0.9, 1.05, 0.9],
-                    opacity: 1,
-                  }}
-                  transition={{
-                    duration: 4,
-                    repeat: Infinity,
-                  }}
-                  style={{
-                    position: "absolute",
-                    width: "120px",
-                    height: "120px",
-                    borderRadius: "50%",
-                    background:
-                      "linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.2) 100%)",
-                    border: "1px solid rgba(16, 185, 129, 0.4)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    boxShadow: "0 0 30px 10px rgba(16, 185, 129, 0.15)",
-                  }}
-                >
-                  {/* Coin/value symbol */}
-                  <motion.div
-                    animate={{
-                      rotateY: 360,
-                    }}
-                    transition={{
-                      duration: 8,
-                      repeat: Infinity,
-                      ease: "linear",
-                    }}
-                    style={{
-                      width: "80px",
-                      height: "80px",
-                      borderRadius: "50%",
-                      background:
-                        "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-                      boxShadow: "0 0 20px 5px rgba(16, 185, 129, 0.3)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "2rem",
-                      color: "white",
-                      fontWeight: "bold",
+                  <Button
+                    href="/download"
+                    variant="contained"
+                    LinkComponent={Link}
+                    sx={{
+                      background: "rgba(29, 71, 0, 0.1)",
+                      backdropFilter: "blur(10px)",
+                      border: "1px solid rgba(29, 71, 0, 0.2)",
+                      color: "#fff",
+                      px: { xs: 4, md: 5 },
+                      py: 1.5,
+                      borderRadius: "4px",
+                      fontSize: "0.9rem",
+                      fontWeight: 400,
+                      letterSpacing: "0.02em",
+                      textTransform: "none",
+                      transition: "all 0.2s ease",
+                      "&:hover": {
+                        background: "rgba(29, 71, 0, 0.2)",
+                        transform: "translateY(-1px)",
+                      },
+                      "&:active": {
+                        transform: "translateY(0)",
+                      },
+                      "& .arrow": {
+                        transition: "transform 0.2s ease",
+                        opacity: 0.7,
+                        fontSize: "1.1rem",
+                      },
+                      "&:hover .arrow": {
+                        transform: "translateX(4px)",
+                        opacity: 1,
+                      },
                     }}
                   >
-                    <span>¢</span>
-                  </motion.div>
-                </motion.div>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      Start as a Node
+                      <span className="arrow">→</span>
+                    </Box>
+                  </Button>
+                  <Button
+                    href="https://centichain.org/articles/671fcec5d136b9550a238077"
+                    variant="text"
+                    sx={{
+                      color: "rgba(255, 255, 255, 0.6)",
+                      px: { xs: 4, md: 5 },
+                      py: 1.5,
+                      borderRadius: "4px",
+                      fontSize: "0.9rem",
+                      fontWeight: 400,
+                      letterSpacing: "0.02em",
+                      textTransform: "none",
+                      transition: "all 0.2s ease",
+                      "&:hover": {
+                        background: "rgba(255, 255, 255, 0.03)",
+                        color: "rgba(255, 255, 255, 0.8)",
+                      },
+                      "& .arrow": {
+                        transition: "all 0.2s ease",
+                        opacity: 0.5,
+                        fontSize: "1.1rem",
+                      },
+                      "&:hover .arrow": {
+                        transform: "translateX(4px)",
+                        opacity: 0.8,
+                      },
+                    }}
+                  >
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      Learn More
+                      <span className="arrow">→</span>
+                    </Box>
+                  </Button>
+                </Stack>
+              </motion.div>
 
-                {/* Security rings */}
+              <Box
+                sx={{
+                  my: { xs: 4, md: 6 },
+                  display: { xs: "block", md: "block" },
+                }}
+              >
                 <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.6, delay: 0.5 }}
+                >
+                  <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
+                    {[
+                      { value: "100%", label: "Asset Security" },
+                      { value: "21M", label: "Maximum Supply" },
+                      { value: "100%", label: "Decentralized" },
+                    ].map((stat, i) => (
+                      <Grid item xs={4} key={i}>
+                        <Box>
+                          <Typography
+                            sx={{
+                              fontSize: {
+                                xs: "1.1rem",
+                                sm: "1.25rem",
+                                md: "1.4rem",
+                              },
+                              fontWeight: 500,
+                              color: "rgba(255, 255, 255, 0.9)",
+                              fontFamily:
+                                "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+                              letterSpacing: "-0.01em",
+                            }}
+                          >
+                            {stat.value}
+                          </Typography>
+                          <Typography
+                            sx={{
+                              fontSize: {
+                                xs: "0.8rem",
+                                sm: "0.85rem",
+                                md: "0.9rem",
+                              },
+                              color: "rgba(255, 255, 255, 0.5)",
+                              fontWeight: 400,
+                              letterSpacing: "0.02em",
+                            }}
+                          >
+                            {stat.label}
+                          </Typography>
+                        </Box>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </motion.div>
+              </Box>
+            </Box>
+          </Grid>
+
+          <Grid
+            item
+            xs={12}
+            sm={8}
+            md={6}
+            lg={6}
+            sx={{
+              order: { xs: 1, sm: 1, md: 2 },
+              mb: { xs: 2, sm: 3, md: 0 },
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                transform: { xs: "scale(0.9)", sm: "scale(1)" },
+              }}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8 }}
+                style={{
+                  position: "relative",
+                  width: "100%",
+                  maxWidth: "480px",
+                  height: isMobile
+                    ? "240px"
+                    : isTablet
+                    ? "320px"
+                    : isLargeScreen
+                    ? "480px"
+                    : "400px",
+                }}
+              >
+                {/* Decorative elements */}
+                <Box
+                  component={motion.div}
                   animate={{
-                    rotate: 360,
-                  }}
-                  transition={{
-                    duration: 30,
-                    repeat: Infinity,
-                    ease: "linear",
-                  }}
-                  style={{
-                    position: "absolute",
-                    width: "240px",
-                    height: "240px",
-                    borderRadius: "50%",
-                    border: "1px dashed rgba(16, 185, 129, 0.3)",
-                  }}
-                />
-                <motion.div
-                  animate={{
-                    rotate: -360,
+                    rotate: [0, 360],
                   }}
                   transition={{
                     duration: 20,
                     repeat: Infinity,
                     ease: "linear",
                   }}
-                  style={{
+                  sx={{
                     position: "absolute",
-                    width: "180px",
-                    height: "180px",
+                    inset: { xs: "-5%", md: "-10%" },
+                    border: "1px dashed rgba(16, 185, 129, 0.3)",
                     borderRadius: "50%",
-                    border: "1px dashed rgba(16, 185, 129, 0.4)",
+                    zIndex: 0,
                   }}
                 />
-              </Box>
-            </motion.div>
-          )}
-        </Box>
+
+                <Box
+                  component={motion.div}
+                  animate={{
+                    rotate: [360, 0],
+                  }}
+                  transition={{
+                    duration: 25,
+                    repeat: Infinity,
+                    ease: "linear",
+                  }}
+                  sx={{
+                    position: "absolute",
+                    inset: { xs: "-2%", md: "-5%" },
+                    border: "1px dashed rgba(16, 185, 129, 0.2)",
+                    borderRadius: "50%",
+                    zIndex: 0,
+                  }}
+                />
+
+                {/* Glow effect */}
+                <Box
+                  sx={{
+                    position: "absolute",
+                    inset: { xs: "10%", md: "15%" },
+                    background:
+                      "radial-gradient(circle at center, rgba(16, 185, 129, 0.15) 0%, transparent 70%)",
+                    borderRadius: "50%",
+                    filter: "blur(40px)",
+                  }}
+                />
+
+                {/* Logo container */}
+                <motion.div
+                  animate={{
+                    y: [0, -15, 0],
+                    scale: [1, 1.03, 1],
+                  }}
+                  transition={{
+                    duration: 6,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  style={{
+                    position: "relative",
+                    width: "100%",
+                    height: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: { xs: "85%", sm: "80%", md: "75%", lg: "70%" },
+                      height: { xs: "85%", sm: "80%", md: "75%", lg: "70%" },
+                      position: "relative",
+                    }}
+                  >
+                    <Image
+                      src="/images/Logo.png"
+                      alt="Centichain Logo"
+                      layout="fill"
+                      objectFit="contain"
+                      priority
+                      style={{
+                        filter: "drop-shadow(0 0 25px rgba(16, 185, 129, 0.4))",
+                      }}
+                    />
+                  </Box>
+                </motion.div>
+
+                {/* Floating particles - only show on non-mobile for performance */}
+                {!isMobile &&
+                  Array.from({ length: 6 }).map((_, i) => (
+                    <Box
+                      key={i}
+                      component={motion.div}
+                      animate={{
+                        y: [
+                          Math.random() * 20,
+                          -Math.random() * 20,
+                          Math.random() * 20,
+                        ],
+                        x: [
+                          Math.random() * 20,
+                          -Math.random() * 20,
+                          Math.random() * 20,
+                        ],
+                        opacity: [0.4, 0.8, 0.4],
+                      }}
+                      transition={{
+                        duration: 3 + Math.random() * 4,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                      sx={{
+                        position: "absolute",
+                        width: 4 + Math.random() * 6,
+                        height: 4 + Math.random() * 6,
+                        borderRadius: "50%",
+                        backgroundColor: "#10b981",
+                        top: `${20 + Math.random() * 60}%`,
+                        left: `${20 + Math.random() * 60}%`,
+                        filter: "blur(1px)",
+                      }}
+                    />
+                  ))}
+              </motion.div>
+            </Box>
+          </Grid>
+        </Grid>
       </Container>
     </Box>
   );

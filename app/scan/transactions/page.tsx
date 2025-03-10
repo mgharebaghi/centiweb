@@ -52,14 +52,24 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
+// تغییر رنگ‌های سبز به نسخه تیره‌تر
+const darkGreenColors = {
+  primary: "#059669", // سبز تیره‌تر برای آیکون‌ها و متن‌های اصلی
+  hover: "#047857", // سبز تیره‌تر برای حالت hover
+  bg: "rgba(5, 150, 105, 0.1)", // پس‌زمینه با شفافیت
+  border: "rgba(5, 150, 105, 0.3)", // رنگ حاشیه
+  glow: "rgba(5, 150, 105, 0.15)", // افکت درخشش
+};
+
 export default function TransactionExplorer() {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
 
   const [transactions, setTransactions] = useState<TrxScan[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedTransaction, setSelectedTransaction] = useState<TrxScan | null>(null);
+  const [selectedTransaction, setSelectedTransaction] =
+    useState<TrxScan | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [page, setPage] = useState(1);
@@ -69,6 +79,10 @@ export default function TransactionExplorer() {
   const [lastTrxCount, setLastTrxCount] = useState(0);
   const [tabValue, setTabValue] = useState(0);
   const itemsPerPage = isMobile ? 3 : isTablet ? 4 : 5;
+  const [debouncedSearchValue, setDebouncedSearchValue] = useState("");
+  const [searchStatus, setSearchStatus] = useState<
+    "idle" | "loading" | "error" | "success"
+  >("idle");
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -105,16 +119,27 @@ export default function TransactionExplorer() {
     }
   };
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchValue(searchValue);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchValue]);
+
   const handleSearch = async () => {
-    if (!searchValue.trim()) return;
+    if (!debouncedSearchValue.trim()) {
+      setSearchStatus("idle");
+      return;
+    }
 
     try {
-      setLoading(true);
+      setSearchStatus("loading");
       setSearchError("");
 
       const response = await fetch("/api/trx", {
         method: "POST",
-        body: JSON.stringify({ hash: searchValue.trim() }),
+        body: JSON.stringify({ hash: debouncedSearchValue.trim() }),
       });
 
       const data = await response.json();
@@ -123,34 +148,25 @@ export default function TransactionExplorer() {
         setTransactions([data.transaction]);
         setTotalPages(1);
         setPage(1);
+        setSearchStatus("success");
       } else {
         setSearchError(data.message || "Transaction not found");
-        fetchTransactions();
+        setSearchStatus("error");
       }
     } catch (error) {
       console.error("Search failed:", error);
       setSearchError("Search failed");
-    } finally {
-      setLoading(false);
+      setSearchStatus("error");
     }
   };
 
   useEffect(() => {
-    if (!searchValue.trim()) {
+    if (debouncedSearchValue) {
+      handleSearch();
+    } else if (debouncedSearchValue === "") {
       fetchTransactions();
     }
-    let interval: NodeJS.Timeout;
-
-    if (autoRefresh && !searchValue.trim()) {
-      interval = setInterval(fetchTransactions, 10000);
-    }
-
-    return () => {
-      if (interval) {
-        clearInterval(interval);
-      }
-    };
-  }, [autoRefresh, page, searchValue]);
+  }, [debouncedSearchValue]);
 
   const handleTransactionClick = (transaction: TrxScan) => {
     setSelectedTransaction(transaction);
@@ -170,248 +186,413 @@ export default function TransactionExplorer() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-zinc-950 pt-[80px] px-4 sm:px-6">
-      <Container maxWidth="md">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Paper
-            elevation={3}
-            className="bg-gradient-to-r from-zinc-900 to-zinc-800 p-4 sm:p-6 rounded-xl border border-zinc-700 shadow-2xl mb-5"
-          >
-            <div className="space-y-4">
-              {/* Title Section */}
-              <div className="text-center">
-                <Typography
-                  variant={isMobile ? "h5" : "h4"}
-                  className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-green-300 to-emerald-400 tracking-tight"
-                >
-                  Live Transaction Explorer
-                </Typography>
-                <Typography className="text-zinc-400 text-xs">
-                  Real-time monitoring of network transactions
-                </Typography>
-              </div>
+    <div className="min-h-screen w-full bg-[#0F172A] relative overflow-hidden mt-16">
+      {/* Background Patterns - Same as blocks page */}
+      <div className="fixed inset-0 z-0">
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0F172A] via-[#131C2F] to-[#162032] opacity-98" />
 
-              {/* Stats Section */}
-              <div className="flex flex-wrap justify-center items-center gap-3">
-                <div className="flex flex-col sm:flex-row items-center gap-3 bg-zinc-800/50 px-3 py-1.5 rounded-xl backdrop-blur-sm border border-zinc-700/50 w-full sm:w-auto">
-                  <div className="flex items-center gap-2">
-                    <div className="p-1 bg-emerald-400/10 rounded-lg">
-                      <RiNodeTree className="text-emerald-400 text-base" />
-                    </div>
-                    <div>
-                      <Typography className="text-xs text-zinc-400">Total Transactions</Typography>
-                      <Typography className="text-base font-semibold text-white">
-                        {lastTrxCount?.toLocaleString()}
-                      </Typography>
-                    </div>
+        {/* Grid Pattern */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, rgba(148, 163, 184, 0.03) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(148, 163, 184, 0.03) 1px, transparent 1px)
+            `,
+            backgroundSize: "40px 40px",
+          }}
+        />
+
+        {/* Radial Glow */}
+        <div className="absolute inset-0">
+          <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-emerald-600/5 rounded-full filter blur-[120px]" />
+          <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/5 rounded-full filter blur-[120px]" />
+        </div>
+
+        {/* Floating Elements */}
+        {Array.from({ length: 15 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full opacity-10"
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              width: `${Math.random() * 3 + 1}px`,
+              height: `${Math.random() * 3 + 1}px`,
+              background: Math.random() > 0.5 ? "#10B981" : "#3B82F6",
+              animation: `float ${Math.random() * 10 + 15}s linear infinite`,
+              animationDelay: `-${Math.random() * 10}s`,
+            }}
+          />
+        ))}
+
+        {/* Dot Pattern */}
+        <svg className="absolute inset-0 w-full h-full opacity-[0.02]">
+          <pattern
+            id="pattern-circles"
+            x="0"
+            y="0"
+            width="48"
+            height="48"
+            patternUnits="userSpaceOnUse"
+            patternContentUnits="userSpaceOnUse"
+          >
+            <circle
+              cx="24"
+              cy="24"
+              r="1"
+              fill="currentColor"
+              className="text-slate-400"
+            />
+          </pattern>
+          <rect
+            x="0"
+            y="0"
+            width="100%"
+            height="100%"
+            fill="url(#pattern-circles)"
+          />
+        </svg>
+      </div>
+
+      {/* Main Content */}
+      <Container maxWidth="xl" className="relative z-10 px-3 sm:px-4 md:px-6">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex flex-col gap-4 py-4 sm:py-6"
+        >
+          {/* Header Layout */}
+          <div className="flex flex-col lg:flex-row items-stretch gap-4 mb-4">
+            {/* Title Section */}
+            <div className="flex items-center justify-between lg:justify-start gap-4">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="flex items-center gap-3"
+              >
+                <Typography className="text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent">
+                  Live Transactions
+                </Typography>
+              </motion.div>
+            </div>
+
+            {/* Stats and Search Section */}
+            <div className="flex flex-col sm:flex-row gap-4 flex-grow">
+              {/* Stats Card */}
+              <Paper
+                elevation={0}
+                className="bg-[#1E293B]/40 backdrop-blur-xl border border-slate-800/50 rounded-xl px-4 h-[52px] flex items-center justify-between sm:justify-start gap-6"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                    <RiNodeTree className="text-emerald-400 text-xl" />
                   </div>
-                  
-                  <div className="hidden sm:block h-6 w-px bg-zinc-700/50" />
-                  
-                  <div
-                    className="flex items-center gap-2 cursor-pointer group mt-2 sm:mt-0"
-                    onClick={toggleAutoRefresh}
-                  >
-                    <div className={`p-1 rounded-lg transition-colors ${
-                      autoRefresh ? 'bg-emerald-400/10' : 'bg-zinc-700/30'
-                    }`}>
-                      <FiClock className={`text-base transition-colors ${
-                        autoRefresh ? 'text-emerald-400' : 'text-zinc-400'
-                      }`} />
-                    </div>
-                    <div>
-                      <Typography className="text-xs text-zinc-400">Auto Refresh</Typography>
-                      <Typography className={`text-xs font-medium transition-colors ${
-                        autoRefresh ? 'text-emerald-400' : 'text-white'
-                      }`}>
-                        {autoRefresh ? 'Active' : 'Inactive'}
-                      </Typography>
-                    </div>
+                  <div>
+                    <Typography className="text-white text-lg font-bold">
+                      #{lastTrxCount?.toLocaleString()}
+                    </Typography>
                   </div>
                 </div>
-              </div>
 
-              {/* Search Section */}
-              <div className="max-w-xl mx-auto relative">
+                <div className="h-8 w-px bg-slate-800/50" />
+
+                {/* Auto Refresh Toggle */}
+                <div
+                  onClick={toggleAutoRefresh}
+                  className="flex items-center gap-3 cursor-pointer group"
+                >
+                  <div
+                    className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-300 ${
+                      autoRefresh ? "bg-emerald-500/10" : "bg-slate-800/30"
+                    }`}
+                  >
+                    <FiClock
+                      className={`text-xl transition-colors duration-300 ${
+                        autoRefresh ? "text-emerald-400" : "text-slate-400"
+                      }`}
+                    />
+                  </div>
+                  <Typography
+                    className={`font-medium transition-colors duration-300 ${
+                      autoRefresh ? "text-emerald-400" : "text-white"
+                    }`}
+                  >
+                    {autoRefresh ? "Auto" : "Manual"}
+                  </Typography>
+                </div>
+              </Paper>
+
+              {/* Search Box with Fixed Height */}
+              <div className="flex-grow">
                 <TextField
                   fullWidth
-                  placeholder={isMobile ? "Search hash..." : "Search by transaction hash..."}
+                  placeholder="Search by transaction hash..."
                   value={searchValue}
                   onChange={(e) => {
                     setSearchValue(e.target.value);
-                    setSearchError("");
+                    if (searchStatus === "error") {
+                      setSearchStatus("idle");
+                      setSearchError("");
+                    }
                   }}
-                  onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                  className="bg-zinc-800/30 rounded-xl shadow-lg transition-all duration-200 hover:shadow-emerald-900/20"
+                  className="w-full"
+                  error={searchStatus === "error"}
                   InputProps={{
                     startAdornment: (
-                      <IconButton
-                        onClick={handleSearch}
-                        size="small"
-                        className="hover:bg-emerald-500/10 transition-colors duration-200"
+                      <div
+                        className={`flex items-center gap-2 pr-3 border-r transition-colors duration-200 ${
+                          searchStatus === "error"
+                            ? "border-red-500/30"
+                            : "border-slate-700"
+                        }`}
                       >
-                        <FiSearch className="text-emerald-400 text-base" />
-                      </IconButton>
+                        <FiSearch
+                          className={`text-lg ${
+                            searchStatus === "error"
+                              ? "text-red-400"
+                              : searchStatus === "success"
+                              ? "text-emerald-600"
+                              : "text-slate-400"
+                          }`}
+                        />
+                      </div>
                     ),
-                    endAdornment: searchValue && (
-                      <IconButton
-                        onClick={() => {
-                          setSearchValue("");
-                          setSearchError("");
-                        }}
-                        size="small"
-                        className="hover:bg-red-500/10 transition-colors duration-200 mr-1"
-                      >
-                        <IoClose className="text-red-400 hover:text-red-300" />
-                      </IconButton>
+                    endAdornment: (
+                      <div className="flex items-center gap-2">
+                        {searchStatus === "loading" && (
+                          <CircularProgress
+                            size={20}
+                            thickness={4}
+                            sx={{ color: "#10B981" }}
+                          />
+                        )}
+                        {searchValue && (
+                          <IconButton
+                            size="small"
+                            onClick={() => {
+                              setSearchValue("");
+                              setSearchError("");
+                              setSearchStatus("idle");
+                              fetchTransactions();
+                            }}
+                            className="hover:bg-slate-700/30"
+                          >
+                            <IoClose className="text-slate-400 hover:text-slate-300" />
+                          </IconButton>
+                        )}
+                      </div>
                     ),
-                    className: "rounded-xl",
                   }}
                   sx={{
                     "& .MuiOutlinedInput-root": {
+                      height: "52px", // Fixed height to match other elements
+                      backgroundColor: "rgba(30, 41, 59, 0.4)",
+                      backdropFilter: "blur(12px)",
+                      borderRadius: "1rem",
+                      border: "1px solid",
+                      borderColor: (theme) =>
+                        searchStatus === "error"
+                          ? "rgba(239, 68, 68, 0.5)"
+                          : searchStatus === "success"
+                          ? "rgba(5, 150, 105, 0.3)"
+                          : "rgba(51, 65, 85, 0.5)",
+                      fontSize: "0.95rem",
+                      transition: "all 0.2s ease-in-out",
+                      "&:hover": {
+                        borderColor: (theme) =>
+                          searchStatus === "error"
+                            ? "rgba(239, 68, 68, 0.7)"
+                            : searchStatus === "success"
+                            ? "rgba(5, 150, 105, 0.5)"
+                            : "rgba(5, 150, 105, 0.3)",
+                        backgroundColor: "rgba(30, 41, 59, 0.5)",
+                      },
+                      "&.Mui-focused": {
+                        borderColor: (theme) =>
+                          searchStatus === "error"
+                            ? "rgb(239, 68, 68)"
+                            : "#059669",
+                        boxShadow: (theme) =>
+                          searchStatus === "error"
+                            ? "0 0 0 2px rgba(239, 68, 68, 0.1)"
+                            : "0 0 0 2px rgba(5, 150, 105, 0.1)",
+                      },
                       "& fieldset": {
-                        borderColor: "rgba(16, 185, 129, 0.1)",
-                        borderWidth: "1px",
-                      },
-                      "&:hover fieldset": {
-                        borderColor: "rgba(16, 185, 129, 0.2)",
-                      },
-                      "&.Mui-focused fieldset": {
-                        borderColor: "#10B981",
+                        border: "none",
                       },
                     },
                     "& .MuiInputBase-input": {
-                      color: "white",
-                      padding: "8px 10px",
-                      fontSize: "0.875rem",
+                      color: "#E2E8F0",
+                      fontFamily: "monospace",
+                      fontSize: "0.95rem",
                       "&::placeholder": {
-                        color: "rgb(156 163 175)",
-                        opacity: 0.7,
+                        color: "#64748B",
+                        opacity: 1,
                       },
                     },
                   }}
                 />
-                {searchError && (
-                  <Typography className="text-red-400 mt-1 text-xs flex items-center gap-1 justify-center animate-pulse">
-                    <IoClose className="text-sm" />
-                    {searchError}
-                  </Typography>
-                )}
               </div>
             </div>
-          </Paper>
+          </div>
 
-          {loading ? (
-            <div className="flex justify-center my-8">
-              <CircularProgress />
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <AnimatePresence>
-                {transactions.map((transaction, index) => (
-                  <motion.div
-                    key={transaction.hash}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
+          {/* Transactions Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
+            <AnimatePresence mode="popLayout">
+              {transactions.map((transaction, index) => (
+                <motion.div
+                  key={transaction.hash}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.4, delay: index * 0.05 }}
+                  layout
+                >
+                  <Card
+                    onClick={() => handleTransactionClick(transaction)}
+                    className="bg-[#1E293B]/40 backdrop-blur-xl border border-slate-800/50 rounded-xl cursor-pointer group transition-all duration-300 hover:-translate-y-1 hover:bg-[#1E293B]/60"
                   >
-                    <Card
-                      onClick={() => handleTransactionClick(transaction)}
-                      className="bg-gradient-to-r from-zinc-900 to-zinc-800 hover:from-zinc-800 hover:to-zinc-700 transition-colors cursor-pointer border border-zinc-700"
-                    >
-                      <CardContent className="p-3 sm:p-4">
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-                          <div className="flex items-center gap-3 w-full sm:w-auto">
-                            <FiHash className="text-emerald-400 text-lg hidden sm:block" />
-                            <div className="w-full sm:w-auto">
-                              <Typography className="text-white font-mono text-xs sm:text-sm break-all">
-                                {isMobile ? 
-                                  `${transaction.hash.slice(0, 20)}...${transaction.hash.slice(-4)}` :
-                                  transaction.hash
-                                }
+                    <CardContent className="p-3 sm:p-4">
+                      <div className="space-y-2 sm:space-y-3">
+                        {/* Card Header */}
+                        <div className="flex justify-between items-start">
+                          <div className="flex items-center gap-2">
+                            <div className="p-1.5 sm:p-2 rounded-lg bg-emerald-700/10 group-hover:bg-emerald-700/15">
+                              <FiHash className="text-emerald-600 text-sm sm:text-base" />
+                            </div>
+                            <div>
+                              <Typography className="text-emerald-600 text-sm sm:text-base font-semibold">
+                                Transaction
                               </Typography>
-                              <div className="flex items-center gap-2 mt-1">
-                                <Typography
-                                  variant="body2"
-                                  className="text-gray-400 text-xs"
-                                >
+                              <div className="flex items-center gap-2">
+                                <div className="w-1 h-1 rounded-full bg-emerald-600/50" />
+                                <Typography className="text-xs font-medium text-slate-200">
                                   {moment(transaction.date).fromNow()}
                                 </Typography>
-                                <Chip
-                                  label={transaction.block ? "Confirmed" : "Pending"}
-                                  size="small"
-                                  className={`${
-                                    transaction.block 
-                                      ? "bg-emerald-400/10 text-emerald-400" 
-                                      : "bg-yellow-400/10 text-yellow-400"
-                                  } text-xs`}
-                                />
                               </div>
                             </div>
                           </div>
                           <Chip
-                            label={`${transaction.value} CENTI`}
-                            className="bg-zinc-800 text-emerald-400 text-xs"
                             size="small"
+                            label={`${transaction.value} CENTI`}
+                            className="bg-emerald-700/10 text-emerald-600 text-xs"
                           />
                         </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
+
+                        {/* Hash */}
+                        <div className="space-y-1">
+                          <Typography className="text-slate-400 text-xs">
+                            Hash
+                          </Typography>
+                          <Typography className="font-mono text-[11px] sm:text-xs text-slate-300 truncate bg-slate-900/50 p-2 rounded-lg">
+                            {transaction.hash}
+                          </Typography>
+                        </div>
+
+                        {/* Status */}
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-2">
+                            <div
+                              className={`w-1.5 h-1.5 rounded-full ${
+                                transaction.block
+                                  ? "bg-emerald-600"
+                                  : "bg-yellow-500"
+                              }`}
+                            />
+                            <Typography className="text-slate-400 text-xs">
+                              {transaction.block ? "Confirmed" : "Pending"}
+                            </Typography>
+                          </div>
+                          <BsArrowRight className="text-emerald-600 text-sm opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all duration-300" />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex justify-center mt-4 sm:mt-6"
+            >
+              <Paper
+                elevation={0}
+                className="bg-[#1E293B]/40 backdrop-blur-xl border border-slate-800/50 rounded-lg p-1 sm:p-2"
+              >
+                <Pagination
+                  count={totalPages}
+                  page={page}
+                  onChange={handlePageChange}
+                  variant="outlined"
+                  shape="rounded"
+                  size={isMobile ? "small" : "medium"}
+                  siblingCount={isMobile ? 0 : 1}
+                  boundaryCount={isMobile ? 1 : 2}
+                  sx={{
+                    "& .MuiPaginationItem-root": {
+                      color: "#E2E8F0",
+                      borderColor: "rgba(51, 65, 85, 0.5)",
+                      fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                      minWidth: { xs: "28px", sm: "32px" },
+                      height: { xs: "28px", sm: "32px" },
+                    },
+                  }}
+                />
+              </Paper>
+            </motion.div>
           )}
 
-          {!loading && transactions.length > 0 && (
-            <div className="flex justify-center mt-6 mb-8">
-              <Pagination
-                count={totalPages}
-                page={page}
-                onChange={handlePageChange}
-                variant="outlined"
-                shape="rounded"
-                size={isMobile ? "small" : "medium"}
-                className="bg-zinc-900 p-2 rounded-lg"
-                sx={{
-                  "& .MuiPaginationItem-root": {
-                    color: "#9CA3AF",
-                    borderColor: "#4B5563",
-                  },
-                  "& .Mui-selected": {
-                    backgroundColor: "#059669 !important",
-                    color: "white",
-                  },
-                }}
-              />
-            </div>
-          )}
-
+          {/* Updated Modal Styling */}
           <Dialog
             open={dialogOpen}
             onClose={() => setDialogOpen(false)}
-            maxWidth="md"
+            maxWidth="lg"
             fullWidth
+            fullScreen={isMobile}
             PaperProps={{
-              className: "bg-zinc-900 m-4",
+              className: "bg-[#1E293B]/95 backdrop-blur-xl",
+              sx: {
+                background:
+                  "linear-gradient(180deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%)",
+                border: "1px solid rgba(51, 65, 85, 0.5)",
+                margin: { xs: 0, sm: 2 },
+                maxHeight: { xs: "100%", sm: "calc(100% - 64px)" },
+                borderRadius: { xs: 0, sm: "16px" },
+              },
             }}
           >
             {selectedTransaction && (
-              <Box className="p-4 sm:p-6">
-                <div className="flex justify-between items-center mb-6">
-                  <Typography variant="h6" className="text-emerald-400 text-base sm:text-lg">
-                    Transaction Details
-                  </Typography>
+              <Box className="relative">
+                {/* Modal Header */}
+                <div className="flex justify-between items-center p-4 sm:p-6 border-b border-slate-700/50">
+                  <div className="flex items-center gap-4">
+                    <div className="p-2.5 rounded-xl bg-emerald-500/10">
+                      <FiHash className="text-emerald-400 text-xl" />
+                    </div>
+                    <div>
+                      <Typography className="text-xl sm:text-2xl font-bold text-white">
+                        Transaction Details
+                      </Typography>
+                      <Typography className="text-slate-400 text-sm">
+                        {moment(selectedTransaction.date).format(
+                          "MMMM Do YYYY, h:mm:ss a"
+                        )}
+                      </Typography>
+                    </div>
+                  </div>
                   <IconButton
                     onClick={() => setDialogOpen(false)}
-                    className="text-gray-400"
+                    className="hover:bg-slate-700/50 transition-colors"
                   >
-                    <IoClose />
+                    <IoClose className="text-slate-400 hover:text-slate-300" />
                   </IconButton>
                 </div>
 
@@ -428,11 +609,11 @@ export default function TransactionExplorer() {
                     "& .MuiTab-root": {
                       color: "#9CA3AF",
                       "&.Mui-selected": {
-                        color: "#ffffff"
+                        color: "#ffffff",
                       },
                       minHeight: isMobile ? "48px" : "64px",
-                      fontSize: isMobile ? "0.75rem" : "0.875rem"
-                    }
+                      fontSize: isMobile ? "0.75rem" : "0.875rem",
+                    },
                   }}
                 >
                   <Tab
@@ -508,7 +689,9 @@ export default function TransactionExplorer() {
                             {selectedTransaction.block ? (
                               selectedTransaction.block
                             ) : (
-                              <span className="text-yellow-400 font-semibold">Pending</span>
+                              <span className="text-yellow-400 font-semibold">
+                                Pending
+                              </span>
                             )}
                           </Typography>
                         </div>

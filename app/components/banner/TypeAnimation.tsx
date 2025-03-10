@@ -48,38 +48,26 @@ const TypeAnimation: React.FC<TypeAnimationProps> = ({
     let timeout: NodeJS.Timeout;
 
     if (!isDeleting && currentIndex < currentText.length) {
+      // Typing
       timeout = setTimeout(() => {
         setDisplayText((prev) => prev + currentText[currentIndex]);
         setCurrentIndex((prev) => prev + 1);
       }, speed);
+    } else if (currentIndex === currentText.length && !isDeleting) {
+      // Finished typing, wait before deleting
+      timeout = setTimeout(() => {
+        setIsDeleting(true);
+      }, repeatDelay);
     } else if (isDeleting && displayText.length > 0) {
+      // Deleting
       timeout = setTimeout(() => {
         setDisplayText((prev) => prev.substring(0, prev.length - 1));
       }, speed / 2);
     } else if (displayText.length === 0 && isDeleting) {
+      // Finished deleting, move to next text
       setIsDeleting(false);
       setCurrentIndex(0);
-
-      // Move to next text in the array if there are multiple texts
-      if (Array.isArray(text) && text.length > 1) {
-        setTextArrayIndex((prev) => (prev + 1) % textArray.length);
-      }
-
-      setIsPaused(true);
-      // Pause before restarting
-      timeout = setTimeout(() => {
-        setIsPaused(false);
-      }, switchDelay);
-    } else if (currentIndex === currentText.length && !isDeleting) {
-      // Pause at the end before deleting
-      setIsPaused(true);
-      timeout = setTimeout(
-        () => {
-          setIsPaused(false);
-          setIsDeleting(true);
-        },
-        repeat ? repeatDelay : switchDelay
-      );
+      setTextArrayIndex((prev) => (prev + 1) % textArray.length);
     }
 
     return () => clearTimeout(timeout);
@@ -89,30 +77,24 @@ const TypeAnimation: React.FC<TypeAnimationProps> = ({
     isDeleting,
     isStarted,
     isPaused,
-    loop,
-    repeat,
-    repeatDelay,
     speed,
     currentText,
     textArray,
     textArrayIndex,
-    switchDelay,
-    text,
+    repeatDelay,
   ]);
 
   return (
     <>
       {displayText}
-      {cursor &&
-        !isPaused &&
-        (currentIndex < currentText.length || isDeleting) && (
-          <span
-            className="cursor"
-            style={{ opacity: 1, animation: "blink 1s step-end infinite" }}
-          >
-            |
-          </span>
-        )}
+      {cursor && (
+        <span
+          className="cursor"
+          style={{ opacity: 1, animation: "blink 1s step-end infinite" }}
+        >
+          |
+        </span>
+      )}
       <style jsx global>{`
         @keyframes blink {
           from,

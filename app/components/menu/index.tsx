@@ -1,37 +1,49 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { usePathname, useRouter } from "next/navigation";
-import Link from "next/link";
-import { useMediaQuery } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import {
+  AppBar,
+  Box,
+  Toolbar,
+  Container,
+  Button,
+  IconButton,
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
+  useScrollTrigger,
+  Stack,
+  useMediaQuery,
+  useTheme,
+  Collapse,
+  ListItemIcon,
+} from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 import Image from "next/image";
-import { IoReorderThree } from "react-icons/io5";
-import { PulseLoader } from "react-spinners";
+import MenuIcon from "@mui/icons-material/Menu";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   FaQrcode,
   FaFileAlt,
   FaDownload,
   FaCode,
-  FaEnvelope,
-  FaUsers,
   FaServer,
-  FaHome,
+  FaEnvelope,
   FaChevronDown,
 } from "react-icons/fa";
-import { IoClose } from "react-icons/io5";
-import Drawer from "@mui/material/Drawer";
+import { usePathname } from "next/navigation";
 
 const menuItems = [
-  { 
-    label: "Explorer", 
-    path: "/scan", 
+  {
+    label: "Explorer",
+    path: "/scan",
     icon: <FaQrcode />,
     submenu: [
       { label: "Blocks", path: "/scan/blocks" },
-      { label: "Transactions", path: "/scan/transactions" }
-    ]
-
+      { label: "Transactions", path: "/scan/transactions" },
+    ],
   },
   {
     label: "Whitepaper",
@@ -61,284 +73,595 @@ const menuItems = [
   },
 ];
 
-const drawerMenuItems = [
-  { label: "Home", path: "/", icon: <FaHome /> },
-  ...menuItems
-];
-
-function Menu() {
+const Menu = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [coins, setCoins] = useState<number | null>(null);
+  const [mounted, setMounted] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const trigger = useScrollTrigger({
+    disableHysteresis: true,
+    threshold: 100,
+  });
+
   const pathname = usePathname();
-  const router = useRouter();
-  const isMobile = useMediaQuery("(max-width: 768px)");
-  const isMedium = useMediaQuery("(max-width: 1024px)");
+  const isHomePage = pathname === "/";
 
   useEffect(() => {
-    fetchCoins();
+    setMounted(true);
   }, []);
 
-  // Close submenu when pathname changes
-  useEffect(() => {
-    setOpenSubmenu(null);
-  }, [pathname]);
-
-  const fetchCoins = async () => {
-    try {
-      const res = await fetch("/api/coins", { cache: "no-store" });
-      const data = await res.json();
-      setCoins(Number(data.message));
-    } catch (error) {
-      console.error("Error fetching coins:", error);
-      setCoins(null);
-    }
-  };
-
-  const menuVariants = {
-    closed: {
-      height: 0,
-      opacity: 0,
-      transition: {
-        duration: 0.2,
-      },
-    },
-    open: {
-      height: "auto",
-      opacity: 1,
-      transition: {
-        duration: 0.2,
-      },
-    },
-  };
-
-  const isPathActive = (menuPath: string) => {
-    if (menuPath === "/dev") {
-      return pathname.startsWith("/dev");
-    }
-    if (menuPath === "/node") {
-      return pathname.startsWith("/node") || pathname === "/contributors";
-    }
-    if (menuPath === "/scan") {
-      return pathname === "/scan" || pathname === "/transactions";
-    }
-    return pathname === menuPath;
-  };
-
-  const handleSubmenuClick = (path: string) => {
-    if (openSubmenu === path) {
-      setOpenSubmenu(null);
-    } else {
-      setOpenSubmenu(path);
-    }
-  };
+  if (!mounted) return null;
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-lg">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo - Left Corner */}
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="cursor-pointer absolute left-4"
-            onClick={() => router.push("/")}
+    <>
+      <AppBar
+        position="fixed"
+        elevation={0}
+        sx={{
+          background: "linear-gradient(135deg, #030800 0%, #020400 100%)",
+          backdropFilter: "blur(12px)",
+          borderBottom: "1px solid rgba(16, 185, 129, 0.1)",
+          transition: "all 0.3s ease-in-out",
+        }}
+      >
+        <Container maxWidth="xl">
+          <Toolbar
+            sx={{
+              height: { xs: 70, md: 80 },
+              transition: "height 0.3s ease",
+            }}
           >
-            <Image
-              src="/images/Logo.png"
-              alt="Logo"
-              width={40}
-              height={40}
-              className="w-10 h-10"
-            />
-          </motion.div>
+            {/* Logo Section */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Link href="/" passHref>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1.5,
+                    cursor: "pointer",
+                    "&:hover": {
+                      "& .logo-image": {
+                        transform: "scale(1.05)",
+                      },
+                      "& .logo-text": {
+                        opacity: 1,
+                      },
+                    },
+                  }}
+                >
+                  <Box
+                    className="logo-image"
+                    sx={{
+                      position: "relative",
+                      width: { xs: 35, md: 40 },
+                      height: { xs: 35, md: 40 },
+                      transition: "transform 0.3s ease",
+                      filter: "drop-shadow(0 0 10px rgba(16, 185, 129, 0.3))",
+                    }}
+                  >
+                    <Image
+                      src="/images/Logo.png"
+                      alt="Centichain Logo"
+                      layout="fill"
+                      objectFit="contain"
+                      priority
+                    />
+                  </Box>
+                  <Box
+                    className="logo-text"
+                    component={motion.div}
+                    sx={{
+                      fontSize: { xs: "1.3rem", md: "1.5rem" },
+                      fontWeight: 600,
+                      opacity: 0.9,
+                      transition: "opacity 0.3s ease",
+                      background:
+                        "linear-gradient(90deg, #fff, rgba(255,255,255,0.8))",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                    }}
+                  >
+                    Centichain
+                  </Box>
+                </Box>
+              </Link>
+            </motion.div>
 
-          {/* Desktop Menu - Centered */}
-          {!isMedium && (
-            <div className="flex items-center justify-center flex-1 space-x-8">
-              {menuItems.map((item) => (
-                <div key={item.path} className="relative">
-                  {item.submenu ? (
-                    <div className="relative">
-                      <button
-                        onClick={() => handleSubmenuClick(item.path)}
-                        className={`
-                          flex items-center space-x-2 px-3 py-2 rounded-md text-sm
-                          transition-all duration-200
-                          ${
-                            isPathActive(item.path)
-                              ? "text-emerald-400 bg-emerald-900/20"
-                              : "text-gray-300 hover:text-emerald-400 hover:bg-emerald-900/10"
-                          }
-                        `}
-                      >
-                        <span>{item.icon}</span>
-                        <span>{item.label}</span>
-                        <FaChevronDown
-                          className={`ml-1 transition-transform ${
-                            openSubmenu === item.path ? "rotate-180" : ""
-                          }`}
-                        />
-                      </button>
-                      {openSubmenu === item.path && (
-                        <div className="absolute top-full left-0 mt-1 py-2 w-48 bg-black/90 backdrop-blur-lg rounded-md shadow-lg">
-                          {item.submenu.map((subItem) => (
-                            <Link
-                              key={subItem.path}
-                              href={subItem.path}
-                              className={`block px-4 py-2 text-sm ${
-                                pathname === subItem.path
-                                  ? "text-emerald-400 bg-emerald-900/20"
-                                  : "text-gray-300 hover:text-emerald-400 hover:bg-emerald-900/10"
-                              }`}
-                            >
-                              {subItem.label}
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <Link
-                      href={item.path}
-                      className={`
-                        flex items-center space-x-2 px-3 py-2 rounded-md text-sm
-                        transition-all duration-200
-                        ${
-                          isPathActive(item.path)
-                            ? "text-emerald-400 bg-emerald-900/20"
-                            : "text-gray-300 hover:text-emerald-400 hover:bg-emerald-900/10"
-                        }
-                      `}
+            {/* Desktop Menu */}
+            {!isMobile && (
+              <Stack
+                direction="row"
+                spacing={1}
+                alignItems="center"
+                sx={{
+                  ml: "auto",
+                  background: "rgba(16, 185, 129, 0.03)",
+                  backdropFilter: "blur(8px)",
+                  padding: "4px",
+                  borderRadius: "12px",
+                  border: "1px solid rgba(16, 185, 129, 0.1)",
+                }}
+              >
+                {menuItems.map((item, index) => (
+                  <Box
+                    key={index}
+                    sx={{ position: "relative" }}
+                    onMouseEnter={() =>
+                      item.submenu && setOpenSubmenu(item.path)
+                    }
+                    onMouseLeave={() => item.submenu && setOpenSubmenu(null)}
+                  >
+                    <Button
+                      component={item.submenu ? Box : Link}
+                      href={!item.submenu ? item.path : undefined}
+                      onClick={() =>
+                        item.submenu &&
+                        setOpenSubmenu(
+                          openSubmenu === item.path ? null : item.path
+                        )
+                      }
+                      sx={{
+                        px: 2,
+                        py: 1,
+                        color: "white",
+                        position: "relative",
+                        overflow: "hidden",
+                        "&::before": {
+                          content: '""',
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          background: "rgba(16, 185, 129, 0.1)",
+                          borderRadius: "8px",
+                          opacity:
+                            !isHomePage &&
+                            (pathname === item.path ||
+                              pathname.startsWith(item.path))
+                              ? 1
+                              : 0,
+                          transition: "opacity 0.3s ease",
+                        },
+                        "&:hover": {
+                          "&::before": {
+                            opacity: 1,
+                          },
+                          "& .menu-icon": {
+                            transform: "translateY(-2px)",
+                            color: "#10b981",
+                          },
+                        },
+                      }}
                     >
-                      <span>{item.icon}</span>
-                      <span>{item.label}</span>
-                    </Link>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                          position: "relative",
+                          zIndex: 1,
+                        }}
+                      >
+                        <Box
+                          className="menu-icon"
+                          sx={{
+                            color:
+                              !isHomePage &&
+                              (pathname === item.path ||
+                                pathname.startsWith(item.path))
+                                ? "#10b981"
+                                : "rgba(255,255,255,0.7)",
+                            transition: "all 0.3s ease",
+                          }}
+                        >
+                          {item.icon}
+                        </Box>
+                        <span>{item.label}</span>
+                        {item.submenu && (
+                          <FaChevronDown
+                            style={{
+                              fontSize: "0.8rem",
+                              transition: "transform 0.3s ease",
+                              transform:
+                                openSubmenu === item.path
+                                  ? "rotate(180deg)"
+                                  : "rotate(0)",
+                            }}
+                          />
+                        )}
+                      </Box>
+                    </Button>
 
-          {/* Remaining CENTIs - Right Corner */}
-          <div className="absolute right-4 flex items-center">
-            {coins !== null ? (
-              <motion.span
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-sm font-medium text-emerald-400"
-              >
-                {isMobile
-                  ? `${Number(coins).toLocaleString()} CENTIs`
-                  : `Remaining CENTIs: ${Number(coins).toLocaleString()}`}
-              </motion.span>
-            ) : (
-              <PulseLoader size={4} color="#34D399" />
+                    {/* Submenu Dropdown */}
+                    {item.submenu && (
+                      <AnimatePresence>
+                        {openSubmenu === item.path && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            transition={{ duration: 0.2 }}
+                            style={{
+                              position: "absolute",
+                              top: "100%",
+                              left: 0,
+                              zIndex: 100,
+                              minWidth: "200px",
+                              marginTop: "0.5rem",
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                background: "#030800",
+                                backdropFilter: "blur(12px)",
+                                borderRadius: "12px",
+                                border: "1px solid rgba(16, 185, 129, 0.15)",
+                                overflow: "hidden",
+                                boxShadow: "0 8px 32px rgba(0, 0, 0, 0.5)",
+                              }}
+                            >
+                              {item.submenu.map((subItem, subIndex) => (
+                                <motion.div
+                                  key={subIndex}
+                                  whileHover={{ x: 5 }}
+                                  transition={{ duration: 0.2 }}
+                                >
+                                  <Button
+                                    component={Link}
+                                    href={subItem.path}
+                                    fullWidth
+                                    sx={{
+                                      py: 1.5,
+                                      px: 3,
+                                      justifyContent: "flex-start",
+                                      color:
+                                        !isHomePage && pathname === subItem.path
+                                          ? "#10b981"
+                                          : "rgba(255,255,255,0.8)",
+                                      background:
+                                        !isHomePage && pathname === subItem.path
+                                          ? "rgba(16, 185, 129, 0.15)"
+                                          : "transparent",
+                                      borderLeft: "2px solid",
+                                      borderColor:
+                                        !isHomePage && pathname === subItem.path
+                                          ? "#10b981"
+                                          : "transparent",
+                                      "&:hover": {
+                                        background: "rgba(16, 185, 129, 0.15)",
+                                        borderColor: "#10b981",
+                                        color: "#fff",
+                                      },
+                                    }}
+                                  >
+                                    {subItem.label}
+                                  </Button>
+                                </motion.div>
+                              ))}
+                            </Box>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    )}
+                  </Box>
+                ))}
+
+                {/* CTA Button */}
+                <Button
+                  component={Link}
+                  href="/download"
+                  sx={{
+                    ml: 2,
+                    background: "rgba(29, 71, 0, 0.1)",
+                    backdropFilter: "blur(10px)",
+                    border: "1px solid rgba(29, 71, 0, 0.2)",
+                    color: "#fff",
+                    px: 3,
+                    py: 1,
+                    borderRadius: "8px",
+                    fontSize: "0.9rem",
+                    textTransform: "none",
+                    fontWeight: 500,
+                    letterSpacing: "0.02em",
+                    "&:hover": {
+                      background: "rgba(29, 71, 0, 0.2)",
+                      transform: "translateY(-2px)",
+                      "& .arrow": {
+                        transform: "translateX(4px)",
+                      },
+                    },
+                  }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    Start as a Node
+                    <span
+                      className="arrow"
+                      style={{ transition: "transform 0.3s ease" }}
+                    >
+                      →
+                    </span>
+                  </Box>
+                </Button>
+              </Stack>
             )}
 
-            {/* Mobile/Medium Menu Button */}
-            {isMedium && (
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setIsOpen(!isOpen)}
-                className="text-gray-300 hover:text-emerald-400 ml-4"
+            {/* Mobile Menu Button */}
+            {isMobile && (
+              <IconButton
+                onClick={() => setIsOpen(true)}
+                sx={{
+                  ml: "auto",
+                  color: "white",
+                  background: "rgba(16, 185, 129, 0.1)",
+                  backdropFilter: "blur(8px)",
+                  border: "1px solid rgba(16, 185, 129, 0.2)",
+                  "&:hover": {
+                    background: "rgba(16, 185, 129, 0.2)",
+                  },
+                }}
               >
-                <IoReorderThree className="w-8 h-8" />
-              </motion.button>
+                <MenuIcon />
+              </IconButton>
             )}
-          </div>
-        </div>
+          </Toolbar>
+        </Container>
+      </AppBar>
 
-        {/* Mobile/Medium Menu Drawer */}
-        <Drawer
-          anchor="right"
-          open={isMedium && isOpen}
-          onClose={() => setIsOpen(false)}
-          PaperProps={{
-            sx: {
-              backgroundColor: "rgba(0, 0, 0, 0.9)",
-              backdropFilter: "blur(10px)",
-              width: "75%",
-            },
+      {/* Mobile Menu Drawer */}
+      <Drawer
+        anchor="right"
+        open={isOpen}
+        onClose={() => setIsOpen(false)}
+        PaperProps={{
+          sx: {
+            width: "100%",
+            maxWidth: "360px",
+            background: "#000000",
+            borderLeft: "1px solid rgba(16, 185, 129, 0.15)",
+          },
+        }}
+      >
+        <Box
+          sx={{
+            p: 3,
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
           }}
         >
-          <div className="relative px-2 pt-16 pb-3 space-y-1">
-            <button
+          {/* Mobile Menu Header */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 4,
+            }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+              <Box
+                sx={{
+                  position: "relative",
+                  width: 35,
+                  height: 35,
+                  filter: "drop-shadow(0 0 8px rgba(16, 185, 129, 0.3))",
+                }}
+              >
+                <Image
+                  src="/images/Logo.png"
+                  alt="Centichain Logo"
+                  layout="fill"
+                  objectFit="contain"
+                />
+              </Box>
+              <span
+                style={{
+                  fontSize: "1.3rem",
+                  fontWeight: 600,
+                  background:
+                    "linear-gradient(90deg, #fff, rgba(255,255,255,0.8))",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                Centichain
+              </span>
+            </Box>
+            <IconButton
               onClick={() => setIsOpen(false)}
-              className="absolute top-4 right-4 text-gray-300 hover:text-emerald-400"
+              sx={{
+                color: "white",
+                background: "rgba(16, 185, 129, 0.15)",
+                backdropFilter: "blur(8px)",
+                border: "1px solid rgba(16, 185, 129, 0.2)",
+                "&:hover": {
+                  background: "rgba(16, 185, 129, 0.25)",
+                },
+              }}
             >
-              <IoClose className="w-6 h-6" />
-            </button>
-            {drawerMenuItems.map((item) => (
-              <div key={item.path}>
-                {item.submenu ? (
-                  <>
-                    <button
-                      onClick={() => handleSubmenuClick(item.path)}
-                      className={`
-                        w-full flex items-center justify-between space-x-3 px-3 py-2 rounded-md text-base
-                        transition-all duration-200
-                        ${
-                          isPathActive(item.path)
-                            ? "text-emerald-400 bg-emerald-900/20"
-                            : "text-gray-300 hover:text-emerald-400 hover:bg-emerald-900/10"
-                        }
-                      `}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <span>{item.icon}</span>
-                        <span>{item.label}</span>
-                      </div>
-                      <FaChevronDown
-                        className={`transition-transform ${
-                          openSubmenu === item.path ? "rotate-180" : ""
-                        }`}
-                      />
-                    </button>
-                    {openSubmenu === item.path && (
-                      <div className="pl-8 mt-1 space-y-1">
-                        {item.submenu.map((subItem) => (
-                          <Link
-                            key={subItem.path}
-                            href={subItem.path}
-                            onClick={() => setIsOpen(false)}
-                            className={`block px-3 py-2 rounded-md text-sm ${
-                              pathname === subItem.path
-                                ? "text-emerald-400 bg-emerald-900/20"
-                                : "text-gray-300 hover:text-emerald-400 hover:bg-emerald-900/10"
-                            }`}
-                          >
-                            {subItem.label}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <Link
-                    href={item.path}
-                    onClick={() => setIsOpen(false)}
-                    className={`
-                      flex items-center space-x-3 px-3 py-2 rounded-md text-base
-                      transition-all duration-200
-                      ${
-                        isPathActive(item.path)
-                          ? "text-emerald-400 bg-emerald-900/20"
-                          : "text-gray-300 hover:text-emerald-400 hover:bg-emerald-900/10"
+              <CloseIcon />
+            </IconButton>
+          </Box>
+
+          {/* Mobile Menu Items */}
+          <List sx={{ mb: 4 }}>
+            {menuItems.map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <ListItem
+                  {...(item.submenu
+                    ? {
+                        onClick: () =>
+                          setOpenSubmenu(
+                            openSubmenu === item.path ? null : item.path
+                          ),
                       }
-                    `}
+                    : {
+                        component: Link,
+                        href: item.path,
+                        onClick: () => setIsOpen(false),
+                      })}
+                  sx={{
+                    mb: 1,
+                    borderRadius: "12px",
+                    background:
+                      !isHomePage &&
+                      (pathname === item.path || pathname.startsWith(item.path))
+                        ? "rgba(16, 185, 129, 0.15)"
+                        : "rgba(0, 0, 0, 0.3)",
+                    border: "1px solid",
+                    borderColor:
+                      !isHomePage &&
+                      (pathname === item.path || pathname.startsWith(item.path))
+                        ? "rgba(16, 185, 129, 0.3)"
+                        : "rgba(16, 185, 129, 0.1)",
+                    "&:hover": {
+                      background: "rgba(16, 185, 129, 0.15)",
+                      borderColor: "rgba(16, 185, 129, 0.3)",
+                    },
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 40,
+                      color:
+                        !isHomePage &&
+                        (pathname === item.path ||
+                          pathname.startsWith(item.path))
+                          ? "#10b981"
+                          : "rgba(255,255,255,0.8)",
+                    }}
                   >
-                    <span>{item.icon}</span>
-                    <span>{item.label}</span>
-                  </Link>
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.label}
+                    sx={{
+                      "& .MuiListItemText-primary": {
+                        fontSize: "1rem",
+                        fontWeight: 500,
+                        color:
+                          !isHomePage &&
+                          (pathname === item.path ||
+                            pathname.startsWith(item.path))
+                            ? "#10b981"
+                            : "rgba(255,255,255,0.9)",
+                      },
+                    }}
+                  />
+                  {item.submenu && (
+                    <FaChevronDown
+                      style={{
+                        fontSize: "0.8rem",
+                        transition: "transform 0.3s ease",
+                        transform:
+                          openSubmenu === item.path
+                            ? "rotate(180deg)"
+                            : "rotate(0)",
+                      }}
+                    />
+                  )}
+                </ListItem>
+
+                {/* Mobile Submenu */}
+                {item.submenu && (
+                  <Collapse in={openSubmenu === item.path} timeout="auto">
+                    <List
+                      component="div"
+                      disablePadding
+                      sx={{
+                        ml: 4,
+                        mt: 1,
+                        mb: 2,
+                        borderLeft: "1px solid rgba(16, 185, 129, 0.2)",
+                        background: "rgba(0, 0, 0, 0.4)",
+                        borderRadius: "0 0 12px 12px",
+                        overflow: "hidden",
+                      }}
+                    >
+                      {item.submenu.map((subItem, subIndex) => (
+                        <ListItem
+                          key={subIndex}
+                          component={Link}
+                          href={subItem.path}
+                          onClick={() => setIsOpen(false)}
+                          sx={{
+                            pl: 4,
+                            py: 1.5,
+                            borderRadius: "8px",
+                            "&:hover": {
+                              background: "rgba(16, 185, 129, 0.15)",
+                            },
+                            transition: "all 0.2s ease",
+                          }}
+                        >
+                          <ListItemText
+                            primary={subItem.label}
+                            sx={{
+                              "& .MuiListItemText-primary": {
+                                fontSize: "0.9rem",
+                                color:
+                                  !isHomePage && pathname === subItem.path
+                                    ? "#10b981"
+                                    : "rgba(255,255,255,0.8)",
+                              },
+                            }}
+                          />
+                        </ListItem>
+                      ))}
+                    </List>
+                  </Collapse>
                 )}
-              </div>
+              </motion.div>
             ))}
-          </div>
-        </Drawer>
-      </div>
-    </nav>
+          </List>
+
+          {/* Mobile CTA Button */}
+          <Box sx={{ mt: "auto", p: 2 }}>
+            <Button
+              component={Link}
+              href="/download"
+              fullWidth
+              sx={{
+                background: "rgba(16, 185, 129, 0.15)",
+                backdropFilter: "blur(10px)",
+                border: "1px solid rgba(16, 185, 129, 0.3)",
+                color: "#fff",
+                py: 2,
+                borderRadius: "12px",
+                fontSize: "1rem",
+                textTransform: "none",
+                fontWeight: 500,
+                letterSpacing: "0.02em",
+                "&:hover": {
+                  background: "rgba(16, 185, 129, 0.25)",
+                  transform: "translateY(-2px)",
+                },
+                transition: "all 0.2s ease",
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                Start as a Node
+                <span style={{ transition: "transform 0.3s ease" }}>→</span>
+              </Box>
+            </Button>
+          </Box>
+        </Box>
+      </Drawer>
+    </>
   );
-}
+};
 
 export default Menu;

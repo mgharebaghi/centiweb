@@ -7,10 +7,13 @@ import { FaTelegram } from "react-icons/fa";
 
 function Footer() {
   const socialLinks = [
-    { icon: <VscGithub size={24} />, href: "https://github.com/mgharebaghi/CentichainV" },
+    {
+      icon: <VscGithub size={24} />,
+      href: "https://github.com/mgharebaghi/CentichainV",
+    },
     { icon: <BsTwitterX size={22} />, href: "https://x.com/centichain" },
     { icon: <MdEmail size={24} />, href: "/contact" },
-    { icon: <FaTelegram size={24} />, href: "https://t.me/centichain" }
+    { icon: <FaTelegram size={24} />, href: "https://t.me/centichain" },
   ];
 
   return (
@@ -18,16 +21,28 @@ function Footer() {
       <Container maxWidth="lg">
         <div className="flex flex-col items-center py-12 space-y-8">
           <div className="flex flex-wrap justify-center gap-8">
-            <Link href="/scan" className="text-gray-400 hover:text-emerald-400 transition-colors duration-200">
+            <Link
+              href="/scan"
+              className="text-gray-400 hover:text-emerald-400 transition-colors duration-200"
+            >
               Explorer
             </Link>
-            <Link href="/download" className="text-gray-400 hover:text-emerald-400 transition-colors duration-200">
+            <Link
+              href="/download"
+              className="text-gray-400 hover:text-emerald-400 transition-colors duration-200"
+            >
               Download
             </Link>
-            <Link href="/dev" className="text-gray-400 hover:text-emerald-400 transition-colors duration-200">
+            <Link
+              href="/dev"
+              className="text-gray-400 hover:text-emerald-400 transition-colors duration-200"
+            >
               DEV
             </Link>
-            <Link href="/contact" className="text-gray-400 hover:text-emerald-400 transition-colors duration-200">
+            <Link
+              href="/contact"
+              className="text-gray-400 hover:text-emerald-400 transition-colors duration-200"
+            >
               Contact
             </Link>
           </div>
