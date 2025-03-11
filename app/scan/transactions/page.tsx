@@ -558,23 +558,30 @@ export default function TransactionExplorer() {
             fullWidth
             fullScreen={isMobile}
             PaperProps={{
-              className: "bg-[#1E293B]/95 backdrop-blur-xl",
+              className: "bg-[#0F172A]/95 backdrop-blur-xl",
               sx: {
                 background:
-                  "linear-gradient(180deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%)",
-                border: "1px solid rgba(51, 65, 85, 0.5)",
+                  "linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(17, 25, 40, 0.98) 100%)",
+                border: "1px solid rgba(16, 185, 129, 0.1)",
                 margin: { xs: 0, sm: 2 },
                 maxHeight: { xs: "100%", sm: "calc(100% - 64px)" },
                 borderRadius: { xs: 0, sm: "16px" },
+                boxShadow: "0 8px 32px rgba(0, 0, 0, 0.4)",
+              },
+            }}
+            BackdropProps={{
+              sx: {
+                backdropFilter: "blur(4px)",
+                backgroundColor: "rgba(15, 23, 42, 0.8)",
               },
             }}
           >
             {selectedTransaction && (
               <Box className="relative">
                 {/* Modal Header */}
-                <div className="flex justify-between items-center p-4 sm:p-6 border-b border-slate-700/50">
+                <div className="flex justify-between items-center p-4 sm:p-6 border-b border-slate-700/30">
                   <div className="flex items-center gap-4">
-                    <div className="p-2.5 rounded-xl bg-emerald-500/10">
+                    <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
                       <FiHash className="text-emerald-400 text-xl" />
                     </div>
                     <div>
@@ -590,16 +597,24 @@ export default function TransactionExplorer() {
                   </div>
                   <IconButton
                     onClick={() => setDialogOpen(false)}
-                    className="hover:bg-slate-700/50 transition-colors"
+                    className="hover:bg-slate-700/30 transition-colors"
+                    sx={{
+                      color: "rgba(255, 255, 255, 0.6)",
+                      background: "rgba(16, 185, 129, 0.05)",
+                      border: "1px solid rgba(16, 185, 129, 0.1)",
+                      "&:hover": {
+                        background: "rgba(16, 185, 129, 0.1)",
+                      },
+                    }}
                   >
-                    <IoClose className="text-slate-400 hover:text-slate-300" />
+                    <IoClose className="text-slate-300" />
                   </IconButton>
                 </div>
 
                 <Tabs
                   value={tabValue}
                   onChange={handleTabChange}
-                  className="border-b border-zinc-700"
+                  className="border-b border-slate-700/30"
                   textColor="inherit"
                   variant={isMobile ? "fullWidth" : "standard"}
                   TabIndicatorProps={{
@@ -607,7 +622,7 @@ export default function TransactionExplorer() {
                   }}
                   sx={{
                     "& .MuiTab-root": {
-                      color: "#9CA3AF",
+                      color: "#94A3B8",
                       "&.Mui-selected": {
                         color: "#ffffff",
                       },
@@ -630,42 +645,42 @@ export default function TransactionExplorer() {
 
                 <TabPanel value={tabValue} index={0}>
                   <div className="space-y-4">
-                    <div className="bg-gradient-to-r from-zinc-900 to-zinc-800 p-4 sm:p-6 rounded-xl border border-zinc-700">
+                    <div className="bg-[#1E293B]/40 backdrop-blur-xl p-4 sm:p-6 rounded-xl border border-slate-800/50">
                       <Typography className="text-emerald-400 text-base sm:text-lg font-semibold mb-4">
                         Transaction Information
                       </Typography>
                       <div className="space-y-4">
                         <div>
-                          <Typography className="text-gray-400 mb-2 text-sm">
+                          <Typography className="text-slate-400 mb-2 text-sm">
                             Hash
                           </Typography>
-                          <Typography className="font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg text-xs sm:text-sm">
+                          <Typography className="font-mono break-all text-white bg-slate-900/50 p-3 rounded-lg text-xs sm:text-sm">
                             {selectedTransaction.hash}
                           </Typography>
                         </div>
                         <div className="grid grid-cols-1 gap-4">
                           <div>
-                            <Typography className="text-gray-400 mb-2 text-sm">
+                            <Typography className="text-slate-400 mb-2 text-sm">
                               From
                             </Typography>
-                            <Typography className="font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg text-xs sm:text-sm">
+                            <Typography className="font-mono break-all text-white bg-slate-900/50 p-3 rounded-lg text-xs sm:text-sm">
                               {selectedTransaction.from}
                             </Typography>
                           </div>
                           <div>
-                            <Typography className="text-gray-400 mb-2 text-sm">
+                            <Typography className="text-slate-400 mb-2 text-sm">
                               To
                             </Typography>
-                            <Typography className="font-mono break-all text-white bg-zinc-800/50 p-3 rounded-lg text-xs sm:text-sm">
+                            <Typography className="font-mono break-all text-white bg-slate-900/50 p-3 rounded-lg text-xs sm:text-sm">
                               {selectedTransaction.to}
                             </Typography>
                           </div>
                         </div>
                         <div>
-                          <Typography className="text-gray-400 mb-2 text-sm">
+                          <Typography className="text-slate-400 mb-2 text-sm">
                             Value
                           </Typography>
-                          <Typography className="font-mono text-white bg-zinc-800/50 p-3 rounded-lg text-xs sm:text-sm">
+                          <Typography className="font-mono text-white bg-slate-900/50 p-3 rounded-lg text-xs sm:text-sm">
                             {selectedTransaction.value} CENTI
                           </Typography>
                         </div>
@@ -676,16 +691,16 @@ export default function TransactionExplorer() {
 
                 <TabPanel value={tabValue} index={1}>
                   <div className="space-y-4">
-                    <div className="bg-gradient-to-r from-zinc-900 to-zinc-800 p-4 sm:p-6 rounded-xl border border-zinc-700">
+                    <div className="bg-[#1E293B]/40 backdrop-blur-xl p-4 sm:p-6 rounded-xl border border-slate-800/50">
                       <Typography className="text-emerald-400 text-base sm:text-lg font-semibold mb-4">
                         Additional Details
                       </Typography>
                       <div className="space-y-4">
                         <div>
-                          <Typography className="text-gray-400 mb-2 text-sm">
+                          <Typography className="text-slate-400 mb-2 text-sm">
                             Block Number
                           </Typography>
-                          <Typography className="font-mono text-white bg-zinc-800/50 p-3 rounded-lg text-xs sm:text-sm">
+                          <Typography className="font-mono text-white bg-slate-900/50 p-3 rounded-lg text-xs sm:text-sm">
                             {selectedTransaction.block ? (
                               selectedTransaction.block
                             ) : (
@@ -696,10 +711,10 @@ export default function TransactionExplorer() {
                           </Typography>
                         </div>
                         <div>
-                          <Typography className="text-gray-400 mb-2 text-sm">
+                          <Typography className="text-slate-400 mb-2 text-sm">
                             Timestamp
                           </Typography>
-                          <Typography className="font-mono text-white bg-zinc-800/50 p-3 rounded-lg text-xs sm:text-sm">
+                          <Typography className="font-mono text-white bg-slate-900/50 p-3 rounded-lg text-xs sm:text-sm">
                             {moment(selectedTransaction.date).format(
                               "MMMM Do YYYY, h:mm:ss a"
                             )}

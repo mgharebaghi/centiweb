@@ -88,6 +88,11 @@ const Menu = () => {
   const isHomePage = pathname === "/";
 
   useEffect(() => {
+    setIsOpen(false);
+    setOpenSubmenu(null);
+  }, [pathname]);
+
+  useEffect(() => {
     setMounted(true);
   }, []);
 
@@ -596,7 +601,10 @@ const Menu = () => {
                           key={subIndex}
                           component={Link}
                           href={subItem.path}
-                          onClick={() => setIsOpen(false)}
+                          onClick={() => {
+                            setIsOpen(false);
+                            setOpenSubmenu(null);
+                          }}
                           sx={{
                             pl: 4,
                             py: 1.5,

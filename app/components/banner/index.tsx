@@ -44,7 +44,7 @@ const Banner = () => {
         justifyContent: "center",
         borderBottom: "1px solid rgba(16, 185, 129, 0.1)",
         fontFamily: "'Inter', sans-serif",
-        pt: { xs: 4, sm: 5, md: 6 },
+        pt: { xs: 10, sm: 12, md: 6 },
         pb: { xs: 4, sm: 5, md: 6 },
       }}
     >
@@ -368,8 +368,13 @@ const Banner = () => {
           alignItems="center"
           justifyContent="center"
           sx={{
-            minHeight: { xs: "calc(100vh - 64px)", sm: "calc(100vh - 80px)" },
+            minHeight: {
+              xs: "calc(100vh - 100px)",
+              sm: "calc(100vh - 100px)",
+              md: "calc(100vh - 80px)",
+            },
             width: "100%",
+            mt: { xs: 8, sm: 0, md: 0 },
           }}
         >
           <Grid
@@ -653,6 +658,7 @@ const Banner = () => {
             sx={{
               order: { xs: 1, sm: 1, md: 2 },
               mb: { xs: 2, sm: 3, md: 0 },
+              mt: { xs: 6, sm: 0, md: 0 },
             }}
           >
             <Box
