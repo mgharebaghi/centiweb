@@ -77,17 +77,17 @@ export async function GET() {
   }
 }
 
-export async function DELETE(req: NextRequest) {
-  try {
-    const relay = req.nextUrl.searchParams.get("addr");
-    collection.deleteOne({ addr: relay?.toString() });
+// export async function DELETE(req: NextRequest) {
+//   try {
+//     const relay = req.nextUrl.searchParams.get("addr");
+//     collection.deleteOne({ addr: relay?.toString() });
 
-    return NextResponse.json({
-      status: "success",
-    });
-  } catch (e) {
-    return NextResponse.json({
-      status: "error: " + e,
-    });
-  }
-}
+//     return NextResponse.json({
+//       status: "success",
+//     });
+//   } catch (e) {
+//     return NextResponse.json({
+//       status: "error: " + e,
+//     });
+//   }
+// }
