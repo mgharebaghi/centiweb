@@ -44,7 +44,7 @@ function Validators() {
     {
       icon: SiWindows,
       text: "Windows",
-      link: "https://centichain.org/downloads/updates/windows/x64/v0.23.8/Centichain_0.23.8_x64_en-US.msi",
+      link: "https://centichain.org/downloads/updates/windows/x64/v0.23.9/Centichain_0.23.9_x64_en-US.msi",
       available: true,
       requirements: "Windows 10 or later, 64-bit processor required",
       size: "15 MB",
