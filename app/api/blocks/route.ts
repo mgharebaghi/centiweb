@@ -11,10 +11,10 @@ export async function GET() {
   try {
     const db = client.db("Centichain");
     const collection = db.collection("Blocks");
-    const number = await collection.countDocuments();
+    const lastBlock = await collection.find().sort({ _id: -1 }).limit(1).toArray();
 
     return NextResponse.json({
-      number: number,
+      number: lastBlock.length > 0 ? lastBlock[0].header.number : 0,
     });
   } catch (e) {
     return NextResponse.json({
