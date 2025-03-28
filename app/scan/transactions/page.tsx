@@ -168,6 +168,17 @@ export default function TransactionExplorer() {
     }
   }, [debouncedSearchValue]);
 
+  useEffect(() => {
+    // Only fetch transactions when not searching
+    if (
+      searchStatus !== "loading" &&
+      searchStatus !== "success" &&
+      !debouncedSearchValue
+    ) {
+      fetchTransactions();
+    }
+  }, [page]); // Add page as a dependency to trigger fetch when page changes
+
   const handleTransactionClick = (transaction: TrxScan) => {
     setSelectedTransaction(transaction);
     setDialogOpen(true);
