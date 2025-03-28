@@ -9,7 +9,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { SiApple, SiLinux, SiWindows } from "react-icons/si";
+import { SiApple, SiLinux, SiWindows11 } from "react-icons/si";
 import { motion } from "framer-motion";
 import {
   FaDownload,
@@ -42,7 +42,7 @@ function Validators() {
   // Download options
   const downloadOptions = [
     {
-      icon: SiWindows,
+      icon: SiWindows11,
       text: "Windows",
       link: "https://centichain.org/downloads/updates/windows/x64/v0.23.17/Centichain_0.23.17_x64_en-US.msi",
       available: true,
