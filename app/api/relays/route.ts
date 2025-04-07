@@ -18,11 +18,12 @@ export async function POST(req: NextRequest) {
       anothers.push({
         addr: doc.addr,
         wallet: doc.wallet,
-        join_date: new Date().toISOString(),
+        join_date: doc.join_date || new Date().toISOString(),
       });
     });
 
     if (!doc) {
+      request.join_date = new Date().toISOString();
       await collection.insertOne(request);
       return NextResponse.json({
         status: "success",
@@ -51,7 +52,11 @@ export async function GET() {
     let final_data: Relays[] = [];
 
     await cursor.forEach((doc) => {
-      addresses.push({ addr: doc.addr, wallet: doc.wallet, join_date: doc.join_date });
+      addresses.push({
+        addr: doc.addr,
+        wallet: doc.wallet,
+        join_date: doc.join_date,
+      });
     });
 
     if (addresses.length > 50) {
@@ -77,17 +82,17 @@ export async function GET() {
   }
 }
 
-// export async function DELETE(req: NextRequest) {
-//   try {
-//     const relay = req.nextUrl.searchParams.get("addr");
-//     collection.deleteOne({ addr: relay?.toString() });
+export async function DELETE(req: NextRequest) {
+  try {
+    const relay = req.nextUrl.searchParams.get("addr");
+    collection.deleteOne({ addr: relay?.toString() });
 
-//     return NextResponse.json({
-//       status: "success",
-//     });
-//   } catch (e) {
-//     return NextResponse.json({
-//       status: "error: " + e,
-//     });
-//   }
-// }
+    return NextResponse.json({
+      status: "success",
+    });
+  } catch (e) {
+    return NextResponse.json({
+      status: "error: " + e,
+    });
+  }
+}
