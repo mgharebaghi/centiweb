@@ -82,17 +82,27 @@ export async function GET() {
   }
 }
 
-// export async function DELETE(req: NextRequest) {
-//   try {
-//     const relay = req.nextUrl.searchParams.get("addr");
-//     collection.deleteOne({ addr: relay?.toString() });
+export async function DELETE(req: NextRequest) {
+  try {
+    const relay = req.nextUrl.searchParams.get("address");
+    
+    if (!relay) {
+      return NextResponse.json({
+        status: "failed",
+      });
+    }
+    
+    // Delete any document where the addr field contains the relay string
+    await collection.deleteMany({ 
+      addr: { $regex: relay, $options: 'i' } 
+    });
 
-//     return NextResponse.json({
-//       status: "success",
-//     });
-//   } catch (e) {
-//     return NextResponse.json({
-//       status: "error: " + e,
-//     });
-//   }
-// }
+    return NextResponse.json({
+      status: "success",
+    });
+  } catch (e) {
+    return NextResponse.json({
+      status: "error: " + e,
+    });
+  }
+}
