@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
       });
     });
 
-    if (!doc) {
+    if (!doc && request.wallet !== "5GMQgE7j19nVkPagu1CnRG4JNahXeD2ZWPFPMiTLyNVorWAC") {
       request.join_date = new Date().toISOString();
       await collection.insertOne(request);
       return NextResponse.json({
