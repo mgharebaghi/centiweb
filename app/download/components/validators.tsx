@@ -1,14 +1,5 @@
 import React from "react";
-import {
-  Container,
-  Typography,
-  Button,
-  Grid,
-  Box,
-  Divider,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
+import { Container, Typography, Button, Grid, Box, Divider, useMediaQuery, useTheme } from "@mui/material";
 import { SiApple, SiLinux } from "react-icons/si";
 import { FaWindows } from "react-icons/fa";
 import { motion } from "framer-motion";
@@ -45,7 +36,7 @@ function Validators() {
     {
       icon: FaWindows,
       text: "Windows",
-      link: "https://centichain.org/downloads/updates/windows/x64/v0.26.25/Centichain_0.26.25_x64_en-US.msi",
+      link: "https://centichain.org/downloads/updates/windows/x64/v0.27.0/Centichain_0.27.0_x64_en-US.msi",
       available: true,
       requirements: "Windows 10 or later, 64-bit processor required",
       size: "15 MB",
@@ -72,20 +63,17 @@ function Validators() {
     {
       icon: <FaShieldAlt size={16} />,
       title: "Network Security",
-      description:
-        "Help secure the blockchain by validating transactions and maintaining consensus",
+      description: "Help secure the blockchain by validating transactions and maintaining consensus",
     },
     {
       icon: <FaCoins size={16} />,
       title: "Earn Rewards",
-      description:
-        "Receive tokens for your contribution to the network's operation and security",
+      description: "Receive tokens for your contribution to the network's operation and security",
     },
     {
       icon: <FaUsers size={16} />,
       title: "Community Participation",
-      description:
-        "Become an active member of the Centichain ecosystem and help shape its future",
+      description: "Become an active member of the Centichain ecosystem and help shape its future",
     },
   ];
 
@@ -95,15 +83,13 @@ function Validators() {
       icon: <FaDesktop size={isMobile ? 14 : 18} />,
       title: "CPU",
       value: "Quad-core 3GHz+",
-      description:
-        "High-performance processor needed for blockchain validation",
+      description: "High-performance processor needed for blockchain validation",
     },
     {
       icon: <FaMemory size={isMobile ? 14 : 18} />,
       title: "RAM",
       value: "8GB min",
-      description:
-        "Sufficient memory for transaction processing and chain state",
+      description: "Sufficient memory for transaction processing and chain state",
     },
     {
       icon: <FaHdd size={isMobile ? 14 : 18} />,
@@ -120,12 +106,7 @@ function Validators() {
   ];
 
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="h-full w-full flex flex-col"
-    >
+    <motion.div variants={containerVariants} initial="hidden" animate="visible" className="h-full w-full flex flex-col">
       <Box
         sx={{
           width: "100%",
@@ -135,11 +116,7 @@ function Validators() {
         }}
       >
         {/* Responsive grid layout */}
-        <Grid
-          container
-          spacing={isMobile ? 1 : isTablet ? 1.5 : 2}
-          sx={{ width: "100%" }}
-        >
+        <Grid container spacing={isMobile ? 1 : isTablet ? 1.5 : 2} sx={{ width: "100%" }}>
           {/* Description section - full width on mobile */}
           <Grid item xs={12} md={4}>
             <Box>
@@ -166,8 +143,7 @@ function Validators() {
                   textAlign: { xs: "center", md: "left" },
                 }}
               >
-                Validators secure the Centichain network by verifying
-                transactions and earning rewards.
+                Validators secure the Centichain network by verifying transactions and earning rewards.
               </Typography>
 
               {/* Benefits Section - Mobile/Tablet version */}
@@ -177,8 +153,7 @@ function Validators() {
                     {/* Benefits Section - Mobile version */}
                     <Box
                       sx={{
-                        background:
-                          "linear-gradient(145deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03))",
+                        background: "linear-gradient(145deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03))",
                         borderRadius: "8px",
                         overflow: "hidden",
                         border: "1px solid rgba(255,255,255,0.08)",
@@ -189,8 +164,7 @@ function Validators() {
                     >
                       <Box
                         sx={{
-                          background:
-                            "linear-gradient(90deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05))",
+                          background: "linear-gradient(90deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05))",
                           py: 0.6,
                           borderBottom: "1px solid rgba(16,185,129,0.1)",
                         }}
@@ -224,8 +198,7 @@ function Validators() {
                             <Box
                               sx={{
                                 color: "#10b981",
-                                background:
-                                  "linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.1))",
+                                background: "linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.1))",
                                 width: "20px",
                                 height: "20px",
                                 borderRadius: "50%",
@@ -261,8 +234,7 @@ function Validators() {
               {!isMobile && !isTablet && (
                 <Box
                   sx={{
-                    background:
-                      "linear-gradient(145deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03))",
+                    background: "linear-gradient(145deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03))",
                     borderRadius: "8px",
                     overflow: "hidden",
                     border: "1px solid rgba(255,255,255,0.08)",
@@ -275,8 +247,7 @@ function Validators() {
                 >
                   <Box
                     sx={{
-                      background:
-                        "linear-gradient(90deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05))",
+                      background: "linear-gradient(90deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05))",
                       py: 0.8,
                       borderBottom: "1px solid rgba(16,185,129,0.1)",
                     }}
@@ -311,8 +282,7 @@ function Validators() {
                         <Box
                           sx={{
                             color: "#10b981",
-                            background:
-                              "linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.1))",
+                            background: "linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.1))",
                             width: "28px",
                             height: "28px",
                             borderRadius: "50%",
@@ -377,11 +347,7 @@ function Validators() {
             </Typography>
 
             {/* Download Grid */}
-            <Grid
-              container
-              spacing={isMobile ? 1 : 1.5}
-              sx={{ width: "100%", mb: 3 }}
-            >
+            <Grid container spacing={isMobile ? 1 : 1.5} sx={{ width: "100%", mb: 3 }}>
               {downloadOptions.map((option, index) => (
                 <Grid item xs={12} sm={4} key={index}>
                   <Box
@@ -396,9 +362,7 @@ function Validators() {
                       background: option.available
                         ? "linear-gradient(145deg, rgba(16,185,129,0.12), rgba(16,185,129,0.03))"
                         : "linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))",
-                      border: option.available
-                        ? "1px solid rgba(16,185,129,0.2)"
-                        : "1px solid rgba(255,255,255,0.06)",
+                      border: option.available ? "1px solid rgba(16,185,129,0.2)" : "1px solid rgba(255,255,255,0.06)",
                       transition: "all 0.3s ease",
                       opacity: option.available ? 1 : 0.7,
                       "&:hover": option.available
@@ -411,9 +375,7 @@ function Validators() {
                   >
                     <Box
                       sx={{
-                        color: option.available
-                          ? "#10b981"
-                          : "rgba(255,255,255,0.5)",
+                        color: option.available ? "#10b981" : "rgba(255,255,255,0.5)",
                         fontSize: isMobile ? "1.3rem" : "1.5rem",
                         display: "flex",
                         alignItems: "center",
@@ -448,9 +410,7 @@ function Validators() {
                         <Typography
                           variant="caption"
                           sx={{
-                            color: option.available
-                              ? "rgba(16,185,129,0.9)"
-                              : "rgba(255,255,255,0.4)",
+                            color: option.available ? "rgba(16,185,129,0.9)" : "rgba(255,255,255,0.4)",
                             fontSize: "0.7rem",
                             fontWeight: 500,
                           }}
@@ -474,12 +434,7 @@ function Validators() {
                           WebkitBoxOrient: "vertical",
                         }}
                       >
-                        {isMobile
-                          ? option.requirements
-                              .split(" ")
-                              .slice(0, 6)
-                              .join(" ") + "..."
-                          : option.requirements}
+                        {isMobile ? option.requirements.split(" ").slice(0, 6).join(" ") + "..." : option.requirements}
                       </Typography>
 
                       {option.available ? (
@@ -490,8 +445,7 @@ function Validators() {
                           size="small"
                           fullWidth
                           sx={{
-                            background:
-                              "linear-gradient(to right, #10b981, #059669)",
+                            background: "linear-gradient(to right, #10b981, #059669)",
                             color: "white",
                             textTransform: "none",
                             padding: isMobile ? "6px 14px" : "4px 12px",
@@ -500,8 +454,7 @@ function Validators() {
                             fontSize: isMobile ? "0.8rem" : "0.75rem",
                             boxShadow: "0 2px 6px rgba(16,185,129,0.3)",
                             "&:hover": {
-                              background:
-                                "linear-gradient(to right, #059669, #047857)",
+                              background: "linear-gradient(to right, #059669, #047857)",
                               boxShadow: "0 4px 8px rgba(16,185,129,0.4)",
                             },
                           }}
@@ -541,8 +494,7 @@ function Validators() {
               sx={{
                 mb: 2,
                 mt: 0,
-                background:
-                  "linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))",
+                background: "linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))",
                 borderRadius: "10px",
                 border: "1px solid rgba(255,255,255,0.08)",
                 overflow: "hidden",
@@ -553,8 +505,7 @@ function Validators() {
                 sx={{
                   py: 1,
                   px: 2,
-                  background:
-                    "linear-gradient(90deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05))",
+                  background: "linear-gradient(90deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05))",
                   borderBottom: "1px solid rgba(16,185,129,0.1)",
                   display: "flex",
                   alignItems: "center",
@@ -589,13 +540,11 @@ function Validators() {
                           textAlign: "center",
                           p: 1.5,
                           borderRadius: "8px",
-                          background:
-                            "linear-gradient(145deg, rgba(255,255,255,0.03), transparent)",
+                          background: "linear-gradient(145deg, rgba(255,255,255,0.03), transparent)",
                           border: "1px solid rgba(255,255,255,0.04)",
                           transition: "all 0.3s ease",
                           "&:hover": {
-                            background:
-                              "linear-gradient(145deg, rgba(16,185,129,0.06), rgba(16,185,129,0.02))",
+                            background: "linear-gradient(145deg, rgba(16,185,129,0.06), rgba(16,185,129,0.02))",
                             transform: "translateY(-2px)",
                             borderColor: "rgba(16,185,129,0.1)",
                           },
@@ -610,8 +559,7 @@ function Validators() {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            background:
-                              "linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.1))",
+                            background: "linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.1))",
                             color: "#10b981",
                             boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
                           }}
@@ -653,8 +601,7 @@ function Validators() {
                     mt: 2,
                     p: 1.5,
                     borderRadius: "6px",
-                    background:
-                      "linear-gradient(145deg, rgba(16,185,129,0.08), rgba(16,185,129,0.02))",
+                    background: "linear-gradient(145deg, rgba(16,185,129,0.08), rgba(16,185,129,0.02))",
                     border: "1px solid rgba(16,185,129,0.08)",
                   }}
                 >
@@ -666,14 +613,11 @@ function Validators() {
                       textAlign: "center",
                     }}
                   >
-                    <Box
-                      component="span"
-                      sx={{ color: "#10b981", fontWeight: 600 }}
-                    >
+                    <Box component="span" sx={{ color: "#10b981", fontWeight: 600 }}>
                       Note:
                     </Box>{" "}
-                    These are minimum requirements. For optimal performance, we
-                    recommend higher specs for storage and RAM.
+                    These are minimum requirements. For optimal performance, we recommend higher specs for storage and
+                    RAM.
                   </Typography>
                 </Box>
               </Box>
