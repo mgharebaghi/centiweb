@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MongoClient, WithId } from "mongodb";
-import { Relays } from "../types/types";
+import { Outnode, Relays } from "../types/types";
 
 const uri = "mongodb://0.0.0.0:27017";
 const client = new MongoClient(uri);
-const db = client.db("centiweb");
-const collection = db.collection<WithId<Relays>>("relays");
+const centiweb_db = client.db("centiweb");
+const collection = centiweb_db.collection<WithId<Relays>>("relays");
+const centichain_db = client.db("Centichain");
+const centichain_collection = centichain_db.collection<WithId<Outnode>>("outnodes");
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,7 +24,27 @@ export async function POST(req: NextRequest) {
       });
     });
 
-    if (!doc && request.wallet !== "5GMQgE7j19nVkPagu1CnRG4JNahXeD2ZWPFPMiTLyNVorWAC") {
+    // Extract peer ID from address
+    const peerIdMatch = request.addr.match(/\/p2p\/([^/]+)/);
+    const peerId = peerIdMatch ? peerIdMatch[1] : null;
+
+    // Check if peer ID exists in outnodes collection
+    let existsInOutnodes = false;
+    if (peerId) {
+      const outnode = await centichain_collection.findOne({ id: peerId });
+      existsInOutnodes = !!outnode;
+    }
+
+    // If it exists in outnodes, don't proceed with insertion
+    if (existsInOutnodes) {
+      return NextResponse.json({
+      status: "failed",
+      detail: "peer exists in outnodes!",
+      anothers: anothers,
+      });
+    }
+
+    if (!doc ) {
       request.join_date = new Date().toISOString();
       await collection.insertOne(request);
       return NextResponse.json({

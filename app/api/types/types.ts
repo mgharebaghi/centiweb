@@ -87,3 +87,7 @@ export interface Relays {
 export interface RPC {
   addr: string;
 }
+
+export interface Outnode {
+  peerid: string;
+}
