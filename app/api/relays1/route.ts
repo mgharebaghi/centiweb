@@ -22,11 +22,18 @@ export async function POST(req: NextRequest) {
         wallet: doc.wallet,
         join_date: doc.join_date || new Date().toISOString(),
       });
-    });
-
-    // Extract peer ID from address
+    }); // Extract peer ID from address
     const peerIdMatch = request.addr.match(/\/p2p\/([^/]+)/);
     const peerId = peerIdMatch ? peerIdMatch[1] : null;
+
+    // Check if the address contains the blocked IP (69.173.208.187)
+    if (request.addr.includes("69.173.208.187")) {
+      return NextResponse.json({
+        status: "failed",
+        detail: "You are note updated!",
+        anothers: anothers,
+      });
+    }
 
     // Check if peer ID exists in outnodes collection
     let existsInOutnodes = false;
@@ -38,13 +45,13 @@ export async function POST(req: NextRequest) {
     // If it exists in outnodes, don't proceed with insertion
     if (existsInOutnodes) {
       return NextResponse.json({
-      status: "failed",
-      detail: "peer exists in outnodes!",
-      anothers: anothers,
+        status: "failed",
+        detail: "peer exists in outnodes!",
+        anothers: anothers,
       });
     }
 
-    if (!doc ) {
+    if (!doc) {
       request.join_date = new Date().toISOString();
       await collection.insertOne(request);
       return NextResponse.json({
@@ -107,16 +114,16 @@ export async function GET() {
 export async function DELETE(req: NextRequest) {
   try {
     const relay = req.nextUrl.searchParams.get("address");
-    
+
     if (!relay) {
       return NextResponse.json({
         status: "failed",
       });
     }
-    
+
     // Delete any document where the addr field contains the relay string
-    await collection.deleteMany({ 
-      addr: { $regex: relay, $options: 'i' } 
+    await collection.deleteMany({
+      addr: { $regex: relay, $options: "i" },
     });
 
     return NextResponse.json({
