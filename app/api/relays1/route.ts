@@ -27,13 +27,13 @@ export async function POST(req: NextRequest) {
     const peerId = peerIdMatch ? peerIdMatch[1] : null;
 
     // Check if the address contains the blocked IP (69.173.208.187)
-    if (request.addr.includes("69.173")) {
-      return NextResponse.json({
-        status: "failed",
-        detail: "You are note updated!",
-        anothers: anothers,
-      });
-    }
+    // if (request.addr.includes("69.173")) {
+    //   return NextResponse.json({
+    //     status: "failed",
+    //     detail: "You are note updated!",
+    //     anothers: anothers,
+    //   });
+    // }
 
     // Check if peer ID exists in outnodes collection
     let existsInOutnodes = false;
