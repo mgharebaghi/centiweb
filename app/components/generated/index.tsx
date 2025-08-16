@@ -10,11 +10,11 @@ function Generated() {
   const router = useRouter();
   const [stats, setStats] = useState({
     blocks: "0",
-    transactions: 0
+    transactions: 0,
   });
   const [loading, setLoading] = useState({
     blocks: false,
-    transactions: false
+    transactions: false,
   });
 
   useEffect(() => {
@@ -25,61 +25,54 @@ function Generated() {
 
   const fetchAllStats = async () => {
     router.refresh();
-    await Promise.all([
-      fetchStat('blocks'),
-      fetchStat('transactions')
-    ]);
+    await Promise.all([fetchStat("blocks"), fetchStat("transactions")]);
   };
 
   const fetchStat = async (type: string) => {
-    setLoading(prev => ({ ...prev, [type]: true }));
+    setLoading((prev) => ({ ...prev, [type]: true }));
     try {
-      const endpoint = type === 'blocks' ? '/api/blocks' : '/api/trxcount';
+      const endpoint = type === "blocks" ? "/api/blocks" : "/api/trxcount";
       const res = await fetch(endpoint, { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
-        setStats(prev => ({ 
-          ...prev, 
-          [type]: type === 'blocks' ? data.number : Number(data.data)
+        setStats((prev) => ({
+          ...prev,
+          [type]: type === "blocks" ? data.number : Number(data.data),
         }));
       }
     } catch (error) {
       console.error(`Error fetching ${type}:`, error);
     } finally {
-      setLoading(prev => ({ ...prev, [type]: false }));
+      setLoading((prev) => ({ ...prev, [type]: false }));
     }
   };
 
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
-      transition: { duration: 0.6 }
-    }
+      transition: { duration: 0.6 },
+    },
   };
 
-  const StatCard = ({ 
-    icon, 
-    value, 
-    label, 
+  const StatCard = ({
+    icon,
+    value,
+    label,
     loading,
-    tooltip
-  }: { 
-    icon: React.ReactNode; 
-    value: string | number; 
-    label: string; 
+    tooltip,
+  }: {
+    icon: React.ReactNode;
+    value: string | number;
+    label: string;
     loading: boolean;
     tooltip: string;
   }) => (
-    <motion.div
-      variants={cardVariants}
-      initial="hidden"
-      animate="visible"
-    >
+    <motion.div variants={cardVariants} initial="hidden" animate="visible">
       <Tooltip title={tooltip} arrow placement="top">
-        <Paper 
-          elevation={3} 
+        <Paper
+          elevation={3}
           className="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-xl shadow-xl border border-gray-700 hover:border-emerald-500 transition-all duration-300"
         >
           <Box className="flex flex-col items-center">
@@ -105,16 +98,12 @@ function Generated() {
   return (
     <div className="min-h-[600px] bg-gradient-to-b from-gray-900 via-slate-900 to-emerald-900 py-20">
       <Container maxWidth="lg">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
           <Typography variant="h2" className="text-white text-center mb-16 font-bold">
             Network Statistics
           </Typography>
         </motion.div>
-        
+
         <Box className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           <StatCard
             icon={<SiHiveBlockchain size={60} />}

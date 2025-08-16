@@ -2,17 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import {
-  Container,
-  Typography,
-  Button,
-  Box,
-  useMediaQuery,
-  Grid,
-  Divider,
-  Chip,
-  Stack,
-} from "@mui/material";
+import { Container, Typography, Button, Box, useMediaQuery, Grid, Divider, Chip, Stack } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import TypeAnimation from "./TypeAnimation";
 import Link from "next/link";
@@ -107,230 +97,192 @@ const Banner = () => {
           }}
         >
           {/* Generate grid lines */}
-          {Array.from({ length: isMobile ? 100 : isTablet ? 225 : 400 }).map(
-            (_, index) => {
-              const row = Math.floor(
-                index / (isMobile ? 10 : isTablet ? 15 : 20)
-              );
-              const col = index % (isMobile ? 10 : isTablet ? 15 : 20);
+          {Array.from({ length: isMobile ? 100 : isTablet ? 225 : 400 }).map((_, index) => {
+            const row = Math.floor(index / (isMobile ? 10 : isTablet ? 15 : 20));
+            const col = index % (isMobile ? 10 : isTablet ? 15 : 20);
 
-              return (
-                <Box
-                  key={`grid-cell-${index}`}
-                  sx={{
-                    position: "relative",
-                    gridRow: row + 1,
-                    gridColumn: col + 1,
-                  }}
-                >
-                  {/* Horizontal connection */}
-                  {col < (isMobile ? 9 : isTablet ? 14 : 19) && (
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        height: "1px",
-                        right: 0,
-                        width: "100%",
-                        background: "rgba(16, 185, 129, 0.1)",
-                      }}
-                    />
-                  )}
+            return (
+              <Box
+                key={`grid-cell-${index}`}
+                sx={{
+                  position: "relative",
+                  gridRow: row + 1,
+                  gridColumn: col + 1,
+                }}
+              >
+                {/* Horizontal connection */}
+                {col < (isMobile ? 9 : isTablet ? 14 : 19) && (
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      height: "1px",
+                      right: 0,
+                      width: "100%",
+                      background: "rgba(16, 185, 129, 0.1)",
+                    }}
+                  />
+                )}
 
-                  {/* Vertical connection */}
-                  {row < (isMobile ? 9 : isTablet ? 14 : 19) && (
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        width: "1px",
-                        bottom: 0,
-                        height: "100%",
-                        background: "rgba(16, 185, 129, 0.1)",
-                      }}
-                    />
-                  )}
-                </Box>
-              );
-            }
-          )}
+                {/* Vertical connection */}
+                {row < (isMobile ? 9 : isTablet ? 14 : 19) && (
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      width: "1px",
+                      bottom: 0,
+                      height: "100%",
+                      background: "rgba(16, 185, 129, 0.1)",
+                    }}
+                  />
+                )}
+              </Box>
+            );
+          })}
         </Box>
 
         {/* Mixed pulses: full lines and center-crossing pulses */}
-        {Array.from({ length: 20 + Math.floor(Math.random() * 10) }).map(
-          (_, index) => {
-            // Grid dimensions
-            const gridCols = isMobile ? 10 : isTablet ? 15 : 20;
-            const gridRows = isMobile ? 10 : isTablet ? 15 : 20;
+        {Array.from({ length: 20 + Math.floor(Math.random() * 10) }).map((_, index) => {
+          // Grid dimensions
+          const gridCols = isMobile ? 10 : isTablet ? 15 : 20;
+          const gridRows = isMobile ? 10 : isTablet ? 15 : 20;
 
-            // Grid center point
-            const centerX = gridCols / 2;
-            const centerY = gridRows / 2;
+          // Grid center point
+          const centerX = gridCols / 2;
+          const centerY = gridRows / 2;
 
-            // Determine pulse type:
-            // 0-1: full horizontal/vertical lines
-            // 2: center cross horizontal
-            // 3: center cross vertical
-            const pulseType = index % 4;
+          // Determine pulse type:
+          // 0-1: full horizontal/vertical lines
+          // 2: center cross horizontal
+          // 3: center cross vertical
+          const pulseType = index % 4;
 
-            if (pulseType < 2) {
-              // Full line pulse (horizontal or vertical)
-              const isHorizontal = pulseType === 0;
+          if (pulseType < 2) {
+            // Full line pulse (horizontal or vertical)
+            const isHorizontal = pulseType === 0;
 
-              // We want some lines to go through center area
-              let linePosition;
-              if (index % 6 < 3) {
-                // 50% chance for center-passing lines
-                // Lines that pass through or near center
-                const offset = Math.floor(Math.random() * 5) - 2; // -2, -1, 0, 1, 2
-                linePosition =
-                  Math.floor(isHorizontal ? centerY : centerX) + offset;
-              } else {
-                // Random position
-                linePosition = Math.floor(
-                  Math.random() * (isHorizontal ? gridRows : gridCols)
-                );
-              }
-
-              // Direction (left-right, right-left, top-bottom, bottom-top)
-              const isReversed = Math.random() > 0.5;
-
-              return (
-                <motion.div
-                  key={`pulse-fullline-${index}`}
-                  style={{
-                    position: "absolute",
-                    left: isHorizontal
-                      ? 0
-                      : `${(linePosition / gridCols) * 100}%`,
-                    top: isHorizontal
-                      ? `${(linePosition / gridRows) * 100}%`
-                      : 0,
-                    width: isHorizontal ? "100%" : "1px",
-                    height: isHorizontal ? "1px" : "100%",
-                    overflow: "hidden",
-                  }}
-                >
-                  <motion.div
-                    initial={{
-                      x: isHorizontal ? (isReversed ? "100%" : "0%") : 0,
-                      y: !isHorizontal ? (isReversed ? "100%" : "0%") : 0,
-                      opacity: 0,
-                    }}
-                    animate={{
-                      x: isHorizontal ? (isReversed ? "0%" : "100%") : 0,
-                      y: !isHorizontal ? (isReversed ? "0%" : "100%") : 0,
-                      opacity: [0, 0.3, 0.8, 0.3, 0],
-                    }}
-                    transition={{
-                      duration: 5 + Math.random() * 3,
-                      ease: "linear",
-                      repeat: Infinity,
-                      delay: index * 0.5,
-                      times: [0, 0.2, 0.5, 0.8, 1],
-                    }}
-                    style={{
-                      position: "absolute",
-                      width: isHorizontal ? "10%" : "1px",
-                      height: !isHorizontal ? "10%" : "1px",
-                      background: isHorizontal
-                        ? `linear-gradient(${
-                            isReversed ? -90 : 90
-                          }deg, rgba(16, 185, 129, 0) 0%, rgba(16, 185, 129, 0.9) 50%, rgba(16, 185, 129, 0) 100%)`
-                        : `linear-gradient(${
-                            isReversed ? 180 : 0
-                          }deg, rgba(16, 185, 129, 0) 0%, rgba(16, 185, 129, 0.9) 50%, rgba(16, 185, 129, 0) 100%)`,
-                      boxShadow: "0 0 6px rgba(16, 185, 129, 0.6)",
-                    }}
-                  />
-                </motion.div>
-              );
+            // We want some lines to go through center area
+            let linePosition;
+            if (index % 6 < 3) {
+              // 50% chance for center-passing lines
+              // Lines that pass through or near center
+              const offset = Math.floor(Math.random() * 5) - 2; // -2, -1, 0, 1, 2
+              linePosition = Math.floor(isHorizontal ? centerY : centerX) + offset;
             } else {
-              // Center cross pulse - start or end in center
-              const isHorizontal = pulseType === 2;
-              const startAtCenter = Math.random() > 0.5;
+              // Random position
+              linePosition = Math.floor(Math.random() * (isHorizontal ? gridRows : gridCols));
+            }
 
-              // Calculate start and end points
-              const startX = isHorizontal
-                ? startAtCenter
-                  ? centerX
-                  : Math.random() > 0.5
-                  ? 0
-                  : gridCols
-                : centerX;
-              const startY = isHorizontal
-                ? centerY
-                : startAtCenter
-                ? centerY
-                : Math.random() > 0.5
-                ? 0
-                : gridRows;
-              const endX = isHorizontal
-                ? startAtCenter
-                  ? Math.random() > 0.5
-                    ? 0
-                    : gridCols
-                  : centerX
-                : centerX;
-              const endY = isHorizontal
-                ? centerY
-                : startAtCenter
-                ? Math.random() > 0.5
-                  ? 0
-                  : gridRows
-                : centerY;
+            // Direction (left-right, right-left, top-bottom, bottom-top)
+            const isReversed = Math.random() > 0.5;
 
-              // Convert to percentages
-              const startXPercent = (startX / gridCols) * 100;
-              const startYPercent = (startY / gridRows) * 100;
-              const endXPercent = (endX / gridCols) * 100;
-              const endYPercent = (endY / gridRows) * 100;
-
-              // Calculate length and angle
-              const deltaX = endX - startX;
-              const deltaY = endY - startY;
-              const length = Math.sqrt(
-                Math.pow(endXPercent - startXPercent, 2) +
-                  Math.pow(endYPercent - startYPercent, 2)
-              );
-              const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
-
-              return (
+            return (
+              <motion.div
+                key={`pulse-fullline-${index}`}
+                style={{
+                  position: "absolute",
+                  left: isHorizontal ? 0 : `${(linePosition / gridCols) * 100}%`,
+                  top: isHorizontal ? `${(linePosition / gridRows) * 100}%` : 0,
+                  width: isHorizontal ? "100%" : "1px",
+                  height: isHorizontal ? "1px" : "100%",
+                  overflow: "hidden",
+                }}
+              >
                 <motion.div
-                  key={`pulse-center-${index}`}
+                  initial={{
+                    x: isHorizontal ? (isReversed ? "100%" : "0%") : 0,
+                    y: !isHorizontal ? (isReversed ? "100%" : "0%") : 0,
+                    opacity: 0,
+                  }}
+                  animate={{
+                    x: isHorizontal ? (isReversed ? "0%" : "100%") : 0,
+                    y: !isHorizontal ? (isReversed ? "0%" : "100%") : 0,
+                    opacity: [0, 0.3, 0.8, 0.3, 0],
+                  }}
+                  transition={{
+                    duration: 5 + Math.random() * 3,
+                    ease: "linear",
+                    repeat: Infinity,
+                    delay: index * 0.5,
+                    times: [0, 0.2, 0.5, 0.8, 1],
+                  }}
                   style={{
                     position: "absolute",
-                    left: `${startXPercent}%`,
-                    top: `${startYPercent}%`,
-                    width: `${length}%`,
-                    height: "1px",
-                    transformOrigin: "0 0",
-                    transform: `rotate(${angle}deg)`,
-                    overflow: "hidden",
+                    width: isHorizontal ? "10%" : "1px",
+                    height: !isHorizontal ? "10%" : "1px",
+                    background: isHorizontal
+                      ? `linear-gradient(${
+                          isReversed ? -90 : 90
+                        }deg, rgba(16, 185, 129, 0) 0%, rgba(16, 185, 129, 0.9) 50%, rgba(16, 185, 129, 0) 100%)`
+                      : `linear-gradient(${
+                          isReversed ? 180 : 0
+                        }deg, rgba(16, 185, 129, 0) 0%, rgba(16, 185, 129, 0.9) 50%, rgba(16, 185, 129, 0) 100%)`,
+                    boxShadow: "0 0 6px rgba(16, 185, 129, 0.6)",
                   }}
-                >
-                  <motion.div
-                    initial={{ x: "0%", opacity: 0 }}
-                    animate={{ x: "100%", opacity: [0, 0.3, 0.8, 0.3, 0] }}
-                    transition={{
-                      duration: 3 + Math.random() * 2,
-                      ease: "linear",
-                      repeat: Infinity,
-                      delay: index * 0.5,
-                      times: [0, 0.2, 0.5, 0.8, 1],
-                    }}
-                    style={{
-                      position: "absolute",
-                      width: "15%",
-                      height: "1px",
-                      background:
-                        "linear-gradient(90deg, rgba(16, 185, 129, 0) 0%, rgba(16, 185, 129, 0.9) 50%, rgba(16, 185, 129, 0) 100%)",
-                      boxShadow: "0 0 6px rgba(16, 185, 129, 0.6)",
-                    }}
-                  />
-                </motion.div>
-              );
-            }
+                />
+              </motion.div>
+            );
+          } else {
+            // Center cross pulse - start or end in center
+            const isHorizontal = pulseType === 2;
+            const startAtCenter = Math.random() > 0.5;
+
+            // Calculate start and end points
+            const startX = isHorizontal ? (startAtCenter ? centerX : Math.random() > 0.5 ? 0 : gridCols) : centerX;
+            const startY = isHorizontal ? centerY : startAtCenter ? centerY : Math.random() > 0.5 ? 0 : gridRows;
+            const endX = isHorizontal ? (startAtCenter ? (Math.random() > 0.5 ? 0 : gridCols) : centerX) : centerX;
+            const endY = isHorizontal ? centerY : startAtCenter ? (Math.random() > 0.5 ? 0 : gridRows) : centerY;
+
+            // Convert to percentages
+            const startXPercent = (startX / gridCols) * 100;
+            const startYPercent = (startY / gridRows) * 100;
+            const endXPercent = (endX / gridCols) * 100;
+            const endYPercent = (endY / gridRows) * 100;
+
+            // Calculate length and angle
+            const deltaX = endX - startX;
+            const deltaY = endY - startY;
+            const length = Math.sqrt(
+              Math.pow(endXPercent - startXPercent, 2) + Math.pow(endYPercent - startYPercent, 2)
+            );
+            const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
+
+            return (
+              <motion.div
+                key={`pulse-center-${index}`}
+                style={{
+                  position: "absolute",
+                  left: `${startXPercent}%`,
+                  top: `${startYPercent}%`,
+                  width: `${length}%`,
+                  height: "1px",
+                  transformOrigin: "0 0",
+                  transform: `rotate(${angle}deg)`,
+                  overflow: "hidden",
+                }}
+              >
+                <motion.div
+                  initial={{ x: "0%", opacity: 0 }}
+                  animate={{ x: "100%", opacity: [0, 0.3, 0.8, 0.3, 0] }}
+                  transition={{
+                    duration: 3 + Math.random() * 2,
+                    ease: "linear",
+                    repeat: Infinity,
+                    delay: index * 0.5,
+                    times: [0, 0.2, 0.5, 0.8, 1],
+                  }}
+                  style={{
+                    position: "absolute",
+                    width: "15%",
+                    height: "1px",
+                    background:
+                      "linear-gradient(90deg, rgba(16, 185, 129, 0) 0%, rgba(16, 185, 129, 0.9) 50%, rgba(16, 185, 129, 0) 100%)",
+                    boxShadow: "0 0 6px rgba(16, 185, 129, 0.6)",
+                  }}
+                />
+              </motion.div>
+            );
           }
-        )}
+        })}
       </Box>
 
       {/* Updated gradient overlay */}
@@ -390,11 +342,7 @@ const Banner = () => {
           >
             <Box>
               {/* Floating badge */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-              >
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
                 <Chip
                   label="Revolutionary Blockchain Technology"
                   sx={{
@@ -431,8 +379,7 @@ const Banner = () => {
                     mb: { xs: 1, md: 1.5 },
                     lineHeight: 1,
                     letterSpacing: "-0.01em",
-                    fontFamily:
-                      "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+                    fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
                   }}
                 >
                   Centichain
@@ -450,8 +397,7 @@ const Banner = () => {
                     fontWeight: 400,
                     color: "rgba(255, 255, 255, 0.85)",
                     letterSpacing: "0.01em",
-                    fontFamily:
-                      "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+                    fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
                     mb: { xs: 3, md: 4 },
                     mt: { xs: 1, md: 1.5 },
                   }}
@@ -495,9 +441,8 @@ const Banner = () => {
                     pr: { md: 6, lg: 8 },
                   }}
                 >
-                  A next generation blockchain designed exclusively as a store
-                  of value. Redefining cryptocurrency with unmatched security
-                  and reliability.
+                  A next generation blockchain designed exclusively as a store of value. Redefining cryptocurrency with
+                  unmatched security and reliability.
                 </Typography>
               </motion.div>
 
@@ -619,8 +564,7 @@ const Banner = () => {
                               },
                               fontWeight: 500,
                               color: "rgba(255, 255, 255, 0.9)",
-                              fontFamily:
-                                "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+                              fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
                               letterSpacing: "-0.01em",
                             }}
                           >
@@ -677,13 +621,7 @@ const Banner = () => {
                   position: "relative",
                   width: "100%",
                   maxWidth: "480px",
-                  height: isMobile
-                    ? "240px"
-                    : isTablet
-                    ? "320px"
-                    : isLargeScreen
-                    ? "480px"
-                    : "400px",
+                  height: isMobile ? "240px" : isTablet ? "320px" : isLargeScreen ? "480px" : "400px",
                 }}
               >
                 {/* Decorative elements */}
@@ -730,8 +668,7 @@ const Banner = () => {
                   sx={{
                     position: "absolute",
                     inset: { xs: "10%", md: "15%" },
-                    background:
-                      "radial-gradient(circle at center, rgba(16, 185, 129, 0.15) 0%, transparent 70%)",
+                    background: "radial-gradient(circle at center, rgba(16, 185, 129, 0.15) 0%, transparent 70%)",
                     borderRadius: "50%",
                     filter: "blur(40px)",
                   }}
@@ -784,16 +721,8 @@ const Banner = () => {
                       key={i}
                       component={motion.div}
                       animate={{
-                        y: [
-                          Math.random() * 20,
-                          -Math.random() * 20,
-                          Math.random() * 20,
-                        ],
-                        x: [
-                          Math.random() * 20,
-                          -Math.random() * 20,
-                          Math.random() * 20,
-                        ],
+                        y: [Math.random() * 20, -Math.random() * 20, Math.random() * 20],
+                        x: [Math.random() * 20, -Math.random() * 20, Math.random() * 20],
                         opacity: [0.4, 0.8, 0.4],
                       }}
                       transition={{

@@ -14,24 +14,20 @@ function Becomes() {
       benefits: [
         "Earn rewards through transaction fees",
         "Support network decentralization",
-        "Low hardware requirements"
+        "Low hardware requirements",
       ],
       icon: <FaServer className="text-blue-500" size={24} />,
       color: "from-blue-500 to-blue-600",
-      section: "relay"
+      section: "relay",
     },
     {
-      title: "Validator Node", 
+      title: "Validator Node",
       description: "Secure and validate network transactions",
-      benefits: [
-        "Earn staking rewards",
-        "Participate in governance",
-        "Help maintain consensus"
-      ],
+      benefits: ["Earn staking rewards", "Participate in governance", "Help maintain consensus"],
       icon: <FaShieldAlt className="text-emerald-500" size={24} />,
       color: "from-emerald-500 to-emerald-600",
-      section: "validator"
-    }
+      section: "validator",
+    },
   ];
 
   const containerVariants = {
@@ -39,9 +35,9 @@ function Becomes() {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2
-      }
-    }
+        staggerChildren: 0.2,
+      },
+    },
   };
 
   const itemVariants = {
@@ -51,21 +47,17 @@ function Becomes() {
       opacity: 1,
       transition: {
         type: "spring",
-        stiffness: 100
-      }
-    }
+        stiffness: 100,
+      },
+    },
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-20 grid items-center">
       <Container maxWidth="lg">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16"
-        >
-          <Typography 
-            variant="h2" 
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-16">
+          <Typography
+            variant="h2"
             className="font-bold bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent"
           >
             Participate in the Network
@@ -78,7 +70,7 @@ function Becomes() {
         <motion.div
           variants={containerVariants}
           initial="hidden"
-          animate="visible" 
+          animate="visible"
           className="grid grid-cols-1 md:grid-cols-2 gap-8"
         >
           {features.map((feature, index) => (
@@ -91,16 +83,12 @@ function Becomes() {
               <div className={`h-2 bg-gradient-to-r ${feature.color}`} />
               <div className="p-8">
                 <div className="flex items-center mb-6">
-                  <div className="p-3 bg-gray-100 rounded-lg">
-                    {feature.icon}
-                  </div>
+                  <div className="p-3 bg-gray-100 rounded-lg">{feature.icon}</div>
                   <div className="ml-4">
                     <Typography variant="h4" className="font-bold">
                       {feature.title}
                     </Typography>
-                    <Typography color="textSecondary">
-                      {feature.description}
-                    </Typography>
+                    <Typography color="textSecondary">{feature.description}</Typography>
                   </div>
                 </div>
 
@@ -113,10 +101,7 @@ function Becomes() {
                   ))}
                 </div>
 
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Button
                     variant="contained"
                     fullWidth
@@ -131,7 +116,7 @@ function Becomes() {
           ))}
         </motion.div>
 
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}

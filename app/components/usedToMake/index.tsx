@@ -4,29 +4,29 @@ import Link from "next/link";
 
 function Make() {
   const technologies = [
-    { 
-      name: "Rust", 
-      logo: "/images/rust-logo-512x512.png", 
+    {
+      name: "Rust",
+      logo: "/images/rust-logo-512x512.png",
       url: "https://www.rust-lang.org/",
-      description: "High-performance systems programming language powering our core blockchain infrastructure"
+      description: "High-performance systems programming language powering our core blockchain infrastructure",
     },
-    { 
-      name: "libp2p", 
-      logo: "/images/libp2p-logo.png", 
+    {
+      name: "libp2p",
+      logo: "/images/libp2p-logo.png",
       url: "https://libp2p.io/",
-      description: "Modular network stack enabling peer-to-peer communication in our decentralized network"
+      description: "Modular network stack enabling peer-to-peer communication in our decentralized network",
     },
-    { 
-      name: "Tauri", 
-      logo: "/images/tauri-logo.png", 
+    {
+      name: "Tauri",
+      logo: "/images/tauri-logo.png",
       url: "https://tauri.app/",
-      description: "Lightweight framework for building our secure and efficient desktop wallet application"
+      description: "Lightweight framework for building our secure and efficient desktop wallet application",
     },
-    { 
-      name: "MongoDB", 
-      logo: "/images/mongodb_logo.png", 
+    {
+      name: "MongoDB",
+      logo: "/images/mongodb_logo.png",
       url: "https://www.mongodb.com/",
-      description: "Flexible document database storing blockchain metadata and user data"
+      description: "Flexible document database storing blockchain metadata and user data",
     },
   ];
 
@@ -58,10 +58,7 @@ function Make() {
                       />
                     </div>
                     <div className="mt-6 pt-6 border-t border-zinc-800">
-                      <Typography 
-                        variant="h6" 
-                        className="text-center text-zinc-300 font-medium"
-                      >
+                      <Typography variant="h6" className="text-center text-zinc-300 font-medium">
                         {tech.name}
                       </Typography>
                     </div>

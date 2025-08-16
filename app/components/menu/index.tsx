@@ -24,15 +24,7 @@ import Link from "next/link";
 import Image from "next/image";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
-import {
-  FaQrcode,
-  FaFileAlt,
-  FaDownload,
-  FaCode,
-  FaServer,
-  FaEnvelope,
-  FaChevronDown,
-} from "react-icons/fa";
+import { FaQrcode, FaFileAlt, FaDownload, FaCode, FaServer, FaEnvelope, FaChevronDown } from "react-icons/fa";
 import { usePathname } from "next/navigation";
 
 const menuItems = [
@@ -118,11 +110,7 @@ const Menu = () => {
             }}
           >
             {/* Logo Section */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-            >
+            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
               <Link href="/" passHref>
                 <Box
                   sx={{
@@ -150,13 +138,7 @@ const Menu = () => {
                       filter: "drop-shadow(0 0 10px rgba(16, 185, 129, 0.3))",
                     }}
                   >
-                    <Image
-                      src="/images/Logo.png"
-                      alt="Centichain Logo"
-                      layout="fill"
-                      objectFit="contain"
-                      priority
-                    />
+                    <Image src="/images/Logo.png" alt="Centichain Logo" layout="fill" objectFit="contain" priority />
                   </Box>
                   <Box
                     className="logo-text"
@@ -166,8 +148,7 @@ const Menu = () => {
                       fontWeight: 600,
                       opacity: 0.9,
                       transition: "opacity 0.3s ease",
-                      background:
-                        "linear-gradient(90deg, #fff, rgba(255,255,255,0.8))",
+                      background: "linear-gradient(90deg, #fff, rgba(255,255,255,0.8))",
                       WebkitBackgroundClip: "text",
                       WebkitTextFillColor: "transparent",
                     }}
@@ -197,20 +178,13 @@ const Menu = () => {
                   <Box
                     key={index}
                     sx={{ position: "relative" }}
-                    onMouseEnter={() =>
-                      item.submenu && setOpenSubmenu(item.path)
-                    }
+                    onMouseEnter={() => item.submenu && setOpenSubmenu(item.path)}
                     onMouseLeave={() => item.submenu && setOpenSubmenu(null)}
                   >
                     <Button
                       component={item.submenu ? Box : Link}
                       href={!item.submenu ? item.path : undefined}
-                      onClick={() =>
-                        item.submenu &&
-                        setOpenSubmenu(
-                          openSubmenu === item.path ? null : item.path
-                        )
-                      }
+                      onClick={() => item.submenu && setOpenSubmenu(openSubmenu === item.path ? null : item.path)}
                       sx={{
                         px: 2,
                         py: 1,
@@ -226,12 +200,7 @@ const Menu = () => {
                           bottom: 0,
                           background: "rgba(16, 185, 129, 0.1)",
                           borderRadius: "8px",
-                          opacity:
-                            !isHomePage &&
-                            (pathname === item.path ||
-                              pathname.startsWith(item.path))
-                              ? 1
-                              : 0,
+                          opacity: !isHomePage && (pathname === item.path || pathname.startsWith(item.path)) ? 1 : 0,
                           transition: "opacity 0.3s ease",
                         },
                         "&:hover": {
@@ -258,9 +227,7 @@ const Menu = () => {
                           className="menu-icon"
                           sx={{
                             color:
-                              !isHomePage &&
-                              (pathname === item.path ||
-                                pathname.startsWith(item.path))
+                              !isHomePage && (pathname === item.path || pathname.startsWith(item.path))
                                 ? "#10b981"
                                 : "rgba(255,255,255,0.7)",
                             transition: "all 0.3s ease",
@@ -274,10 +241,7 @@ const Menu = () => {
                             style={{
                               fontSize: "0.8rem",
                               transition: "transform 0.3s ease",
-                              transform:
-                                openSubmenu === item.path
-                                  ? "rotate(180deg)"
-                                  : "rotate(0)",
+                              transform: openSubmenu === item.path ? "rotate(180deg)" : "rotate(0)",
                             }}
                           />
                         )}
@@ -313,11 +277,7 @@ const Menu = () => {
                               }}
                             >
                               {item.submenu.map((subItem, subIndex) => (
-                                <motion.div
-                                  key={subIndex}
-                                  whileHover={{ x: 5 }}
-                                  transition={{ duration: 0.2 }}
-                                >
+                                <motion.div key={subIndex} whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
                                   <Button
                                     component={Link}
                                     href={subItem.path}
@@ -327,18 +287,13 @@ const Menu = () => {
                                       px: 3,
                                       justifyContent: "flex-start",
                                       color:
-                                        !isHomePage && pathname === subItem.path
-                                          ? "#10b981"
-                                          : "rgba(255,255,255,0.8)",
+                                        !isHomePage && pathname === subItem.path ? "#10b981" : "rgba(255,255,255,0.8)",
                                       background:
                                         !isHomePage && pathname === subItem.path
                                           ? "rgba(16, 185, 129, 0.15)"
                                           : "transparent",
                                       borderLeft: "2px solid",
-                                      borderColor:
-                                        !isHomePage && pathname === subItem.path
-                                          ? "#10b981"
-                                          : "transparent",
+                                      borderColor: !isHomePage && pathname === subItem.path ? "#10b981" : "transparent",
                                       "&:hover": {
                                         background: "rgba(16, 185, 129, 0.15)",
                                         borderColor: "#10b981",
@@ -386,10 +341,7 @@ const Menu = () => {
                 >
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     Start as a Node
-                    <span
-                      className="arrow"
-                      style={{ transition: "transform 0.3s ease" }}
-                    >
+                    <span className="arrow" style={{ transition: "transform 0.3s ease" }}>
                       →
                     </span>
                   </Box>
@@ -459,19 +411,13 @@ const Menu = () => {
                   filter: "drop-shadow(0 0 8px rgba(16, 185, 129, 0.3))",
                 }}
               >
-                <Image
-                  src="/images/Logo.png"
-                  alt="Centichain Logo"
-                  layout="fill"
-                  objectFit="contain"
-                />
+                <Image src="/images/Logo.png" alt="Centichain Logo" layout="fill" objectFit="contain" />
               </Box>
               <span
                 style={{
                   fontSize: "1.3rem",
                   fontWeight: 600,
-                  background:
-                    "linear-gradient(90deg, #fff, rgba(255,255,255,0.8))",
+                  background: "linear-gradient(90deg, #fff, rgba(255,255,255,0.8))",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                 }}
@@ -507,10 +453,7 @@ const Menu = () => {
                 <ListItem
                   {...(item.submenu
                     ? {
-                        onClick: () =>
-                          setOpenSubmenu(
-                            openSubmenu === item.path ? null : item.path
-                          ),
+                        onClick: () => setOpenSubmenu(openSubmenu === item.path ? null : item.path),
                       }
                     : {
                         component: Link,
@@ -521,14 +464,12 @@ const Menu = () => {
                     mb: 1,
                     borderRadius: "12px",
                     background:
-                      !isHomePage &&
-                      (pathname === item.path || pathname.startsWith(item.path))
+                      !isHomePage && (pathname === item.path || pathname.startsWith(item.path))
                         ? "rgba(16, 185, 129, 0.15)"
                         : "rgba(0, 0, 0, 0.3)",
                     border: "1px solid",
                     borderColor:
-                      !isHomePage &&
-                      (pathname === item.path || pathname.startsWith(item.path))
+                      !isHomePage && (pathname === item.path || pathname.startsWith(item.path))
                         ? "rgba(16, 185, 129, 0.3)"
                         : "rgba(16, 185, 129, 0.1)",
                     "&:hover": {
@@ -542,9 +483,7 @@ const Menu = () => {
                     sx={{
                       minWidth: 40,
                       color:
-                        !isHomePage &&
-                        (pathname === item.path ||
-                          pathname.startsWith(item.path))
+                        !isHomePage && (pathname === item.path || pathname.startsWith(item.path))
                           ? "#10b981"
                           : "rgba(255,255,255,0.8)",
                     }}
@@ -558,9 +497,7 @@ const Menu = () => {
                         fontSize: "1rem",
                         fontWeight: 500,
                         color:
-                          !isHomePage &&
-                          (pathname === item.path ||
-                            pathname.startsWith(item.path))
+                          !isHomePage && (pathname === item.path || pathname.startsWith(item.path))
                             ? "#10b981"
                             : "rgba(255,255,255,0.9)",
                       },
@@ -571,10 +508,7 @@ const Menu = () => {
                       style={{
                         fontSize: "0.8rem",
                         transition: "transform 0.3s ease",
-                        transform:
-                          openSubmenu === item.path
-                            ? "rotate(180deg)"
-                            : "rotate(0)",
+                        transform: openSubmenu === item.path ? "rotate(180deg)" : "rotate(0)",
                       }}
                     />
                   )}
@@ -620,10 +554,7 @@ const Menu = () => {
                             sx={{
                               "& .MuiListItemText-primary": {
                                 fontSize: "0.9rem",
-                                color:
-                                  !isHomePage && pathname === subItem.path
-                                    ? "#10b981"
-                                    : "rgba(255,255,255,0.8)",
+                                color: !isHomePage && pathname === subItem.path ? "#10b981" : "rgba(255,255,255,0.8)",
                               },
                             }}
                           />
